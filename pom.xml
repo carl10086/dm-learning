@@ -48,6 +48,9 @@
   </build>
   <modules>
     <module>dm-resilience4j</module>
+    <module>dm-websecu</module>
+    <module>dm-cat</module>
+    <module>dm-fast</module>
   </modules>
 
 </project>
