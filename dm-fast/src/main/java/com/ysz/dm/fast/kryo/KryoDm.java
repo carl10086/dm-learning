@@ -1,11 +1,13 @@
 package com.ysz.dm.fast.kryo;
 
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import org.junit.Test;
 
 /**
@@ -14,21 +16,22 @@ import org.junit.Test;
  */
 public class KryoDm {
 
-  public int jsonBytes(CustomObj obj) throws IOException {
+  public int jsonBytes(ComplexObj obj) throws IOException {
     String s = JSON.toJSONString(obj);
     return s.getBytes().length;
   }
 
-  public int javaBytes(CustomObj obj) throws IOException {
+  public int javaBytes(ComplexObj obj) throws IOException {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     ObjectOutputStream stream = new ObjectOutputStream(outputStream);
     stream.writeObject(obj);
     return outputStream.toByteArray().length;
   }
 
-  public int kryoWithRegisty(CustomObj obj) {
+  public int kryoWithRegisty(Object obj) {
     Kryo kryo = new Kryo();
-    kryo.register(CustomObj.class);
+    kryo.register(ComplexObj.class);
+    kryo.register(ArrayList.class);
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Output output = new Output(outputStream);
     kryo.writeObject(output, obj);
@@ -38,21 +41,50 @@ public class KryoDm {
 
   @Test
   public void tstBytes() throws IOException {
-    CustomObj obj = mockCustomObj();
+    ComplexObj obj = mockComplexObj();
     System.out.println("java:" + javaBytes(obj));
     System.out.println("json:" + jsonBytes(obj));
     System.out.println("kryo:" + kryoWithRegisty(obj));
-    System.out.println("custom:" + obj.asBytes().length);
+    System.out.println("kryo with plain:" + kryoWithRegisty(obj.asPlainObjs()));
   }
 
-  private CustomObj mockCustomObj() {
-    CustomObj customObj = new CustomObj();
+  private SimpleObj mockCustomObj() {
+    SimpleObj customObj = new SimpleObj();
     customObj.setStartAt((int) (System.currentTimeMillis() / 1000L));
     customObj.setDuration(5);
     customObj.setApp("saturn");
     customObj.setName("aaa.bbb.ccc");
     customObj.setType("repo");
     return customObj;
+  }
+
+  public ComplexObj mockComplexObj() {
+    /*模拟5层递归*/
+    ComplexObj obj = mockWithLevel(1, "parent");
+    obj.setRootId(obj.getId());
+    obj.setChildren(new ArrayList<>());
+    for (int i = 0; i < 5; i++) {
+      ComplexObj child = mockWithLevel(2, "-demo-" + i);
+      obj.addChild(child);
+      child.setChildren(new ArrayList<>());
+      for (int j = 0; j < 5; j++) {
+        ComplexObj third = mockWithLevel(3, "-demo-" + j);
+        child.addChild(third);
+      }
+    }
+    return obj;
+  }
+
+
+  public ComplexObj mockWithLevel(int level, String name) {
+    ComplexObj complexObj = new ComplexObj();
+    complexObj.setId(IdUtil.objectId());
+    complexObj.setStartAt((int) (System.currentTimeMillis() / 1000L));
+    complexObj.setDuration(2);
+    complexObj.setApp("saturn");
+    complexObj.setName("level-" + level + "-" + name);
+    complexObj.setType("repo");
+    return complexObj;
   }
 
 
