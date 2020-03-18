@@ -10,7 +10,9 @@ import lombok.Data;
  * @date 2020/3/17
  */
 @Data
-public class CustomObj implements Serializable {
+public class SimpleObj implements Serializable {
+
+
 
   /**
    * 开始时间、秒
