@@ -51,6 +51,7 @@
     <module>dm-websecu</module>
     <module>dm-cat</module>
     <module>dm-fast</module>
+    <module>dm-agent</module>
   </modules>
 
 </project>

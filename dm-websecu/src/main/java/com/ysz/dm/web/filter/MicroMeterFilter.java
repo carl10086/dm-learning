@@ -4,7 +4,6 @@ import com.ysz.dm.web.PrometheusMeterRegistryHolder;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import java.io.IOException;
-import java.time.Duration;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -41,7 +40,7 @@ public class MicroMeterFilter implements Filter {
       throw e;
     } finally {
       sample.stop(
-          Timer.builder("url.timer")
+          Timer.builder("url_timer")
               .tags()
 //              .publishPercentiles(0.95)
 //              .publishPercentileHistogram()
