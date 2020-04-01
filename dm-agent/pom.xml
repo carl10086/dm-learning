@@ -18,6 +18,14 @@
       <version>3.12.1.GA</version>
       <type>jar</type>
     </dependency>
+
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+      <version>1.10.9</version>
+    </dependency>
+
+
   </dependencies>
 
 
@@ -41,6 +49,7 @@
           <artifactSet>
             <includes>
               <include>javassist:javassist:jar:</include>
+              <include>net.bytebuddy:byte-buddy:jar:</include>
             </includes>
           </artifactSet>
         </configuration>

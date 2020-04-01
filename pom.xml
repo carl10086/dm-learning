@@ -52,6 +52,7 @@
     <module>dm-cat</module>
     <module>dm-fast</module>
     <module>dm-agent</module>
+    <module>dm-bytebuddy</module>
   </modules>
 
 </project>
