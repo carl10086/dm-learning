@@ -8,8 +8,14 @@ import cn.hutool.core.util.IdUtil;
  */
 public class IdMain {
 
+
+  private static void tstTimed() {
+  }
+
   public static void main(String[] args) {
+    tstTimed();
     System.out.println(IdUtil.objectId());
   }
+
 
 }
