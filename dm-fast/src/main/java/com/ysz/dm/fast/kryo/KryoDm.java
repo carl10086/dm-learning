@@ -8,13 +8,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
+import org.nustaq.serialization.FSTConfiguration;
+import org.nustaq.serialization.FSTObjectOutput;
 
 /**
  * @author carl.yu
  * @date 2020/3/17
  */
 public class KryoDm {
+
+  static FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
 
   public int jsonBytes(ComplexObj obj) throws IOException {
     String s = JSON.toJSONString(obj);
@@ -25,6 +30,15 @@ public class KryoDm {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     ObjectOutputStream stream = new ObjectOutputStream(outputStream);
     stream.writeObject(obj);
+    return outputStream.toByteArray().length;
+  }
+
+  public int fastSerialization(Object obj) throws IOException {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    FSTObjectOutput out = conf.getObjectOutput(outputStream);
+    out.writeObject(obj, obj.getClass());
+    out.flush();
+    outputStream.close();
     return outputStream.toByteArray().length;
   }
 
@@ -44,8 +58,12 @@ public class KryoDm {
     ComplexObj obj = mockComplexObj();
     System.out.println("java:" + javaBytes(obj));
     System.out.println("json:" + jsonBytes(obj));
+    System.out.println("fst: " + fastSerialization(obj));
     System.out.println("kryo:" + kryoWithRegisty(obj));
-    System.out.println("kryo with plain:" + kryoWithRegisty(obj.asPlainObjs()));
+    List<ComplexObj> complexObjs = obj.asPlainObjs();
+    System.out.println("kryo with plain:" + kryoWithRegisty(complexObjs));
+    System.out.println("fst with plain:" + fastSerialization(complexObjs));
+
   }
 
   private SimpleObj mockCustomObj() {
