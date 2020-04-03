@@ -53,6 +53,7 @@
     <module>dm-fast</module>
     <module>dm-agent</module>
     <module>dm-bytebuddy</module>
+    <module>dm-jaeger</module>
   </modules>
 
 </project>
