@@ -40,18 +40,21 @@ public class UsageDm {
     final BulkheadRegistry registry = BulkheadRegistry.of(BulkheadConfig.custom().build());
 
     ExecutorService executorService = Executors.newCachedThreadPool();
+
+    /*主程序调用了多个子线程， 可以理解为多个 HTTP IO 处理线程*/
     Runnable task = () -> {
       final BulkheadConfig config = BulkheadConfig.custom()
           .maxConcurrentCalls(1)
           .build();
       Bulkhead bulkhead = registry.bulkhead("slowCall", config);
+      /*在子线程就迅速失败的东西. 这样调用者线程就不会阻塞住了 ..*/
       Try<Integer> integerTry = Try.of(
           Bulkhead.decorateCheckedSupplier(bulkhead, (CheckedFunction0<Integer>) () -> slowCall())
       );
       if (integerTry.isSuccess()) {
 
       } else if (integerTry.isFailure()) {
-        System.out.println(integerTry.failed().get());
+        System.err.println(integerTry.failed().get());
       } else {
         System.out.println("success");
       }
