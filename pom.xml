@@ -55,6 +55,7 @@
     <module>dm-bytebuddy</module>
     <module>dm-jaeger</module>
     <module>dm-dataproxy</module>
+    <module>dm-kafka</module>
   </modules>
 
 </project>
