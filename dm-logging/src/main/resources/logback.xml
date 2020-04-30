@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <appender name="GrayLog" class="de.siegmar.logbackgelf.GelfUdpAppender" additivity="false">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>ERROR</level>
+    </filter>
+    <graylogHost>std-1.gl.infra.duitang.net</graylogHost>
+    <graylogPort>12201</graylogPort>
+    <maxChunkSize>508</maxChunkSize>
+    <useCompression>true</useCompression>
+    <encoder class="de.siegmar.logbackgelf.GelfEncoder">
+      <!--<originHost>localhost</originHost>-->
+      <includeRawMessage>false</includeRawMessage>
+      <includeMarker>true</includeMarker>
+      <includeMdcData>true</includeMdcData>
+      <includeCallerData>false</includeCallerData>
+      <includeRootCauseData>false</includeRootCauseData>
+      <includeLevelName>false</includeLevelName>
+      <shortPatternLayout class="ch.qos.logback.classic.PatternLayout">
+        <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</pattern>
+      </shortPatternLayout>
+      <fullPatternLayout class="ch.qos.logback.classic.PatternLayout">
+        <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</pattern>
+      </fullPatternLayout>
+      <numbersAsString>false</numbersAsString>
+      <staticField>app:saturn</staticField>
+      <staticField>env:release</staticField>
+    </encoder>
+  </appender>
+
+  <appender name="MainLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/duitang/logs/usr/saturn/main.log</file>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</Pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>/duitang/logs/usr/saturn/main.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>200MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>7</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="MainLog"/>
+    <appender-ref ref="GrayLog"/>
+  </root>
+
+  <appender name="UserLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/duitang/logs/usr/saturn/user.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- daily rollover -->
+      <fileNamePattern>/duitang/logs/usr/saturn/user.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- or whenever the file size reaches 200MB -->
+        <maxFileSize>200MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- keep 30 days' worth of history -->
+      <maxHistory>7</maxHistory>
+    </rollingPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</Pattern>
+    </encoder>
+  </appender>
+  <logger name="com.duitang.saturn.server.user" level="INFO" additivity="false">
+    <appender-ref ref="UserLog"/>
+    <appender-ref ref="GrayLog"/>
+  </logger>
+
+  <appender name="ConnectInfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/duitang/logs/usr/saturn/connect_info.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>/duitang/logs/usr/saturn/connect_info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>200MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>7</maxHistory>
+    </rollingPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</Pattern>
+    </encoder>
+  </appender>
+  <logger name="com.duitang.saturn.server.connectinfo" level="INFO" additivity="false">
+    <appender-ref ref="ConnectInfoLog"/>
+    <appender-ref ref="GrayLog"/>
+  </logger>
+
+  <appender name="RelationshipLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/duitang/logs/usr/saturn/relationship.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>/duitang/logs/usr/saturn/relationship.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>200MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>7</maxHistory>
+    </rollingPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</Pattern>
+    </encoder>
+  </appender>
+  <logger name="com.duitang.saturn.server.relationship" level="INFO" additivity="false">
+    <appender-ref ref="RelationshipLog"/>
+    <appender-ref ref="GrayLog"/>
+  </logger>
+
+  <appender name="BlogQueryLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/duitang/logs/usr/saturn/blog_query.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>/duitang/logs/usr/saturn/blog_query.%i.log</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>7</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>128MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</Pattern>
+    </encoder>
+  </appender>
+
+  <logger name="com.duitang.saturn.server.blog" level="INFO" additivity="false">
+    <appender-ref ref="BlogQueryLog"/>
+    <appender-ref ref="GrayLog"/>
+  </logger>
+
+  <appender name="ThreadPoolLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/duitang/logs/usr/saturn/threadpool.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>/duitang/logs/usr/saturn/threadpool.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>200MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>7</maxHistory>
+    </rollingPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%class{16} %line] - %msg%n</Pattern>
+    </encoder>
+  </appender>
+
+  <logger name="ThreadPoolLog" level="INFO" additivity="false">
+    <appender-ref ref="ThreadPoolLog"/>
+    <appender-ref ref="GrayLog"/>
+  </logger>
+
+  <appender name="WatercaveLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/duitang/logs/usr/saturn/watercave.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>/duitang/logs/usr/saturn/watercave.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>200MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>7</maxHistory>
+    </rollingPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%class{16} %line] - %msg%n</Pattern>
+    </encoder>
+  </appender>
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>%date{yyyy-MM-dd HH:mm:ss} | %highlight(%-5level) | %boldYellow(%thread) |
+        %boldGreen(%logger) | %msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+
+  <appender name="MonitorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/duitang/logs/usr/saturn/monitor.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>/duitang/logs/usr/saturn/monitor.%i.log</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>7</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>128MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</Pattern>
+    </encoder>
+  </appender>
+
+  <logger name="com.duitang.saturn.server.watercave" level="INFO" additivity="false">
+    <appender-ref ref="WatercaveLog"/>
+    <appender-ref ref="GrayLog"/>
+    <!--    <appender-ref ref="console"/>-->
+  </logger>
+
+  <logger name="MONITOR" level="INFO" additivity="false">
+    <appender-ref ref="MonitorLog"/>
+    <!--    <appender-ref ref="console"/>-->
+  </logger>
+</configuration>

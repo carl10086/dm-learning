@@ -56,6 +56,8 @@
     <module>dm-jaeger</module>
     <module>dm-dataproxy</module>
     <module>dm-kafka</module>
+    <module>dm-logging</module>
+    <module>dm-vavr</module>
   </modules>
 
 </project>
