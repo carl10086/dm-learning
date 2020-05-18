@@ -59,6 +59,7 @@
     <module>dm-vavr</module>
     <module>dm-mongodb</module>
     <module>dm-clickhouse</module>
+    <module>dm-springredis</module>
   </modules>
 
 </project>
