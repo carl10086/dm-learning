@@ -9,14 +9,15 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>dm-cat</artifactId>
+  <artifactId>dm-clickhouse</artifactId>
+
 
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/com.github.housepower/clickhouse-native-jdbc -->
     <dependency>
-      <groupId>com.dianping.cat</groupId>
-      <artifactId>cat-client</artifactId>
-      <version>3.0.0</version>
+      <groupId>ru.yandex.clickhouse</groupId>
+      <artifactId>clickhouse-jdbc</artifactId>
+      <version>0.2</version>
     </dependency>
   </dependencies>
-
 </project>
