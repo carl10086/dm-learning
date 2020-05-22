@@ -5,10 +5,10 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Arrays;
 
-public class ClickhouseNativeDm {
+public class ClickhouseHttpDm {
 
   public static void main(String[] args) throws Exception {
-    Connection connection = DriverManager.getConnection("jdbc:clickhouse://10.1.13.54:8123");
+    Connection connection = DriverManager.getConnection("jdbc:clickhouse://10.1.13.54:9000");
 
     Statement statement = connection.createStatement();
 //    statement.addBatch(
