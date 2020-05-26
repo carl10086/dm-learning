@@ -1,19 +1,9 @@
 package com.ysz.dm.web;
 
 import com.ysz.dm.web.filter.MicroMeterFilter;
-import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
-import io.micrometer.core.instrument.binder.logging.LogbackMetrics;
-import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
-import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
-import io.micrometer.core.instrument.binder.system.UptimeMetrics;
-import io.micrometer.prometheus.PrometheusConfig;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
-import io.micrometer.prometheus.PrometheusRenameFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +16,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class WebApp {
 
+  @Bean
+  @ConfigurationProperties(prefix = "redis.feedrec")
+  public FeedRecRedisProperties feedRecRedisProperties() {
+    return new FeedRecRedisProperties();
+  }
 
   @Bean
   public FilterRegistrationBean microMeterFilter() {
