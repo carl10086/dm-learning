@@ -1,5 +1,6 @@
 package com.ysz.dm.web;
 
+import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,8 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DmApi {
 
+  @Resource
+  private FeedRecRedisProperties feedRecRedisProperties;
+
   @GetMapping("/")
   public String getData() {
+    System.err.println(feedRecRedisProperties);
     return "hello world";
   }
 
