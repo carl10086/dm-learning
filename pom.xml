@@ -60,6 +60,7 @@
     <module>dm-mongodb</module>
     <module>dm-clickhouse</module>
     <module>dm-springredis</module>
+    <module>dm-raft</module>
   </modules>
 
 </project>
