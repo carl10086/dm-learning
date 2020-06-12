@@ -152,7 +152,6 @@
       <artifactId>jol-core</artifactId>
       <version>0.10</version>
     </dependency>
-
   </dependencies>
 
   <build>
