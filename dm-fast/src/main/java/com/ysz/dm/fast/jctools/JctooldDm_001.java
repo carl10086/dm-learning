@@ -16,7 +16,6 @@ public class JctooldDm_001 {
     queue.drain(buffer::add);
     for (Integer i : buffer) {
       System.out.println(i);
-
     }
   }
 }
