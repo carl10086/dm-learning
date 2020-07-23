@@ -2,6 +2,7 @@ package com.ysz.biz.validator;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -30,6 +31,7 @@ public class Validate_Dm_001 {
     validator = factory.getValidator();
     Set<ConstraintViolation<Object>> validateRes = validator.validate(ComplexBean.mock());
     for (ConstraintViolation<Object> validateRe : validateRes) {
+      Path propertyPath = validateRe.getPropertyPath();
       System.out.println(validateRe.getMessage());
     }
   }
