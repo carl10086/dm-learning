@@ -63,7 +63,7 @@
     <module>dm-raft</module>
     <module>dm-biz</module>
     <module>dm-es</module>
-    <module>dm-id</module>
+    <module>dm-netty</module>
   </modules>
 
 </project>
