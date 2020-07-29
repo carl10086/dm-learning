@@ -24,13 +24,13 @@ public class UsageDm {
   }
 
   public int slowCall() {
-    System.out.println("start");
+//    System.out.println("start");
     try {
       Thread.sleep(3 * 1000L);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    System.out.println("finish");
+//    System.out.println("finish");
     return 0;
   }
 
@@ -44,7 +44,7 @@ public class UsageDm {
     /*主程序调用了多个子线程， 可以理解为多个 HTTP IO 处理线程*/
     Runnable task = () -> {
       final BulkheadConfig config = BulkheadConfig.custom()
-          .maxConcurrentCalls(1)
+          .maxConcurrentCalls(3)
           .build();
       Bulkhead bulkhead = registry.bulkhead("slowCall", config);
       /*在子线程就迅速失败的东西. 这样调用者线程就不会阻塞住了 ..*/
@@ -52,7 +52,7 @@ public class UsageDm {
           Bulkhead.decorateCheckedSupplier(bulkhead, (CheckedFunction0<Integer>) () -> slowCall())
       );
       if (integerTry.isSuccess()) {
-
+        System.out.printf("success get result:%s\n", integerTry.get());
       } else if (integerTry.isFailure()) {
         System.err.println(integerTry.failed().get());
       } else {
@@ -60,8 +60,9 @@ public class UsageDm {
       }
     };
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 20; i++) {
       executorService.execute(task);
+      Thread.sleep(10L);
     }
 
     System.in.read();
