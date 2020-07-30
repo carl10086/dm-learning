@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -28,7 +29,7 @@ public class OkHttpClient_Dm_001 {
   public void tstGet() {
 
     final Request request = new Request.Builder()
-        .url("https://c-ssl.duitang.com/uploads/item/202005/14/20200514123116_ctfff.png")
+        .url("https://c-ssl.duitang.com/uploads/item/202005/14/20200514123116_ctfff.png?aaa=carl")
         .build();
 
     try (Response response = okHttpClient.newBuilder().readTimeout(200L, TimeUnit.MILLISECONDS)
@@ -42,7 +43,8 @@ public class OkHttpClient_Dm_001 {
       final ResponseBody body = response.body();
       assert body != null;
       System.out.println("请求的长度是:" + body.contentLength());
-      try (FileOutputStream outputStream = new FileOutputStream("/Users/carl/tmp/image/1.png")) {
+      try (FileOutputStream outputStream = new FileOutputStream(
+          "/Users/carl/tmp/image/1.png")) {
         IOUtils.copyLarge(body.byteStream(), outputStream);
       } catch (Exception e) {
         e.printStackTrace();
@@ -67,7 +69,7 @@ public class OkHttpClient_Dm_001 {
       Request request = chain.request();
 
       long t1 = System.nanoTime();
-      final String url = request.url().toString();
+      final HttpUrl url = request.url();
       log.info(String
           .format("Sending request %s on %s%n%s", url, chain.connection(), request.headers()));
       try {
