@@ -25,7 +25,17 @@ public class ThreadExecutor_Dm_001 {
             System.err.printf("线程打印拒绝日志:%s -> %s", Thread.currentThread().getName(), r.toString());
           }
         }
-    );
+    ) {
+      @Override
+      protected void afterExecute(Runnable r, Throwable t) {
+        super.afterExecute(r, t);
+        if (t != null) {
+          System.err.println("捕获到子线程的异常:");
+          t.printStackTrace();
+        }
+      }
+
+    };
 
     Thread thread = new Thread(new ThreadExecutorMonitor(threadPoolExecutor));
     thread.setDaemon(true);
@@ -37,6 +47,7 @@ public class ThreadExecutor_Dm_001 {
         for (int i = 0; i < 100; i++) {
           try {
             Thread.sleep(1000L);
+            System.out.println(1 / 0);
           } catch (InterruptedException ignored) {
           }
         }
