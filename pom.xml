@@ -56,7 +56,6 @@
     <module>dm-dataproxy</module>
     <module>dm-kafka</module>
     <module>dm-logging</module>
-    <module>dm-vavr</module>
     <module>dm-mongodb</module>
     <module>dm-clickhouse</module>
     <module>dm-springredis</module>
