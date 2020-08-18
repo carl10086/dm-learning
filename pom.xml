@@ -14,7 +14,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.10</version>
+      <version>1.18.12</version>
       <scope>provided</scope>
     </dependency>
 
@@ -32,7 +32,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-archetype-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>3.2.0</version>
       </plugin>
 
       <plugin>
@@ -51,14 +51,11 @@
     <module>dm-websecu</module>
     <module>dm-fast</module>
     <module>dm-agent</module>
-    <module>dm-bytebuddy</module>
     <module>dm-jaeger</module>
-    <module>dm-dataproxy</module>
     <module>dm-kafka</module>
     <module>dm-logging</module>
     <module>dm-mongodb</module>
     <module>dm-clickhouse</module>
-    <module>dm-springredis</module>
     <module>dm-raft</module>
     <module>dm-biz</module>
     <module>dm-es</module>
