@@ -52,14 +52,13 @@
     <module>dm-fast</module>
     <module>dm-agent</module>
     <module>dm-jaeger</module>
-    <module>dm-kafka</module>
     <module>dm-logging</module>
     <module>dm-mongodb</module>
     <module>dm-clickhouse</module>
-    <module>dm-raft</module>
     <module>dm-biz</module>
     <module>dm-es</module>
     <module>dm-netty</module>
+    <module>dm-etl</module>
   </modules>
 
 </project>
