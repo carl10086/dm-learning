@@ -1,8 +1,13 @@
 package com.ysz.biz.scylla;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
+import com.datastax.driver.core.querybuilder.Clause;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select.Where;
 import com.datastax.driver.mapping.DefaultNamingStrategy;
 import com.datastax.driver.mapping.DefaultPropertyMapper;
 import com.datastax.driver.mapping.Mapper;
@@ -10,6 +15,7 @@ import com.datastax.driver.mapping.MappingConfiguration;
 import com.datastax.driver.mapping.MappingManager;
 import com.datastax.driver.mapping.NamingConventions;
 import com.datastax.driver.mapping.PropertyMapper;
+import com.google.common.collect.Lists;
 import com.ysz.biz.scylla.dataobject.MesssageMessageDO;
 import java.util.Date;
 
@@ -29,8 +35,28 @@ public class BasicDm_001 {
       MappingConfiguration configuration = MappingConfiguration.builder()
           .withPropertyMapper(propertyMapper).build();
       MappingManager mappingManager = new MappingManager(session, configuration);
+      Clause id = QueryBuilder.in("id",
+          Lists.newArrayList(
+              1
+          )
+      );
+
       Mapper<MesssageMessageDO> mapper = mappingManager.mapper(MesssageMessageDO.class);
       mapper.save(mockMesssageMessageDO());
+
+      Where where = QueryBuilder.select().from("carl_test", "message_message").where(id);
+      long start = System.currentTimeMillis();
+      int count = 100;
+
+      for (int i = 0; i < count; i++) {
+        ResultSet execute = session.execute(where);
+        for (Row row : execute) {
+          assert row != null;
+        }
+      }
+      long end = System.currentTimeMillis();
+      System.err.println((end - start) / count);
+
     }
   }
 
