@@ -102,6 +102,17 @@
       <version>4.1.6.Final</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.zendesk</groupId>
+      <artifactId>mysql-binlog-connector-java</artifactId>
+      <version>0.23.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.10</version>
+    </dependency>
 
   </dependencies>
 
