@@ -10,7 +10,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
-public class KafkaSendDm {
+public class KafkaProducerDm {
 
   private final String tstTopicName = "tsttopic";
 
@@ -24,7 +24,7 @@ public class KafkaSendDm {
     }
   }
 
-  public KafkaSendDm() {
+  public KafkaProducerDm() {
     this.init();
   }
 
@@ -76,27 +76,27 @@ public class KafkaSendDm {
     kafkaProducer.flush();
   }
 
-  private void simpleError(String format, Object... params) {
+  public static void simpleError(String format, Object... params) {
     System.err.println(now() + StringTools.formatWithSpecial(format, params));
   }
 
-  private String now() {
+  public static String now() {
     return FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss ->").format(new Date());
   }
 
 
-  private void simpleLog(String format, Object... params) {
+  public static void simpleLog(String format, Object... params) {
     System.out.println(now() + StringTools.formatWithSpecial(format, params));
   }
 
 
   public static void main(String[] args) throws Exception {
-    KafkaSendDm kafkaSendDm = new KafkaSendDm();
+    KafkaProducerDm kafkaProducerDm = new KafkaProducerDm();
     for (int i = 0; i < 10; i++) {
-      kafkaSendDm.sendWithCallback(i);
+      kafkaProducerDm.sendWithCallback(i);
       Thread.sleep(1000L);
     }
-    kafkaSendDm.flush();
+    kafkaProducerDm.flush();
     System.in.read();
   }
 
