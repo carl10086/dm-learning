@@ -7,44 +7,28 @@ import java.util.List;
 public class Dm_002 {
 
 
-  private static void test(List<String> data) {
-    int finalSize = (int) Math.pow(2, data.size());
-    List<List<Boolean>> result = new ArrayList<>(finalSize);
-    int size = data.size();
-    List<Boolean> l1 = new ArrayList<>(size);
-    l1.add(true);
-    List<Boolean> l2 = new ArrayList<>(size);
-    l2.add(false);
-
-    result.add(l1);
-    result.add(l2);
-
-    for (int i = 1; i < data.size(); i++) {
-      List<List<Boolean>> copyResult = new ArrayList<>();
-      for (List<Boolean> booleans : result) {
-        List<Boolean> cloneData = new ArrayList<>(booleans);
-        copyResult.add(cloneData);
+  public static Thread startAsync(final String url) {
+    Thread thread = new Thread(() -> {
+      System.out.println("开始下载:" + url);
+      try {
+        Thread.sleep(100L);
+      } catch (InterruptedException ignored) {
       }
-      copyResult.forEach(x -> x.add(true));
-      result.forEach(x -> x.add(false));
-      result.addAll(copyResult);
-
-    }
-
-    System.err.println(result.size());
-    for (List<Boolean> booleans : result) {
-      System.out.println(booleans);
-    }
-
+      System.out.println("结束下载:" + url);
+    });
+    thread.start();
+    return thread;
   }
 
-
-  public static void main(String[] args) {
-    test(Lists.newArrayList(
-        "p3", "p4", "p5", "p6"
-    ));
-
-
+  public static void load(Thread t1, Thread t2) throws Exception {
+    t1.join();
+    t2.join();
+    System.out.println("开始执行 load 方法");
+    System.out.println("结束执行load 方法");
   }
 
+  public static void main(String[] args) throws Exception {
+    load(startAsync("js1"), startAsync("js2"));
+    System.in.read();
+  }
 }
