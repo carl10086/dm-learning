@@ -1,5 +1,7 @@
 package com.ysz.dm.fast.basic.disruptor;
 
+import org.openjdk.jol.vm.VM;
+
 public class FalseSharing implements Runnable {
 
   public final static long ITERATIONS = 500L * 1000L * 100L;
@@ -17,13 +19,21 @@ public class FalseSharing implements Runnable {
   }
 
   public static void main(final String[] args) throws Exception {
-    for (int i = 1; i < 10; i++) {
-      System.gc();
-      final long start = System.currentTimeMillis();
-      runTest(i);
-      System.out.println("Thread num " + i + " duration = " + (System.currentTimeMillis() - start));
-    }
+//    for (int i = 1; i < 10; i++) {
+//      System.gc();
+//      final long start = System.currentTimeMillis();
+//      runTest(i);
+//      System.out.println("Thread num " + i + " duration = " + (System.currentTimeMillis() - start));
+//    }
+    runTest(10);
 
+  }
+
+  private static void showMemoryAddress() {
+    long firstAddress = VM.current().addressOf(longs[0]);
+    for (ValueNoPadding aLong : longs) {
+      System.out.println("内存地址偏移:" + (VM.current().addressOf(aLong) - firstAddress));
+    }
   }
 
   private static void runTest(int NUM_THREADS) throws InterruptedException {
@@ -32,6 +42,7 @@ public class FalseSharing implements Runnable {
     for (int i = 0; i < longs.length; i++) {
       longs[i] = new ValueNoPadding();
     }
+    showMemoryAddress();
     for (int i = 0; i < threads.length; i++) {
       threads[i] = new Thread(new FalseSharing(i));
     }
