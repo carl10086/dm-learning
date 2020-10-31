@@ -83,7 +83,7 @@ public class LRUCache {
         node.data = value;
       } else {
         if (size < capacity) {
-          addNewNodeToLast(key, value;
+          addNewNodeToLast(key, value);
         } else {
           /*这里是已经满了情况, 要删除 first*/
           int toDelKey = this.first.key;
