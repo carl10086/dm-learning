@@ -25,6 +25,8 @@
     <springProfile name="prepare">
       <appender-ref ref="main"/>
     </springProfile>
-    <appender-ref ref="console"/>
+    <springProfile name="!prepare">
+      <appender-ref ref="console"/>
+    </springProfile>
   </root>
 </configuration>
