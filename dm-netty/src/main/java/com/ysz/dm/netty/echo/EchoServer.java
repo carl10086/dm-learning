@@ -1,5 +1,6 @@
 package com.ysz.dm.netty.echo;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -9,9 +10,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 public class EchoServer {
 
   public static void main(String[] args) throws Exception {
-    EventLoopGroup boss = new NioEventLoopGroup(1);
-    EventLoopGroup work = new NioEventLoopGroup();
-
+    /*EventLoopGroup 代表的就是线程池资源*/
+    EventLoopGroup boss = new NioEventLoopGroup(1, new ThreadFactoryBuilder()
+        .setNameFormat("boss-%d")
+        .build());
+    EventLoopGroup work = new NioEventLoopGroup(new ThreadFactoryBuilder()
+        .setNameFormat("worker-%d")
+        .build());
     try {
       ServerBootstrap serverBootstrap = new ServerBootstrap();
       serverBootstrap
@@ -25,6 +30,7 @@ public class EchoServer {
                   ch.pipeline()
                       .addLast(
                           new ChannelInboundHandlerAdapter() {
+
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg)
                                 throws Exception {
