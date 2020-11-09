@@ -2,7 +2,12 @@ package com.ysz.dm.netty.echo;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -17,6 +22,8 @@ public class EchoServer {
     EventLoopGroup work = new NioEventLoopGroup(new ThreadFactoryBuilder()
         .setNameFormat("worker-%d")
         .build());
+
+    final EchoLogHandler echoLogHandler = new EchoLogHandler();
     try {
       ServerBootstrap serverBootstrap = new ServerBootstrap();
       serverBootstrap
@@ -34,7 +41,8 @@ public class EchoServer {
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg)
                                 throws Exception {
-                              ctx.write(msg);
+                              ctx.write(msg); // 仅仅是加入到缓冲 ...
+                              ctx.write(msg); // 仅仅是加入到缓冲 ...
                             }
 
                             @Override
@@ -50,6 +58,7 @@ public class EchoServer {
                               ctx.close();
                             }
                           });
+                  ch.pipeline().addLast(echoLogHandler);
                 }
               });
 
