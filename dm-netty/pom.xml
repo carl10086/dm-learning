@@ -11,6 +11,10 @@
 
   <artifactId>dm-netty</artifactId>
 
+  <properties>
+    <hessian.version>3.3.6</hessian.version>
+  </properties>
+
 
   <dependencies>
     <!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
@@ -31,6 +35,27 @@
       <artifactId>guava</artifactId>
       <version>29.0-jre</version>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.alipay.sofa/bolt -->
+    <dependency>
+      <groupId>com.alipay.sofa</groupId>
+      <artifactId>bolt</artifactId>
+      <version>1.6.3</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>netty-all</artifactId>
+          <groupId>io.netty</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.alipay.sofa</groupId>
+      <artifactId>hessian</artifactId>
+      <version>${hessian.version}</version>
+    </dependency>
+
 
   </dependencies>
 
