@@ -2,12 +2,14 @@ package com.ysz.dm.netty.order.server;
 
 import com.ysz.dm.netty.order.domain.MessageReq;
 import com.ysz.dm.netty.order.domain.Operation;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * @author carl
  */
+@Sharable
 public class OrderServerBizHandler extends SimpleChannelInboundHandler<MessageReq> {
 
   @Override
