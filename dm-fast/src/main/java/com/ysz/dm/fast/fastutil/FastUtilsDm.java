@@ -1,4 +1,4 @@
-package com.ysz.dm.fast.util;
+package com.ysz.dm.fast.fastutil;
 
 public class FastUtilsDm {
 
