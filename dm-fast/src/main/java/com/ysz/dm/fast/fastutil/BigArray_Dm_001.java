@@ -12,9 +12,7 @@ public class BigArray_Dm_001 {
     set.add(2);
     set.add(3);
 
-    System.err.println(set
-    );
-
+    System.err.println(set);
   }
 
 }
