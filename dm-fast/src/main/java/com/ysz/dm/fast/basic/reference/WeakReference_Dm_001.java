@@ -25,7 +25,9 @@ public class WeakReference_Dm_001 {
     WeakReference<Object> weakRerference;
     //创建弱引用
     byte[] bytes = new byte[10 * WeakReference_Dm_001.M];
-    weakRerference = new WeakReference<>(bytes, referenceQueue);
+    /*测试下是否有 referenceQueue 的区别*/
+//    weakRerference = new WeakReference<>(bytes, referenceQueue);
+    weakRerference = new WeakReference<>(bytes);
     /*..引发 gc.*/
     bytes = null;
     WeakReference_Dm_001.printlnMemory("2.实例化10M的数组,并建立弱引用");
