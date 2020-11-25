@@ -56,8 +56,16 @@
       <version>${hessian.version}</version>
     </dependency>
 
+    <!-- In dependencies section -->
+    <dependency>
+      <groupId>com.spotify</groupId>
+      <artifactId>folsom</artifactId>
+      <version>1.7.4</version>
+    </dependency>
+
 
   </dependencies>
+
 
   <build>
     <plugins>
