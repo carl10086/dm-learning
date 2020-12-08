@@ -23,7 +23,7 @@ public class BasicDm_001 {
 
 
   public static void main(String[] args) {
-    try (Cluster cluster = Cluster.builder().addContactPoints("10.1.1.36", "10.1.1.47", "10.1.1.96")
+    try (Cluster cluster = Cluster.builder().addContactPoints("10.1.4.36")
         .withLoadBalancingPolicy(new RoundRobinPolicy())
         .build(); Session session = cluster.connect()
     ) {

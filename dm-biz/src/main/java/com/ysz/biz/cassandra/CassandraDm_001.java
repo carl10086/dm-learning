@@ -23,14 +23,6 @@ public class CassandraDm_001 {
     b[off] = (byte) (val >>> 56);
   }
 
-
-  private static byte[] longToByteArray(long l) {
-    byte[] b = new byte[8];
-    putLong(b, 0, l);
-    return b;
-  }
-
-
   private static long[] getHash(long n) {
     ByteBuffer key = ByteBuffer.allocate(8).putLong(0, n);
     long[] hash = new long[2];
