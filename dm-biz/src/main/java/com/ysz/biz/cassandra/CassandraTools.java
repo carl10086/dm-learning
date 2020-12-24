@@ -57,8 +57,9 @@ public class CassandraTools {
     final CassandraTools cassandraTools = new CassandraTools();
     final LongArrayList ring = cassandraTools.ring;
     System.out.println(ring.size());
-    System.err.println(cassandraTools.getPartIdx(1310533353));
-    System.err.println(cassandraTools.getPartIdx(54917156));
-    System.err.println(cassandraTools.getPartIdx(1310504674));
+//    System.err.println(cassandraTools.getPartIdx(1310533353));
+//    System.err.println(cassandraTools.getPartIdx(54917156));
+//    System.err.println(cassandraTools.getPartIdx(1310504674));
+    System.err.println(cassandraTools.getPartIdx(425791996L));
   }
 }
