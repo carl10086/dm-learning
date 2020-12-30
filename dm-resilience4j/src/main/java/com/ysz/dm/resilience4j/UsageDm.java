@@ -3,9 +3,13 @@ package com.ysz.dm.resilience4j;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.timelimiter.TimeLimiter;
+import io.github.resilience4j.timelimiter.TimeLimiterConfig;
+import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
 import io.vavr.CheckedFunction0;
 import io.vavr.control.Try;
 import java.time.Duration;
@@ -24,13 +28,11 @@ public class UsageDm {
   }
 
   public int slowCall() {
-//    System.out.println("start");
     try {
       Thread.sleep(3 * 1000L);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-//    System.out.println("finish");
     return 0;
   }
 
@@ -91,10 +93,28 @@ public class UsageDm {
       Try<Integer> test = Try.of(supplier);
       if (test.isSuccess()) {
       } else {
-        System.out.println(test.failed().get());
+        final Throwable throwable = test.failed().get();
+        if (throwable instanceof CallNotPermittedException) {
+          throwable.printStackTrace();
+        } else {
+          System.out.println(throwable);
+        }
       }
 
     }
 
+  }
+
+
+  @Test
+  public void tstTimeout() {
+
+    final TimeLimiterRegistry registry = TimeLimiterRegistry
+        .of(TimeLimiterConfig.custom().cancelRunningFuture(true)
+            .timeoutDuration(Duration.ofMillis(500L)).build());
+
+    final TimeLimiter timeLimiter = registry.timeLimiter("name");
+
+//    timeLimiter.executeFutureSupplier();
   }
 }
