@@ -2,12 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>dm-learning</artifactId>
+    <groupId>com.ysz</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.ysz</groupId>
-  <artifactId>dm-learning</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <artifactId>dm-duitang</artifactId>
+
+  <properties>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+  </properties>
 
 
   <dependencies>
@@ -15,24 +22,16 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.12</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13</version>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-archetype-plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-archetype-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.1.2</version>
       </plugin>
 
       <plugin>
@@ -46,22 +45,4 @@
       </plugin>
     </plugins>
   </build>
-  <modules>
-    <module>dm-resilience4j</module>
-    <module>dm-websecu</module>
-    <module>dm-fast</module>
-    <module>dm-agent</module>
-    <module>dm-jaeger</module>
-    <module>dm-logging</module>
-    <module>dm-mongodb</module>
-    <module>dm-clickhouse</module>
-    <module>dm-biz</module>
-    <module>dm-es</module>
-    <module>dm-netty</module>
-    <module>dm-etl</module>
-    <module>dm-dubbo</module>
-    <module>dm-soulgw</module>
-    <module>dm-duitang</module>
-  </modules>
-
 </project>
