@@ -60,6 +60,7 @@
     <module>dm-netty</module>
     <module>dm-etl</module>
     <module>dm-dubbo</module>
+    <module>dm-soulgw</module>
   </modules>
 
 </project>
