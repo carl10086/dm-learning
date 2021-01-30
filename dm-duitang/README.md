@@ -43,6 +43,8 @@ biz support 不能够清晰的反映出依赖关系 . 或许通过 config 可以
 
 审核 查询需要 BlogMeta ; 搜索 查询需要 BlogDetail ;
 
+感觉是一个很坑爹 东西就是 BlogDetail 没有用处 !!!!!!!!, 应该在 DTO 的逻辑中实现 RpcServiceImpl 中实现这个组合逻辑
+
 # Reference
 
 - [阿里 DDD 系列 1](https://developer.aliyun.com/article/716908)
