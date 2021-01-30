@@ -41,6 +41,8 @@ biz support 不能够清晰的反映出依赖关系 . 或许通过 config 可以
 
 ## Q4: Blog 的丰富查询实现在 哪里?
 
+[BlogDetail 应该是个错误的设计](https://blog.csdn.net/FS1360472174/article/details/88542163)
+
 审核 查询需要 BlogMeta ; 搜索 查询需要 BlogDetail ;
 
 感觉是一个很坑爹 东西就是 BlogDetail 没有用处 !!!!!!!!, 应该在 DTO 的逻辑中实现 RpcServiceImpl 中实现这个组合逻辑
