@@ -14,9 +14,8 @@ import com.ysz.dm.duitang.srv.support.blog.domain.BlogMetaRepo;
 import com.ysz.dm.duitang.srv.support.blog.domain.BlogText;
 import com.ysz.dm.duitang.srv.support.blog.domain.BlogUser;
 import java.util.Date;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+//@Slf4j
 public class BlogAppSrv {
 
   private BlogMetaRepo blogMetaRepo;

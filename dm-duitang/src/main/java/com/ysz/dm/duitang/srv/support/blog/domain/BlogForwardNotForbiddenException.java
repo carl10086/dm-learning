@@ -6,10 +6,9 @@ import com.ysz.dm.duitang.srv.infra.core.BizException;
 public class BlogForwardNotForbiddenException extends BizException {
 
 
-  private final ForwardBlogReq req;
-  private final String errorMsg;
+    private final ForwardBlogReq req;
 
-  public BlogForwardNotForbiddenException(final ForwardBlogReq req) {
-    this.req = req;
-  }
+    public BlogForwardNotForbiddenException(final ForwardBlogReq req) {
+        this.req = req;
+    }
 }

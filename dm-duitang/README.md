@@ -51,3 +51,10 @@ biz support 不能够清晰的反映出依赖关系 . 或许通过 config 可以
 
 - [阿里 DDD 系列 1](https://developer.aliyun.com/article/716908)
 - [阿里 DDD 系列 2](https://developer.aliyun.com/article/719251)
+
+
+
+
+- [meituan_ddd_rumen]
+- [ddd_in_practice](https://www.cnblogs.com/xiandnc/p/11070470.html#_caption_5)
+- [azurl_ddd](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/apply-simplified-microservice-cqrs-ddd-patterns)
