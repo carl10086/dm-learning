@@ -138,6 +138,9 @@ DomainService 为了解决的问题就是 AppSrv 和 Domain Model 都不好解�
 7. 从是否初次构建的角度 有重建这种特殊情况 ...
 
 
+补充? 为什么最终还是补充了一个工厂 . 觉得 AppSrv 应该不想知道这么多的创建细节.
+
+
 
 所以回到系统本身?
 
@@ -148,10 +151,8 @@ DomainService 为了解决的问题就是 AppSrv 和 Domain Model 都不好解�
 
 ## Q9 When to use DomainService 
 
-
-
-[repo 放在 applicationService 还是 domainService?](https://softwareengineering.stackexchange.com/questions/330428/ddd-repositories-in-application-or-domain-service)
-[什么时候用domainService?](https://enterprisecraftsmanship.com/posts/domain-vs-application-services/)
+- [repo 放在 applicationService 还是 domainService?](https://softwareengineering.stackexchange.com/questions/330428/ddd-repositories-in-application-or-domain-service)
+- [什么时候用domainService?](https://enterprisecraftsmanship.com/posts/domain-vs-application-services/)
 
 
 # Reference
