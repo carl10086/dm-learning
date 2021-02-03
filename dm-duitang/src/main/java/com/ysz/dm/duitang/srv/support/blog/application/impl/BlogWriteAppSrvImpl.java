@@ -12,10 +12,9 @@ import com.ysz.dm.duitang.srv.support.blog.domain.adapter.BlogCountAdapter;
 import com.ysz.dm.duitang.srv.support.blog.domain.event.BlogEventSender;
 import com.ysz.dm.duitang.srv.support.blog.domain.exception.BlogForwardNotForbiddenException;
 import com.ysz.dm.duitang.srv.support.blog.domain.exception.BlogIdNotExistException;
+import com.ysz.dm.duitang.srv.support.blog.domain.factory.BlogFactory;
 import com.ysz.dm.duitang.srv.support.blog.domain.model.Blog;
-import com.ysz.dm.duitang.srv.support.blog.domain.model.BlogContentType;
 import com.ysz.dm.duitang.srv.support.blog.domain.model.BlogMeta;
-import com.ysz.dm.duitang.srv.support.blog.domain.model.BlogText;
 import com.ysz.dm.duitang.srv.support.blog.domain.model.BlogUserId;
 import com.ysz.dm.duitang.srv.support.blog.domain.repo.BlogRepo;
 import java.util.Date;
@@ -33,35 +32,15 @@ public class BlogWriteAppSrvImpl implements BlogWriteAppSrv {
 
   private BlogEventSender blogEventSender;
 
-  private BlogMeta newBlogMeta(PublishBlogReq req) {
-    final Date now = accurateTimeManager.now();
-    return new BlogMeta(
-        idGenerateManager.nextBlogId(),
-        new BlogText(req.getMsg()),
-        null /*extra 假装已经有了*/,
-        now,
-        BlogContentType.valueOf(req.getContentType()),
-        new BlogUserId(req.getUserId()),
-        req.getPhotoId()
-    );
-  }
+  private BlogFactory blogFactory;
+
 
   @Override
   public Blog publishBlog(PublishBlogReq req) {
-    /*原发发布的时候、包含了 BlogMeta 对象的创建逻辑, 是否应该抽象为一个 Factory , factory 应该是无状态的 . */
-    final BlogMeta blogMeta = newBlogMeta(req);
-
-    /*在生成一个原发(BlogMeta) 的时候、也要生成一个默认的转发关系作为根(BlogForward)*/
-    Blog blog = new Blog(
-        blogMeta.getId(),
-        blogMeta,
-        null,
-        blogMeta.getBlogUserId(),
-        blogMeta.getCreateAt()
-    );
-    blogRepo.save(blog);
-    blogEventSender.sendBlogPublishedEvent(blog);
-    return blog;
+    final Blog originBlog = blogFactory.createOriginBlog(req);
+    blogRepo.save(originBlog);
+    blogEventSender.sendBlogPublishedEvent(originBlog);
+    return originBlog;
   }
 
 
@@ -87,7 +66,7 @@ public class BlogWriteAppSrvImpl implements BlogWriteAppSrv {
         accurateTimeManager.now()
     );
     blogRepo.addForward(blog);
-    addParentFavCnt(parent); /*面向过程的逻辑*/
+    addParentFavCnt(parent);
     return blog;
   }
 
