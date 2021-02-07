@@ -1,6 +1,7 @@
 package com.ysz.dm.fast.basic.disruptor;
 
 import org.openjdk.jol.vm.VM;
+import sun.misc.Contended;
 
 public class FalseSharing implements Runnable {
 
@@ -12,37 +13,37 @@ public class FalseSharing implements Runnable {
    *
    * 2. 所有的线程都修改自己对应 idx 的值
    */
-  private static ValueNoPadding[] longs;
+  private static ValuePadding[] longs;
 
   public FalseSharing(final int arrayIndex) {
     this.arrayIndex = arrayIndex;
   }
 
   public static void main(final String[] args) throws Exception {
-//    for (int i = 1; i < 10; i++) {
-//      System.gc();
-//      final long start = System.currentTimeMillis();
-//      runTest(i);
-//      System.out.println("Thread num " + i + " duration = " + (System.currentTimeMillis() - start));
-//    }
-    runTest(10);
+    for (int i = 1; i < 10; i++) {
+      System.gc();
+      final long start = System.currentTimeMillis();
+      runTest(i);
+      System.out.println("Thread num " + i + " duration = " + (System.currentTimeMillis() - start));
+    }
+//    runTest(10);
 
   }
 
   private static void showMemoryAddress() {
     long firstAddress = VM.current().addressOf(longs[0]);
-    for (ValueNoPadding aLong : longs) {
+    for (ValuePadding aLong : longs) {
       System.out.println("内存地址偏移:" + (VM.current().addressOf(aLong) - firstAddress));
     }
   }
 
   private static void runTest(int NUM_THREADS) throws InterruptedException {
     Thread[] threads = new Thread[NUM_THREADS];
-    longs = new ValueNoPadding[NUM_THREADS];
+    longs = new ValuePadding[NUM_THREADS];
     for (int i = 0; i < longs.length; i++) {
-      longs[i] = new ValueNoPadding();
+      longs[i] = new ValuePadding();
     }
-    showMemoryAddress();
+//    showMemoryAddress();
     for (int i = 0; i < threads.length; i++) {
       threads[i] = new Thread(new FalseSharing(i));
     }
