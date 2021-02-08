@@ -24,7 +24,7 @@ public class CacheLine_Dm_001 {
     /**
      * 32 bit 的 int 数字;
      *
-     * 前 24 bit 拷贝自内存地址的前 24 bit
+     * 前 20 bit 拷贝自内存地址的前 24 bit
      * 中间 6 it 表示 group 的 索引 .
      * 最后 6 bit 表示 line 中的 索引 .
      */
