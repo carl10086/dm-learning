@@ -1,4 +1,4 @@
-package com.ysz.dm.fast.system.cacheline;
+package com.ysz.dm.fast.kernel.cacheline;
 
 /**
  * 例子:
