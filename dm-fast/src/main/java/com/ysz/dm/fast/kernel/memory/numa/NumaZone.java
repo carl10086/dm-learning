@@ -1,7 +1,9 @@
 package com.ysz.dm.fast.kernel.memory.numa;
 
 /**
- * 一个存储节点下 包含了 ZONE_DMA, ZONE_NORMAL, ZONE_HIGHMEM 三个管理区
+ * 一个存储节点下 包含了 ZONE_DMA, ZONE_NORMAL, ZONE_HIGHMEM 三个管理区;
+ *
+ * 只有 1G 左右、应该就是内核空间 那块了， 单独的作为管理区的地方 ?
  *
  * - ZONE_DMA: 0-16M, 这个区域的页面专门为 提供 IO 设备的  DMA 使用 .
  * - ZONE_NORMAL: 16M - 896M, 内核能够直接使用的
