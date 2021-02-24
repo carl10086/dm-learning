@@ -24,9 +24,9 @@ public class NumaPageData {
   private int nrZones;
 
   /**
-   * 当前节点中的 第一个 页面 ...
+   * 当前节点中的 第一个 页面 ... , 第一个页面 + 大小就相当于数组了吧 .
    */
-  private NumaPage nodeMemMap;
+  private NumaPage[] nodeMemMap;
 
 
   /**
