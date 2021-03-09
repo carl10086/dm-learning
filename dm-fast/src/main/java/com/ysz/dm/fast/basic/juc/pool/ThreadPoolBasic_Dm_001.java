@@ -48,7 +48,6 @@ public class ThreadPoolBasic_Dm_001 {
   }
 
   public static void main(String[] args) throws Exception {
-
     final ThreadPoolExecutor pool = pool();
     pool.submit(new SlowQuery(10L)).get();
     Thread.sleep(1000L);
