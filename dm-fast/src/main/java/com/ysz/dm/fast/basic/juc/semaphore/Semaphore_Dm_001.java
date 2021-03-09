@@ -12,10 +12,17 @@ public class Semaphore_Dm_001 {
     new Thread(() -> {
       try {
         semaphore.acquire();
-      } catch (InterruptedException e) {
+//        final boolean b = semaphore.tryAcquire();
+//        System.err.println(b);
+        System.err.println("child thread can execute");
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }).start();
+
+    System.out.println("parent thread begin to release");
+    semaphore.release();
+    System.out.println("parent thread finish to release");
     System.in.read();
   }
 
