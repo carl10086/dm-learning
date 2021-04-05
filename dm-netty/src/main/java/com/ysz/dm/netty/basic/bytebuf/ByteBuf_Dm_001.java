@@ -1,4 +1,4 @@
-package com.ysz.dm.netty.bytebuf;
+package com.ysz.dm.netty.basic.bytebuf;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
