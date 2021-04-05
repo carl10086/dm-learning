@@ -13,7 +13,7 @@ public class SpringBean {
 
   public void hello() {
     System.err.println("profile:" + profile);
-    log.error("hello world");
+    log.error("hello world, {}, {}", "1", "2", "3", "4", new RuntimeException());
   }
 
 }
