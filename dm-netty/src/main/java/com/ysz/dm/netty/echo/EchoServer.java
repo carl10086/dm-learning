@@ -61,7 +61,7 @@ public class EchoServer {
                   ch.pipeline().addLast(echoLogHandler);
                 }
               });
-
+      // 同步等待 server 启动, sync 是 Promise 的子实现
       ChannelFuture channelFuture = serverBootstrap.bind(1234).sync();
       // Wait until the server socket is closed.
       channelFuture.channel().closeFuture().sync();
