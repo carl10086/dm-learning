@@ -58,7 +58,6 @@
     <module>dm-es</module>
     <module>dm-netty</module>
     <module>dm-etl</module>
-    <module>dm-dubbo</module>
     <module>dm-duitang</module>
   </modules>
 
