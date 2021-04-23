@@ -23,7 +23,7 @@ public class EchoServer {
         .setNameFormat("worker-%d")
         .build());
 
-    final EchoLogHandler echoLogHandler = new EchoLogHandler();
+    final EchoLogHandler echoLogHandler = new EchoLogHandler(); // 这个 handler 可以被所有的 channel 共享，绝对没有并发安全问题 ...
     try {
       ServerBootstrap serverBootstrap = new ServerBootstrap();
       serverBootstrap

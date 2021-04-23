@@ -53,14 +53,12 @@
     <module>dm-agent</module>
     <module>dm-jaeger</module>
     <module>dm-logging</module>
-    <module>dm-mongodb</module>
     <module>dm-clickhouse</module>
     <module>dm-biz</module>
     <module>dm-es</module>
     <module>dm-netty</module>
     <module>dm-etl</module>
     <module>dm-dubbo</module>
-    <module>dm-soulgw</module>
     <module>dm-duitang</module>
   </modules>
 
