@@ -14,13 +14,14 @@ public class AnsjDm_003_custom {
       // 创建一个 根节点 ...
       DicLibrary.put(DicLibrary.DEFAULT, DicLibrary.DEFAULT, new Forest());
     }
-    DicLibrary.insert(DicLibrary.DEFAULT, "增加新词", "我是词性", 1000);
-    DicLibrary.insert(DicLibrary.DEFAULT, "增加新词", "我是词性2", 1000);
-    Result parse = DicAnalysis.parse("这是用户自定义词典增加新词的例子");
-    System.out.println(parse);
-    boolean flag = false;
+    DicLibrary.insert(DicLibrary.DEFAULT, "攻城狮", "我是词性", 1000);
+    DicLibrary.insert(DicLibrary.DEFAULT, "单身狗", "我是词性", 1000);
+    DicLibrary.insert(DicLibrary.DEFAULT, "狮逆", "我是词性", 1000);
+    DicLibrary.insert(DicLibrary.DEFAULT, "娶白", "我是词性", 1000);
+    DicLibrary.insert(DicLibrary.DEFAULT, "白富美", "我是词性", 1000);
+    Result parse = DicAnalysis.parse("攻城狮逆袭单身狗，迎娶白富美，走上人生巅峰，习近平");
     for (Term term : parse) {
-      flag = flag || "增加新词".equals(term.getName());
+      System.out.println(term);
     }
   }
 
