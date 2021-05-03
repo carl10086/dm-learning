@@ -13,10 +13,18 @@
 
   <properties>
     <scylla.version>3.10.1-scylla-0</scylla.version>
+    <nacos.version>2.0.1</nacos.version>
   </properties>
 
 
   <dependencies>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>21.0</version>
+    </dependency>
+
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -137,6 +145,7 @@
       </exclusions>
     </dependency>
 
+
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
@@ -180,6 +189,43 @@
       <artifactId>hanlp</artifactId>
       <version>portable-1.8.1</version>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.alibaba.nacos/nacos-spring-context -->
+    <dependency>
+      <groupId>com.alibaba.nacos</groupId>
+      <artifactId>nacos-spring-context</artifactId>
+      <version>1.1.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>nacos-api</artifactId>
+          <groupId>com.alibaba.nacos</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>nacos-client</artifactId>
+          <groupId>com.alibaba.nacos</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.alibaba.nacos</groupId>
+      <artifactId>nacos-client</artifactId>
+      <version>${nacos.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.alibaba.nacos</groupId>
+      <artifactId>nacos-api</artifactId>
+      <version>${nacos.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.alibaba.nacos</groupId>
+      <artifactId>nacos-common</artifactId>
+      <version>${nacos.version}</version>
+    </dependency>
+
 
   </dependencies>
 

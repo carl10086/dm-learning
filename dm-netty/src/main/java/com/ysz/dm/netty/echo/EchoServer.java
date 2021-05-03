@@ -34,7 +34,7 @@ public class EchoServer {
               new ChannelInitializer<SocketChannel>() {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
-                  ch.pipeline()
+                  ch.pipeline(  )
                       .addLast(
                           new ChannelInboundHandlerAdapter() {
 
