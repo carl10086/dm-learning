@@ -1,7 +1,6 @@
 package com.ysz.dm.fast.basic.disruptor;
 
 import org.openjdk.jol.vm.VM;
-import sun.misc.Contended;
 
 public class FalseSharing implements Runnable {
 
