@@ -239,6 +239,14 @@
       <version>5.1.0</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.jeasy/easy-rules-core -->
+    <dependency>
+      <groupId>org.jeasy</groupId>
+      <artifactId>easy-rules-core</artifactId>
+      <version>4.1.0</version>
+    </dependency>
+
+
 
   </dependencies>
 
