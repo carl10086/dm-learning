@@ -1,4 +1,4 @@
-package com.ysz.dm.fast.kafka;
+package com.ysz.dm.fast.kafka.old;
 
 import com.ysz.dm.fast.jmh.StringTools;
 import java.util.Date;
