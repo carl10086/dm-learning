@@ -92,9 +92,10 @@ public class KafkaProducerDm {
 
   public static void main(String[] args) throws Exception {
     KafkaProducerDm kafkaProducerDm = new KafkaProducerDm();
-    for (int i = 0; i < 10; i++) {
-      kafkaProducerDm.sendWithCallback(i);
-      Thread.sleep(1000L);
+    for (int i = 0; i < 30; i++) {
+//      kafkaProducerDm.sendWithCallback(i);
+      kafkaProducerDm.sendSingle(i);
+//      Thread.sleep(1000L);
     }
     kafkaProducerDm.flush();
     System.in.read();
