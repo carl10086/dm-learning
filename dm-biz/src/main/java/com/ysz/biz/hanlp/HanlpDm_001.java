@@ -13,7 +13,7 @@ public class HanlpDm_001 {
 
   public static void main(String[] args) throws Exception {
     System.out.println("-----增加自定义词库前----");
-    String text = "攻城狮逆袭单身狗，迎娶白富美，走上人生巅峰，习近平";  // 怎么可能噗哈哈！
+    String text = "攻城狮逆袭单身狗，迎娶白富美，走上人生巅峰，我尼玛, 习近平";  // 怎么可能噗哈哈！
     /*1. 没有定义词库前*/
 //    showAll(text);
 
@@ -22,25 +22,34 @@ public class HanlpDm_001 {
     CustomDictionary.add("狮逆", "duitang 1024");
     CustomDictionary.add("娶白", "duitang 1024");
     CustomDictionary.add("习近平", "duitang 1024");
-    // 强行插入
     CustomDictionary.insert("白富美", "duitang 1024");
+    CustomDictionary.insert("尼玛", "duitang 1024");
+    CustomDictionary.remove("尼玛");
+    if (CustomDictionary.contains("尼玛")) {
+      CustomDictionary.insert("尼玛", "other 1024");
+    }
+    showCustomOnly(text);
+
+//    System.err.println("包含尼玛：" + CustomDictionary.contains("尼玛"));
+//    System.err.println("包含尼玛：" + CustomDictionary.contains("尼玛"));
+    // 强行插入
     // 删除词语（注释掉试试）
 //        CustomDictionary.remove("攻城狮");
-    System.out.println(CustomDictionary.add("单身狗", "duitang 1024"));
-    System.out.println(CustomDictionary.get("单身狗"));
+//    System.out.println(CustomDictionary.add("单身狗", "duitang 1024"));
+//    System.out.println(CustomDictionary.get("单身狗"));
     // 自定义词典在所有分词器中都有效
     /*2. 定义了词库后*/
 
-    System.out.println("-----增加自定义词库后----");
+//    System.out.println("-----增加自定义词库后----");
 
     showAll(text);
   }
 
   private static void showAll(String text) {
     System.out.println("---start---");
-    showNormal(text);
-    showNshort(text);
-    indexToken(text);
+//    showNormal(text);
+//    showNshort(text);
+//    indexToken(text);
     showCustomOnly(text);
     System.out.println("---end---");
   }
