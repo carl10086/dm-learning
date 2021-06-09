@@ -1,22 +1,22 @@
 package com.ysz.biz;
 
-import com.google.common.collect.Lists;
-import java.util.Comparator;
-import java.util.stream.Collectors;
-
 public class Tmp {
 
   public static void main(String[] args) {
 //    tstSql();
-
-    System.out.println(
-        Lists.newArrayList(3, 1).stream().sorted(Comparator.reverseOrder())
-            .limit(3).collect(
-            Collectors.toList())
-    );
+    tstSql();
   }
 
   private static void tstSql() {
+
+    String sql = "";
+    for (int i = 0; i < 16; i++) {
+      sql += "drop table blog_origin_audit_detail_" + i + ";\n";
+    }
+
+//    System.err.println(sql);
+
+
     String createTableSql = "";
 
     for (int i = 0; i < 16; i++) {
@@ -86,6 +86,7 @@ public class Tmp {
           + "    finalStatus        tinyint                             null,\n"
           + "    finalAuditType     tinyint                             null,\n"
           + "    finalOperator      bigint                              null,\n"
+          + "    syncOffset         timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),\n"
           + "    finalOperateAt     timestamp default CURRENT_TIMESTAMP not null,\n"
           + "    constraint blog_origin_audit_detail_pk\n"
           + "        primary key (blogId)\n"
