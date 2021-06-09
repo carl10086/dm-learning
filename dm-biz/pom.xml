@@ -14,6 +14,8 @@
   <properties>
     <scylla.version>3.10.1-scylla-0</scylla.version>
     <nacos.version>2.0.1</nacos.version>
+    <canal.version>1.1.5</canal.version>
+
   </properties>
 
 
@@ -247,6 +249,21 @@
     </dependency>
 
 
+    <!--   ===================== canal start =====================-->
+    <dependency>
+      <groupId>com.alibaba.otter</groupId>
+      <artifactId>canal.instance.core</artifactId>
+      <version>1.1.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.alibaba.otter</groupId>
+      <artifactId>canal.client</artifactId>
+      <version>1.1.5</version>
+    </dependency>
+
+
+    <!--   ===================== canal end =====================-->
 
   </dependencies>
 
