@@ -49,6 +49,15 @@
       </exclusions>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.alipay.sofa/sofa-rpc-all -->
+    <dependency>
+      <groupId>com.alipay.sofa</groupId>
+      <artifactId>sofa-rpc-all</artifactId>
+      <version>5.7.8</version>
+    </dependency>
+
+
+
 
     <dependency>
       <groupId>com.alipay.sofa</groupId>

@@ -23,6 +23,7 @@ public class RpcServerDemoByMain {
       @Override
       public Object handleRequest(final BizContext bizCtx, final SimpleStringWrapper request)
           throws Exception {
+
         System.err.println("接收到请求...");
         return "hello";
       }
