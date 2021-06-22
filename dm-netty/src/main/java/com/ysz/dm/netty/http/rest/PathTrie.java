@@ -361,11 +361,11 @@ public class PathTrie<T> {
       this.trie = trie;
       this.paramSupplier = paramSupplier;
       this.modes = new ArrayList<>(Arrays.asList(
-          TrieMatchingMode.EXPLICIT_NODES_ONLY,
-          TrieMatchingMode.WILDCARD_ROOT_NODES_ALLOWED,
-          TrieMatchingMode.WILDCARD_LEAF_NODES_ALLOWED,
+//          TrieMatchingMode.EXPLICIT_NODES_ONLY,
+//          TrieMatchingMode.WILDCARD_ROOT_NODES_ALLOWED,
+//          TrieMatchingMode.WILDCARD_LEAF_NODES_ALLOWED,
           TrieMatchingMode.WILDCARD_NODES_ALLOWED));
-      assert TrieMatchingMode.values().length == 4 : "missing trie matching mode";
+//      assert TrieMatchingMode.values().length == 4 : "missing trie matching mode";
     }
 
     @Override
