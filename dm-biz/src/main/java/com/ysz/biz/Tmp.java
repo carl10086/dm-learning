@@ -14,7 +14,7 @@ public class Tmp {
       sql += "drop table blog_origin_audit_detail_" + i + ";\n";
     }
 
-//    System.err.println(sql);
+    System.err.println(sql);
 
 
     String createTableSql = "";
@@ -78,7 +78,7 @@ public class Tmp {
           + "    machinePhotoStatus tinyint                             null,\n"
           + "    status             tinyint                             not null,\n"
           + "    firstAt            TIMESTAMP default CURRENT_TIMESTAMP not null,\n"
-          + "    firstOp            Long                                null,\n"
+          + "    firstOp            bigint                              null,\n"
           + "    firstStatus        tinyint                             not null,\n"
           + "    secondAt           timestamp default CURRENT_TIMESTAMP not null,\n"
           + "    secondOp           bigint                              null,\n"
@@ -88,6 +88,10 @@ public class Tmp {
           + "    finalOperator      bigint                              null,\n"
           + "    syncOffset         timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),\n"
           + "    finalOperateAt     timestamp default CURRENT_TIMESTAMP not null,\n"
+          + "    lastCheckNo        bigint                              null,\n"
+          + "    lastCheckAt        timestamp                           null,\n"
+          + "    lastCheckBy        bigint                              null,\n"
+          + "    lastCheckAction    tinyint                             null,\n"
           + "    constraint blog_origin_audit_detail_pk\n"
           + "        primary key (blogId)\n"
           + ") ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;\n"

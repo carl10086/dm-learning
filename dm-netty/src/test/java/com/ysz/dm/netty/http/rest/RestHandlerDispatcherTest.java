@@ -13,10 +13,17 @@ public class RestHandlerDispatcherTest {
 
   @Before
   public void setUp() throws Exception {
-    instance.registerHandler(Method.GET, "/tst/users", new RestHandler() {
+    instance.registerHandler(Method.GET, "//{}cateId/{}", new RestHandler() {
       @Override
       public String toString() {
-        return "->/tst/users";
+        return "->//tst/{cateId}/users";
+      }
+    });
+
+    instance.registerHandler(Method.GET, "/tst/abc/users", new RestHandler() {
+      @Override
+      public String toString() {
+        return "/tst/abc/users";
       }
     });
   }
@@ -29,7 +36,8 @@ public class RestHandlerDispatcherTest {
     for (Iterator<MethodHandlers> it = allHandlers; it.hasNext(); ) {
       Optional<RestHandler> mHandler = Optional.empty();
       if (requestMethod != null) {
-        mHandler = Optional.ofNullable(it.next()).flatMap(mh -> mh.getHandler(requestMethod));
+        MethodHandlers next = it.next();
+        mHandler = Optional.ofNullable(next).flatMap(mh -> mh.getHandler(requestMethod));
       }
       if (mHandler.isPresent()) {
         RestHandler restHandler = mHandler.get();
@@ -47,7 +55,7 @@ public class RestHandlerDispatcherTest {
   public RestRequest mock() {
     RestRequest restRequest = new RestRequest();
     restRequest.setParams(new HashMap<>());
-    restRequest.setRawPath("/tst/users");
+    restRequest.setRawPath("/tst/abc/users");
     return restRequest;
   }
 
