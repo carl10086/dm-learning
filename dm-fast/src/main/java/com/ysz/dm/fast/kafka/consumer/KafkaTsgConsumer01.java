@@ -1,6 +1,5 @@
 package com.ysz.dm.fast.kafka.consumer;
 
-import com.ysz.dm.fast.kafka.KafkaProducerDm;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
@@ -70,8 +69,8 @@ public class KafkaTsgConsumer01 {
             }
             count++;
             Thread.sleep(1000L);
-            KafkaProducerDm.simpleLog("msg: %s",
-                record.value());
+//            KafkaProducerDm.simpleLog("msg: %s",
+//                record.value());
           }
 //          KafkaProducerDm.simpleError("收到了消息条数:" + count);
         }
@@ -86,7 +85,6 @@ public class KafkaTsgConsumer01 {
   }
 
   private int errorCnt = 0;
-
 
 
 }

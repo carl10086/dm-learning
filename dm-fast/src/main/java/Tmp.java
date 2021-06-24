@@ -1,12 +1,9 @@
-import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 public class Tmp {
 
   public static void main(String[] args) throws Exception {
-    try (FileOutputStream outputStream = new FileOutputStream("./tst", true)) {
-      outputStream.write("hello world".getBytes(StandardCharsets.UTF_8));
-    }
+    System.out.println("hour=" + LocalDateTime.now().minusHours(-5L).getHour());
   }
 
 }
