@@ -11,11 +11,10 @@ public class Tmp {
 
     String sql = "";
     for (int i = 0; i < 16; i++) {
-      sql += "drop table blog_origin_audit_detail_" + i + ";\n";
+      sql += "drop table blog_origin_" + i + ";\n";
     }
 
     System.err.println(sql);
-
 
     String createTableSql = "";
 
@@ -25,17 +24,20 @@ public class Tmp {
           + "   id bigint not null,\n"
           + "   contentType tinyint not null,\n"
           + "   senderId bigint not null,\n"
+          + "   albumId bigint not null,\n"
           + "   createAt timestamp not null DEFAULT CURRENT_TIMESTAMP ,\n"
           + "   photoId bigint not null,\n"
           + "   officalTag varchar(255) null,\n"
-          + "   msgAsShort varchar(255) null,\n"
+          + "   msgAsShort varchar(500) null,\n"
           + "   ocr varchar(255) null,\n"
+          + "   ocrTextLen int   null,\n"
           + "   status int not null,\n"
           + "   updateAt timestamp not null DEFAULT CURRENT_TIMESTAMP ,\n"
           + "   metaVersion int default 0 not null,\n"
           + "   sourceLink varchar(255) null,\n"
           + "   sourceTitle varchar(255) null,\n"
           + "   sourceType varchar(255) null,\n"
+          + "   syncOffset timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),\n"
           + "   constraint blog_origin_0_pk primary key (id)\n"
           + ") ENGINE = InnoDB DEFAULT CHARSET = utf8mb4; \n";
     }
@@ -97,6 +99,6 @@ public class Tmp {
           + ") ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;\n"
           + "\n";
     }
-    System.out.println(createTableSql);
+//    System.out.println(createTableSql);
   }
 }

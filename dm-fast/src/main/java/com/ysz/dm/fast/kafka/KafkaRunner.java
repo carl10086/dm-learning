@@ -79,7 +79,7 @@ public class KafkaRunner extends Thread {
       }
 
     } catch (Throwable e) {
-      KafkaProducerDm.simpleError("error");
+//      KafkaProducerDm.simpleError("error");
       e.printStackTrace();
     } finally {
       consumer.close();
