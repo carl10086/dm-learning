@@ -31,7 +31,7 @@ public class Tmp {
           + "   msgAsShort varchar(500) null,\n"
           + "   ocr varchar(255) null,\n"
           + "   ocrTextLen int   null,\n"
-          + "   status int not null,\n"
+          + "   status tinyint not null,\n"
           + "   updateAt timestamp not null DEFAULT CURRENT_TIMESTAMP ,\n"
           + "   metaVersion int default 0 not null,\n"
           + "   sourceLink varchar(255) null,\n"
@@ -40,9 +40,11 @@ public class Tmp {
           + "   syncOffset timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),\n"
           + "   constraint blog_origin_0_pk primary key (id)\n"
           + ") ENGINE = InnoDB DEFAULT CHARSET = utf8mb4; \n";
+
+      createTableSql += "create index blog_origin_createAt on blog_origin_" + i + " (createAt);\n";
     }
 
-//    System.out.println(createTableSql);
+    System.out.println(createTableSql);
 
     createTableSql = "";
 
