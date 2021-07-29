@@ -22,7 +22,7 @@ public class DubboDm {
   @Before
   public void setUp() throws Exception {
     curatorFramework = CuratorFrameworkFactory
-        .newClient("10.1.5.87:3881", new ExponentialBackoffRetry(1000, 3));
+        .newClient("10.1.5.72:3881", new ExponentialBackoffRetry(1000, 3));
     curatorFramework.start();
   }
 
@@ -46,8 +46,8 @@ public class DubboDm {
 
   @Test
   public void tst() throws Exception {
-    final String interfaceName = "com.duitang.saturn.client.user.service.IUserService";
-    final String consumersPath = String.format("/dubbo/%s/consumers", interfaceName);
+    final String interfaceName = "com.duitang.munich.client.tip.service.ITipService";
+    final String consumersPath = String.format("/dubbo/%s/providers", interfaceName);
 
     List<MyUrl> urls = curatorFramework.getChildren().forPath(consumersPath).stream()
         .map(x -> new MyUrl(decode(x), interfaceName)).collect(
