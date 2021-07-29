@@ -1,5 +1,6 @@
 package com.ysz.dm.fast.kafka.consumer;
 
+import com.ysz.dm.fast.kafka.old.KafkaProducerDm;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,7 +13,7 @@ import org.apache.kafka.common.TopicPartition;
 
 public class KafkaTsgConsumer01 {
 
-  private static final String TST_TOPIC_NAME = "block_img_0";
+  private static final String TST_TOPIC_NAME = "blog_core_0";
 
   public static void main(String[] args) throws Exception {
     new Thread(() -> {
@@ -68,9 +69,10 @@ public class KafkaTsgConsumer01 {
               continue;
             }
             count++;
-            Thread.sleep(1000L);
-//            KafkaProducerDm.simpleLog("msg: %s",
-//                record.value());
+//            System.out.println();
+//            Thread.sleep(1000L);
+            KafkaProducerDm.simpleLog("msg: %s",
+                record.value());
           }
 //          KafkaProducerDm.simpleError("收到了消息条数:" + count);
         }
