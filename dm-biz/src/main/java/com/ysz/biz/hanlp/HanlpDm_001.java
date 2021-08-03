@@ -55,7 +55,7 @@ public class HanlpDm_001 {
   }
 
 
-  private static ObjectArrayList<String> parseCustom(String text) {
+  public static ObjectArrayList<String> parseCustom(String text) {
     final char[] chars = text.toCharArray();
     final ObjectArrayList<String> objectArrayList = new ObjectArrayList<>();
     CustomDictionary.parseText(text,
