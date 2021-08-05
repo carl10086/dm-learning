@@ -209,6 +209,14 @@
       <type>pom</type>
     </dependency>
 
+
+    <!--    metric start-->
+    <!-- https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core -->
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <version>4.2.3</version>
+    </dependency>
   </dependencies>
   <build>
     <extensions>

@@ -14,7 +14,6 @@ public class QueuesDm {
       queue.offer(i);
 
       List<Integer> buffer = new ArrayList<>(10);
-      Queues.drain(queue, buffer, 10, Duration.ofSeconds(10));
     }
   }
 }
