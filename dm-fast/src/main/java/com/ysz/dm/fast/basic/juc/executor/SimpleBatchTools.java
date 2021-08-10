@@ -1,11 +1,13 @@
-package com.duitang.webscript.infra.utils;
+package com.ysz.dm.fast.basic.juc.executor;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import kotlin.jvm.internal.CollectionToArray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
@@ -47,7 +49,7 @@ public class SimpleBatchTools {
         final String line = it.next();
         buffer.add(line);
         if (count % batchSize == 0) {
-          consumer.accept(buffer);
+          consumer.accept(ImmutableList.copyOf(buffer));
           buffer.clear();
           /*测试的时候可能只想要测试第一批*/
           if (onlyFirstBatch) {
@@ -56,7 +58,7 @@ public class SimpleBatchTools {
         }
       }
       if (buffer.size() > 0) {
-        consumer.accept(buffer);
+        consumer.accept(ImmutableList.copyOf(buffer));
         buffer.clear();
       }
 
@@ -68,6 +70,7 @@ public class SimpleBatchTools {
       }
     }
   }
+
 
   public static <T> void batchWithCollection(
       final Iterable<T> collection,
