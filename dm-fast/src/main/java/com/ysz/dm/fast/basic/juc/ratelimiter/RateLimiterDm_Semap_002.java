@@ -8,6 +8,10 @@ import com.ysz.dm.fast.infra.tools.MixUtils;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+
+/**
+ * <pre>信号量的思路</pre>
+ */
 public class RateLimiterDm_Semap_002 {
 
   private final MetricRegistry metrics;
