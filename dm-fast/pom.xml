@@ -12,6 +12,20 @@
   <artifactId>dm-fast</artifactId>
 
   <dependencies>
+
+
+    <dependency>
+      <groupId>io.github.resilience4j</groupId>
+      <artifactId>resilience4j-core</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.github.resilience4j</groupId>
+      <artifactId>resilience4j-ratelimiter</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/junit/junit -->
     <dependency>
       <groupId>junit</groupId>
@@ -217,7 +231,6 @@
       <artifactId>metrics-core</artifactId>
       <version>4.2.3</version>
     </dependency>
-
 
   </dependencies>
 
