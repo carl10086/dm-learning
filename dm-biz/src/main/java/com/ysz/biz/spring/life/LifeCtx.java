@@ -1,11 +1,8 @@
 package com.ysz.biz.spring.life;
 
-import com.alibaba.nacos.api.annotation.NacosProperties;
-import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
-import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySources;
 import com.ysz.biz.spring.life.anno.EnableMyBeanAnno;
-import com.ysz.biz.spring.life.anno.EnableMyNacosAnno;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -29,6 +26,11 @@ import org.springframework.context.annotation.PropertySource;
 @EnableMyBeanAnno
 @Slf4j
 public class LifeCtx {
+
+  @Bean
+  public SpringInitBeanWatch springInitBeanWatch() {
+    return new SpringInitBeanWatch();
+  }
 
   public LifeCtx() {
     log.info("LifeCtx constructed");
