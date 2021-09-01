@@ -9,6 +9,15 @@ public enum MyResult {
   BELOW_MINIMUM_CALLS_THRESHOLD;
 
 
+  /**
+   * <pre>
+   *   是否 有任何的异常行为
+   *   卡请求 和 挂请求 是否超出了 阈值
+   *
+   * </pre>
+   * @param result 结果
+   * @return
+   */
   public static boolean hasExceededThresholds(MyResult result) {
     return
         hasFailureRateExceededThreshold(result)

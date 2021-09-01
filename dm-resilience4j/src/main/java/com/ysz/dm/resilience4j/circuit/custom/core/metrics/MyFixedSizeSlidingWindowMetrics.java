@@ -48,7 +48,7 @@ public class MyFixedSizeSlidingWindowMetrics implements MyMetrics {
     synchronized (this) {
       totalAggregation.record(duration, durationUnit, outcome);
       moveWindowByOne().record(duration, durationUnit, outcome);
-      return null;
+      return new MySnapshotImpl(totalAggregation);
     }
   }
 
