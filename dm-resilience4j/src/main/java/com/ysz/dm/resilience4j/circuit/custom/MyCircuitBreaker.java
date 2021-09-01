@@ -34,8 +34,8 @@ public class MyCircuitBreaker {
 
   private class MyClosedState implements MyCircuitBreakerState {
 
-    private final MyCircuitBreakerMetrics circuitBreakerMetrics;
-    private final AtomicBoolean isClosed;
+    private MyCircuitBreakerMetrics circuitBreakerMetrics;
+    private AtomicBoolean isClosed;
 
     @Override
     public void acquirePermission() {
