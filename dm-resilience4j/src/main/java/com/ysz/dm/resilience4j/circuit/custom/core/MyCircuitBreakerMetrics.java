@@ -34,6 +34,7 @@ public class MyCircuitBreakerMetrics {
       Clock clock
   ) {
     if (slidingWindowType == MySlidingWindowType.COUNT_BASED) {
+
     }
   }
 
@@ -107,6 +108,4 @@ public class MyCircuitBreakerMetrics {
 
     return snapshot.getFailureRate();
   }
-
-
 }

@@ -4,10 +4,16 @@ import com.google.common.base.Preconditions;
 import com.ysz.dm.resilience4j.circuit.custom.core.MyCircuitBreakerCfg;
 import com.ysz.dm.resilience4j.circuit.custom.core.MyCircuitBreakerMetrics;
 import com.ysz.dm.resilience4j.circuit.custom.core.metrics.MyResult;
+import io.github.resilience4j.circuitbreaker.internal.SchedulerFactory;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,9 +23,20 @@ import java.util.stream.Collectors;
 
 public class MyCircuitBreaker {
 
-  private final MyCircuitBreakerCfg circuitBreakerCfg;
+  /**
+   * <pre>
+   *   方便调试的命名
+   * </pre>
+   */
+  private String name;
 
-  private final AtomicReference<MyCircuitBreakerState> stateReference;
+  private MyCircuitBreakerCfg circuitBreakerCfg;
+
+  private AtomicReference<MyCircuitBreakerState> stateReference;
+
+  private SchedulerFactory schedulerFactory;
+
+  private Clock clock;
 
   public MyCircuitBreaker(
       final MyCircuitBreakerCfg circuitBreakerCfg,
@@ -30,20 +47,50 @@ public class MyCircuitBreaker {
 
   }
 
-
-  private void transitionToOpenState() {
-
+  public String getName() {
+    return name;
   }
 
+  private void transitionToHalfOpenState() {
+//    stateTransition(
+//        MyState.HALF_OPEN,
+//    );
+  }
+
+  private void transitionToOpenState() {
+    stateTransition(
+        MyState.OPEN,
+        currentState
+            ->
+            new MyOpenState(currentState.attempts() + 1, currentState.getMetrics()));
+  }
+
+  /**
+   * <pre>
+   *   状态机转换核心代码 .
+   * </pre>
+   * @param newState 要称为的状态 ...
+   * @param newStateGenerator
+   */
   private void stateTransition(
       MyState newState,
       UnaryOperator<MyCircuitBreakerState> newStateGenerator
   ) {
-
-    stateReference.getAndUpdate(
+    /*原子性操作、修改 state,  同时 ?*/
+    final MyCircuitBreakerState prevState
+        = stateReference.getAndUpdate(
+        /*UnaryOperator 是特殊的 function, 输出和输入都是同一种类型*/
         currentState -> {
-          Stat
-        };
+          /*1. 这里好像不会真正的修改、其实是对 state 的校验~*/
+          MyStateTransition.transitionBetween(
+              getName(),
+              currentState.getState(),
+              newState
+          );
+          /*2. 这里才是返回的是真正修改之后的 state*/
+          /*2.1 到这一步就不需要进行 状态机判断了 ....*/
+          return newStateGenerator.apply(currentState);
+        }
     );
   }
 
@@ -164,6 +211,12 @@ public class MyCircuitBreaker {
     void onError(long duration, TimeUnit durationUnit, Throwable throwable);
 
     void onSuccess(long duration, TimeUnit durationUnit);
+
+    MyState getState();
+
+    MyCircuitBreakerMetrics getMetrics();
+
+    int attempts();
   }
 
 
@@ -178,7 +231,9 @@ public class MyCircuitBreaker {
     }
 
     @Override
-    public void onError(final long duration, final TimeUnit durationUnit,
+    public void onError(
+        final long duration,
+        final TimeUnit durationUnit,
         final Throwable throwable) {
 //      checkIfThresholdsExceeded(circuitBreakerMetrics.onError(duration, durationUnit));
     }
@@ -186,6 +241,21 @@ public class MyCircuitBreaker {
     @Override
     public void onSuccess(final long duration, final TimeUnit durationUnit) {
       checkIfThresholdsExceeded(circuitBreakerMetrics.onSuccess(duration, durationUnit));
+    }
+
+    @Override
+    public MyState getState() {
+      return null;
+    }
+
+    @Override
+    public MyCircuitBreakerMetrics getMetrics() {
+      return null;
+    }
+
+    @Override
+    public int attempts() {
+      return 0;
     }
 
     private void checkIfThresholdsExceeded(MyResult result) {
@@ -197,8 +267,92 @@ public class MyCircuitBreaker {
           transitionToOpenState();
         }
       }
-
     }
   }
 
+
+  private class MyOpenState implements MyCircuitBreakerState {
+
+    /**
+     * <pre>
+     *   为什么 openState 是要一个 attempts 的 .
+     *
+     *   这需要去了解 作者的思路、
+     *
+     *   尝试是因为会失败。 什么场景下会失败:
+     *   -  推理就是 CAS .
+     * </pre>
+     */
+    private int attempts;
+    private Instant retryAfterWaitDuration;
+    private MyCircuitBreakerMetrics circuitBreakerMetrics;
+    private AtomicBoolean isOpen;
+    private ScheduledFuture<?> transitionToHalfOpenFuture;
+
+    public MyOpenState(
+        int attempts,
+        MyCircuitBreakerMetrics circuitBreakerMetrics
+    ) {
+      this.attempts = attempts; /*重试次数, 意味着有指数重试机制*/
+      final Long waitDurationInMillis = circuitBreakerCfg.getWaitIntervalFunctionInOpenState()
+          .apply(attempts);
+
+      this.retryAfterWaitDuration = clock.instant().plus(waitDurationInMillis, ChronoUnit.MILLIS);
+      this.circuitBreakerMetrics = circuitBreakerMetrics;
+
+      /*可以看出这个配置是 自动开启 切换半 Open 状态的配置. 默认是关闭的*/
+      if (circuitBreakerCfg.isAutomaticTransitionFromOpenToHalfOpenEnabled()) {
+        final ScheduledExecutorService scheduledExecutorService = schedulerFactory.getScheduler();
+
+        /*定时任务机制是为了过一段时间自动延迟进入 半开状态*/
+        transitionToHalfOpenFuture = scheduledExecutorService.schedule(
+            this::toHalfOpenState,
+            waitDurationInMillis,
+            TimeUnit.MILLISECONDS
+        );
+      } else {
+        transitionToHalfOpenFuture = null;
+      }
+      isOpen = new AtomicBoolean(true);
+    }
+
+
+    private synchronized void toHalfOpenState() {
+      if (isOpen.compareAndSet(true, false)) {
+        transitionToHalfOpenState();
+      }
+    }
+
+
+    @Override
+    public void acquirePermission() {
+
+    }
+
+    @Override
+    public void onError(final long duration, final TimeUnit durationUnit,
+        final Throwable throwable) {
+
+    }
+
+    @Override
+    public void onSuccess(final long duration, final TimeUnit durationUnit) {
+      circuitBreakerMetrics.onSuccess(duration, durationUnit);
+    }
+
+    @Override
+    public int attempts() {
+      return this.attempts;
+    }
+
+    @Override
+    public MyState getState() {
+      return null;
+    }
+
+    @Override
+    public MyCircuitBreakerMetrics getMetrics() {
+      return null;
+    }
+  }
 }

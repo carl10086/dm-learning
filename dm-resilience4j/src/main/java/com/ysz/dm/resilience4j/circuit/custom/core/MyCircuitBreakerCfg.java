@@ -18,6 +18,11 @@ public class MyCircuitBreakerCfg {
   private int minimumNumberOfCalls = 100;
   private boolean writableStackTraceEnabled = true;
   private boolean automaticTransitionFromOpenToHalfOpenEnabled = false;
+  /**
+   * <pre>
+   *   实际上是状态机转换时的函数. 输入
+   * </pre>
+   */
   private IntervalFunction waitIntervalFunctionInOpenState = IntervalFunction
       .of(Duration.ofSeconds(60));
   private float slowCallRateThreshold = 100;
