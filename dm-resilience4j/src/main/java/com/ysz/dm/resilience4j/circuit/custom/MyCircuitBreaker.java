@@ -3,8 +3,10 @@ package com.ysz.dm.resilience4j.circuit.custom;
 import com.google.common.base.Preconditions;
 import com.ysz.dm.resilience4j.circuit.custom.core.MyCircuitBreakerCfg;
 import com.ysz.dm.resilience4j.circuit.custom.core.MyCircuitBreakerMetrics;
+import com.ysz.dm.resilience4j.circuit.custom.core.exceptions.MyCallNotPermittedException;
 import com.ysz.dm.resilience4j.circuit.custom.core.metrics.MyResult;
 import io.github.resilience4j.circuitbreaker.internal.SchedulerFactory;
+import io.github.resilience4j.core.lang.Nullable;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import java.time.Clock;
@@ -16,6 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -47,14 +50,23 @@ public class MyCircuitBreaker {
 
   }
 
+  public MyCircuitBreakerCfg getCircuitBreakerCfg() {
+    return circuitBreakerCfg;
+  }
+
+  public MyState getState() {
+    return this.stateReference.get().getState();
+  }
+
   public String getName() {
     return name;
   }
 
   private void transitionToHalfOpenState() {
-//    stateTransition(
-//        MyState.HALF_OPEN,
-//    );
+    stateTransition(
+        MyState.HALF_OPEN,
+        currentState -> new HalfOpenState(currentState.attempts())
+    );
   }
 
   private void transitionToOpenState() {
@@ -67,7 +79,7 @@ public class MyCircuitBreaker {
 
   /**
    * <pre>
-   *   状态机转换核心代码 .
+   *   状态机转换核心代码 ...
    * </pre>
    * @param newState 要称为的状态 ...
    * @param newStateGenerator
@@ -206,6 +218,11 @@ public class MyCircuitBreaker {
 
   private interface MyCircuitBreakerState {
 
+    /**
+     * <pre>
+     *   最核心的代码 ..
+     * </pre>
+     */
     void acquirePermission();
 
     void onError(long duration, TimeUnit durationUnit, Throwable throwable);
@@ -227,7 +244,7 @@ public class MyCircuitBreaker {
 
     @Override
     public void acquirePermission() {
-
+      /*完全没有操作.*/
     }
 
     @Override
@@ -317,9 +334,11 @@ public class MyCircuitBreaker {
     }
 
 
-    private synchronized void toHalfOpenState() {
-      if (isOpen.compareAndSet(true, false)) {
-        transitionToHalfOpenState();
+    private void toHalfOpenState() {
+      synchronized (this) {
+        if (isOpen.compareAndSet(true, false)) {
+          transitionToHalfOpenState();
+        }
       }
     }
 
@@ -353,6 +372,112 @@ public class MyCircuitBreaker {
     @Override
     public MyCircuitBreakerMetrics getMetrics() {
       return null;
+    }
+  }
+
+  private class HalfOpenState implements MyCircuitBreakerState {
+
+    private AtomicInteger permittedNumberOfCalls;
+    /**
+     * 开闭状态、唯一性控制
+     */
+    private AtomicBoolean isHalfOpen;
+    private int attempts;
+    private MyCircuitBreakerMetrics circuitBreakerMetrics;
+    @Nullable
+    private ScheduledFuture<?> transitionToOpenFuture;
+
+
+    HalfOpenState(int attempts) {
+      /*1. 获取 半开状态下的 窗口*/
+      int permittedNumberOfCallsInHalfOpenState = circuitBreakerCfg
+          .getPermittedNumberOfCallsInHalfOpenState();
+
+      this.circuitBreakerMetrics = MyCircuitBreakerMetrics.forHalfOpen(
+          permittedNumberOfCallsInHalfOpenState,
+          getCircuitBreakerCfg(),
+          clock
+      );
+      this.permittedNumberOfCalls = new AtomicInteger(permittedNumberOfCallsInHalfOpenState);
+      this.isHalfOpen = new AtomicBoolean(true);
+      this.attempts = attempts;
+
+      /**
+       * 参数默认是 0 、
+       * >=1 的话，会做一个基于时间的策略，过了这么多时间自动转化为 OpenState
+       */
+      final long maxWaitDurationInHalfOpenState = circuitBreakerCfg
+          .getMaxWaitDurationInHalfOpenState().toMillis();
+      if (maxWaitDurationInHalfOpenState >= 1) {
+        final ScheduledExecutorService scheduledExecutorService = schedulerFactory.getScheduler();
+        this.transitionToOpenFuture = scheduledExecutorService
+            .schedule(this::toOpenState, maxWaitDurationInHalfOpenState, TimeUnit.MILLISECONDS);
+      } else {
+        this.transitionToOpenFuture = null;
+      }
+
+//      MyCircuitBreakerMetrics.for
+    }
+
+    /**
+     * <pre>
+     *   判断当前的请求是否允许 .
+     * </pre>
+     * @return true: 计数器 !=0
+     */
+    public boolean tryAcquirePermission() {
+      /*一个原子性 -- 操作、防止 < 0 ;  然后是 getAndUpdate */
+      if (permittedNumberOfCalls.getAndUpdate(
+          current -> current == 0 ? current : --current)
+          > 0) {
+        return true;
+      }
+      /*同时、保留 超出允许请求的计数器*/
+      circuitBreakerMetrics.onCallNotPermitted();
+      return false;
+    }
+
+
+    @Override
+    public void acquirePermission() {
+        if (!tryAcquirePermission()) {
+          throw MyCallNotPermittedException.createCallNotPermittedException(
+              MyCircuitBreaker.this
+          );
+        }
+    }
+
+    private void toOpenState() {
+      if (!isHalfOpen.compareAndSet(true, false)) {
+        transitionToOpenState();
+      }
+    }
+
+    @Override
+    public void onError(final long duration, final TimeUnit durationUnit,
+        final Throwable throwable) {
+
+    }
+
+    @Override
+    public void onSuccess(final long duration, final TimeUnit durationUnit) {
+
+    }
+
+
+    @Override
+    public MyState getState() {
+      return null;
+    }
+
+    @Override
+    public MyCircuitBreakerMetrics getMetrics() {
+      return null;
+    }
+
+    @Override
+    public int attempts() {
+      return 0;
     }
   }
 }

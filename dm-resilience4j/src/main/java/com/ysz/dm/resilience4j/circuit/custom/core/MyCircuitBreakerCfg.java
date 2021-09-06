@@ -28,6 +28,7 @@ public class MyCircuitBreakerCfg {
   private float slowCallRateThreshold = 100;
   private Duration slowCallDurationThreshold = Duration
       .ofSeconds(60);
+  private Duration maxWaitDurationInHalfOpenState = Duration.ofSeconds(0);
 
 
   private MyCircuitBreakerCfg() {

@@ -1,5 +1,6 @@
 package com.ysz.dm.resilience4j.circuit.custom.core;
 
+import com.ysz.dm.resilience4j.circuit.custom.core.metrics.MyFixedSizeSlidingWindowMetrics;
 import com.ysz.dm.resilience4j.circuit.custom.core.metrics.MyMetrics;
 import com.ysz.dm.resilience4j.circuit.custom.core.metrics.MyMetrics.MyOutcome;
 import com.ysz.dm.resilience4j.circuit.custom.core.metrics.MyResult;
@@ -27,15 +28,56 @@ public class MyCircuitBreakerMetrics {
   private LongAdder numberOfNotPermittedCalls;
   private int minimumNumberOfCalls;
 
+
+  /**
+   * <pre>
+   *   create from Half Open ...
+   *   1. 此时窗口转化为 COUNT_BASED
+   *   2. 窗口大小上限调整为 permittedNumberOfCallsInHalfOpenState, 但是不可能超过 cfg 的 getMinimumNumberOfCalls
+   * </pre>
+   * @param permittedNumberOfCallsInHalfOpenState openState 中允许的请求
+   * @param circuitBreakerCfg cfg
+   * @param clock clock
+   * @return
+   */
+  public static MyCircuitBreakerMetrics forHalfOpen(
+      final int permittedNumberOfCallsInHalfOpenState,
+      final MyCircuitBreakerCfg circuitBreakerCfg,
+      final Clock clock
+  ) {
+    return new MyCircuitBreakerMetrics(
+        permittedNumberOfCallsInHalfOpenState,
+        MySlidingWindowType.COUNT_BASED,
+        circuitBreakerCfg,
+        clock
+    );
+  }
+
+  /**
+   *
+   * @param slidingWindowSize 滑动窗口大小
+   * @param slidingWindowType 滑动窗口类型
+   * @param circuitBreakerCfg 配置
+   * @param clock
+   */
   public MyCircuitBreakerMetrics(
       int slidingWindowSize,
       MySlidingWindowType slidingWindowType,
       MyCircuitBreakerCfg circuitBreakerCfg,
       Clock clock
   ) {
+    /*1. 如果是基于计数器的 滑动窗口*/
     if (slidingWindowType == MySlidingWindowType.COUNT_BASED) {
-
+      this.metrics = new MyFixedSizeSlidingWindowMetrics(slidingWindowSize);
+      this.minimumNumberOfCalls = Math
+          .min(slidingWindowSize, circuitBreakerCfg.getMinimumNumberOfCalls());
     }
+
+    this.failureRateThreshold = circuitBreakerCfg.getFailureRateThreshold();
+    this.slowCallRateThreshold = circuitBreakerCfg.getSlowCallRateThreshold();
+    this.slowCallDurationThresholdInNanos = circuitBreakerCfg.getSlowCallDurationThreshold()
+        .toNanos();
+    this.numberOfNotPermittedCalls = new LongAdder();
   }
 
 
@@ -107,5 +149,9 @@ public class MyCircuitBreakerMetrics {
     }
 
     return snapshot.getFailureRate();
+  }
+
+  public void onCallNotPermitted() {
+    this.numberOfNotPermittedCalls.increment();
   }
 }
