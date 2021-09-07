@@ -15,14 +15,14 @@ public class Circuit_Dm_001 {
       .slowCallRateThreshold(50)
       .waitDurationInOpenState(Duration.ofMillis(1000))
       .slowCallDurationThreshold(Duration.ofSeconds(2))
-      .permittedNumberOfCallsInHalfOpenState(3)
+      .permittedNumberOfCallsInHalfOpenState(0)
       .minimumNumberOfCalls(10)
-      .slidingWindowType(SlidingWindowType.TIME_BASED)
-      .slidingWindowSize(5)
+      .slidingWindowType(SlidingWindowType.COUNT_BASED)
+      .slidingWindowSize(10)
 //      .recordException(e -> INTERNAL_SERVER_ERROR
 //          .equals(getResponse().getStatus()))
-      .recordExceptions(RuntimeException.class)
-      .ignoreExceptions(NullPointerException.class)
+//      .recordExceptions(RuntimeException.class)
+//      .ignoreExceptions(NullPointerException.class)
       .build();
 
   CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.of(circuitBreakerConfig);
@@ -30,17 +30,19 @@ public class Circuit_Dm_001 {
   public void execute() {
     CircuitBreaker c1 = circuitBreakerRegistry.circuitBreaker("name1");
 
-    final CheckedFunction0<String> stringCheckedFunction0 = c1
-        .decorateCheckedSupplier((CheckedFunction0<String>) () -> {
-          System.err.println(1);
-          Thread.sleep(1000L);
-          return "ok";
-        });
+    for (int i = 0; i < 20; i++) {
+      final int count = i;
+      final CheckedFunction0<Integer> stringCheckedFunction0 = c1
+          .decorateCheckedSupplier((CheckedFunction0<Integer>) () -> {
+            int j = 0;
+            return count / j;
+          });
 
-    final Try<String> of = Try.of(stringCheckedFunction0);
-
-    System.err.println(of.get());
-
+      try {
+        Try.of(stringCheckedFunction0).get();
+      } catch (Exception ignored) {
+      }
+    }
   }
 
 

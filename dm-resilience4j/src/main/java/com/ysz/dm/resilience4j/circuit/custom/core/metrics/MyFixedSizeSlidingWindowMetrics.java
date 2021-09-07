@@ -54,7 +54,6 @@ public class MyFixedSizeSlidingWindowMetrics implements MyMetrics {
 
   private MyMeasurement moveWindowByOne() {
     moveHeadIndexByOne();
-    /*目得是为了释放 部分资源吧.*/
     final MyMeasurement latestMeasurement = this.measurements[headIndex];
     totalAggregation.removeBucket(latestMeasurement);
     latestMeasurement.reset();

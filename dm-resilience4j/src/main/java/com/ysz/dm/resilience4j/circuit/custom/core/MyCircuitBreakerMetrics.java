@@ -94,6 +94,19 @@ public class MyCircuitBreakerMetrics {
     );
 
     return checkIfThresholdsExceeded(snapshot);
+  }
+
+  public MyResult onError(
+      long duration,
+      TimeUnit durationUnit
+  ) {
+    return checkIfThresholdsExceeded(metrics.record(
+        duration,
+        durationUnit,
+        durationUnit.toNanos(duration) > slowCallDurationThresholdInNanos ?
+            MyOutcome.SLOW_ERROR :
+            MyOutcome.ERROR
+    ));
 
   }
 
@@ -104,7 +117,7 @@ public class MyCircuitBreakerMetrics {
     float failureRateInPercentage = getFailureRate(snapshot);
     float slowCallsInPercentage = getSlowCallRate(snapshot);
 
-    /*2. 这直接说明了上面特殊值 -1 的作用 是说明 目前的 call 还不够*/
+    /*2. 这直接说明了上面特殊值 -1 的作用 是说明 目前的 call 还不够, 也就是处理窗口累积的逻辑在这里*/
     if (failureRateInPercentage == -1 || slowCallsInPercentage == -1) {
       return MyResult.BELOW_MINIMUM_CALLS_THRESHOLD;
     }

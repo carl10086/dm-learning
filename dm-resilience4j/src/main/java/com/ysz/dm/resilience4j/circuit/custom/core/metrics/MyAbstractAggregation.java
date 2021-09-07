@@ -14,7 +14,7 @@ public abstract class MyAbstractAggregation {
 
   /**
    * <pre>
-   *   所有的慢查询 耗时
+   *   所有的慢查询
    * </pre>
    */
   int numberOfSlowCalls = 0;

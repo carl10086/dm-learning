@@ -69,12 +69,18 @@ public class MyCircuitBreaker {
     );
   }
 
+
+  public void transitionToClosedState() {
+    stateTransition(MyState.CLOSED, currentState -> new MyClosedState());
+  }
+
   private void transitionToOpenState() {
     stateTransition(
         MyState.OPEN,
         currentState
             ->
-            new MyOpenState(currentState.attempts() + 1, currentState.getMetrics()));
+            new MyOpenState(currentState.attempts() + 1 /*这里的切换会导致 +1*/,
+                currentState.getMetrics()));
   }
 
   /**
@@ -218,6 +224,8 @@ public class MyCircuitBreaker {
 
   private interface MyCircuitBreakerState {
 
+    boolean tryAcquirePermission();
+
     /**
      * <pre>
      *   最核心的代码 ..
@@ -241,6 +249,11 @@ public class MyCircuitBreaker {
 
     private MyCircuitBreakerMetrics circuitBreakerMetrics;
     private AtomicBoolean isClosed;
+
+    @Override
+    public boolean tryAcquirePermission() {
+      return true;
+    }
 
     @Override
     public void acquirePermission() {
@@ -344,6 +357,11 @@ public class MyCircuitBreaker {
 
 
     @Override
+    public boolean tryAcquirePermission() {
+      return false;
+    }
+
+    @Override
     public void acquirePermission() {
 
     }
@@ -393,6 +411,7 @@ public class MyCircuitBreaker {
       int permittedNumberOfCallsInHalfOpenState = circuitBreakerCfg
           .getPermittedNumberOfCallsInHalfOpenState();
 
+      /*2. 进入到 HalfOpenState 会创建一个新的窗口*/
       this.circuitBreakerMetrics = MyCircuitBreakerMetrics.forHalfOpen(
           permittedNumberOfCallsInHalfOpenState,
           getCircuitBreakerCfg(),
@@ -440,11 +459,11 @@ public class MyCircuitBreaker {
 
     @Override
     public void acquirePermission() {
-        if (!tryAcquirePermission()) {
-          throw MyCallNotPermittedException.createCallNotPermittedException(
-              MyCircuitBreaker.this
-          );
-        }
+      if (!tryAcquirePermission()) {
+        throw MyCallNotPermittedException.createCallNotPermittedException(
+            MyCircuitBreaker.this
+        );
+      }
     }
 
     private void toOpenState() {
@@ -456,14 +475,120 @@ public class MyCircuitBreaker {
     @Override
     public void onError(final long duration, final TimeUnit durationUnit,
         final Throwable throwable) {
+      this.checkIfThresholdsExceeded(
+          circuitBreakerMetrics.onError(duration, durationUnit)
+      );
+    }
+
+    @Override
+    public void onSuccess(final long duration, final TimeUnit durationUnit) {
+      this.checkIfThresholdsExceeded(circuitBreakerMetrics.onSuccess(duration, durationUnit));
+    }
+
+    private void checkIfThresholdsExceeded(MyResult result) {
+      if (MyResult.hasExceededThresholds(result)) {
+        if (isHalfOpen.compareAndSet(true, false)) {
+          transitionToOpenState();
+        }
+      }
+
+      if (result == MyResult.BELOW_THRESHOLDS) {
+        if (isHalfOpen.compareAndSet(true, false)) {
+          transitionToClosedState();
+        }
+      }
+    }
+
+
+    @Override
+    public MyState getState() {
+      return MyCircuitBreaker.MyState.HALF_OPEN;
+    }
+
+    @Override
+    public MyCircuitBreakerMetrics getMetrics() {
+      return null;
+    }
+
+    @Override
+    public int attempts() {
+      return 0;
+    }
+  }
+
+
+  private class OpenState implements MyCircuitBreakerState {
+
+    private int attempts;
+    private Instant retryAfterWaitDuration;
+    private MyCircuitBreakerMetrics circuitBreakerMetrics;
+    private AtomicBoolean isOpen;
+
+    private ScheduledFuture<?> transitionToHalfOpenFuture;
+
+    public OpenState(
+        final int attempts,
+        final MyCircuitBreakerMetrics circuitBreakerMetrics) {
+
+      this.attempts = attempts;
+
+      final Long waitDurationInMillis = circuitBreakerCfg.getWaitIntervalFunctionInOpenState()
+          .apply(attempts);
+      this.retryAfterWaitDuration = clock.instant().plus(waitDurationInMillis, ChronoUnit.MILLIS);
+      this.circuitBreakerMetrics = circuitBreakerMetrics;
+
+      if (circuitBreakerCfg.isAutomaticTransitionFromOpenToHalfOpenEnabled()) {
+        transitionToHalfOpenFuture = schedulerFactory.getScheduler()
+            .schedule(this::toHalfOpenState, waitDurationInMillis, TimeUnit.MILLISECONDS);
+      } else {
+        transitionToHalfOpenFuture = null;
+      }
+
+      isOpen = new AtomicBoolean(true);
+    }
+
+    private synchronized void toHalfOpenState() {
+      if (isOpen.compareAndSet(true, false)) {
+        transitionToHalfOpenState();
+      }
+    }
+
+    @Override
+    public boolean tryAcquirePermission() {
+      if (clock.instant().isAfter(retryAfterWaitDuration)) { //(1)  超过开放窗口 进入半开状态
+        toHalfOpenState(); // (2) 必须进入半开状态
+        boolean callPermitted = stateReference.get().tryAcquirePermission(); //(2) 尝试一下
+
+        if (!callPermitted) {
+          circuitBreakerMetrics.onCallNotPermitted();
+        }
+
+        return callPermitted;
+      }
+
+      circuitBreakerMetrics.onCallNotPermitted();
+      return false;
+    }
+
+    @Override
+    public void acquirePermission() {
+      if (!tryAcquirePermission()) {
+        throw MyCallNotPermittedException.createCallNotPermittedException(
+            MyCircuitBreaker.this
+        );
+      }
+    }
+
+    @Override
+    public void onError(final long duration, final TimeUnit durationUnit,
+        final Throwable throwable) {
 
     }
 
     @Override
     public void onSuccess(final long duration, final TimeUnit durationUnit) {
-
+      this.circuitBreakerMetrics.onSuccess(duration, durationUnit);
     }
-
 
     @Override
     public MyState getState() {
