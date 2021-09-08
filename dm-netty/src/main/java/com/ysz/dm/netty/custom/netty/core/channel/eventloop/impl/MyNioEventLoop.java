@@ -1,7 +1,7 @@
-package com.ysz.dm.netty.custom.core.channel.eventloop.impl;
+package com.ysz.dm.netty.custom.netty.core.channel.eventloop.impl;
 
-import com.ysz.dm.netty.custom.core.channel.eventloop.MySingleThreadEventLoop;
-import com.ysz.dm.netty.custom.core.channel.eventloop.selection.MySelectedSelectionKeySet;
+import com.ysz.dm.netty.custom.netty.core.channel.eventloop.MySingleThreadEventLoop;
+import com.ysz.dm.netty.custom.netty.core.channel.eventloop.selection.MySelectedSelectionKeySet;
 import io.netty.channel.ChannelException;
 import io.netty.util.internal.PlatformDependent;
 import io.netty.util.internal.SystemPropertyUtil;
