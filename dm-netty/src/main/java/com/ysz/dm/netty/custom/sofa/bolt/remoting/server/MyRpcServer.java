@@ -4,6 +4,7 @@ import com.ysz.dm.netty.custom.sofa.bolt.remoting.cfg.MyBoltGenericOptions;
 import com.ysz.dm.netty.custom.sofa.bolt.remoting.cfg.MyBoltServerOptions;
 import com.ysz.dm.netty.custom.sofa.bolt.remoting.core.address.MyAddressParser;
 import com.ysz.dm.netty.custom.sofa.bolt.remoting.core.address.MyAddressParserImpl;
+import com.ysz.dm.netty.custom.sofa.bolt.remoting.core.protocol.codec.MyCodec;
 import com.ysz.dm.netty.custom.sofa.bolt.remoting.core.connection.MyConnectionManager;
 import com.ysz.dm.netty.custom.sofa.bolt.remoting.core.connection.impl.MyDefaultConnectionManager;
 import com.ysz.dm.netty.custom.sofa.bolt.remoting.core.connection.impl.MyRandomSelectStrategy;
@@ -12,13 +13,16 @@ import com.ysz.dm.netty.custom.sofa.bolt.remoting.infra.utils.MyNettyEventLoopUt
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.UnpooledByteBufAllocator;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.WriteBufferWaterMark;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.flush.FlushConsolidationHandler;
+import io.netty.handler.timeout.IdleStateHandler;
+import java.util.concurrent.TimeUnit;
 
 public class MyRpcServer extends MyAbstractRemotingServer {
 
@@ -26,6 +30,7 @@ public class MyRpcServer extends MyAbstractRemotingServer {
   private ChannelFuture channelFuture;
   private MyAddressParser myAddressParser;
   private MyConnectionManager connectionManager;
+  private MyCodec codec;
 
 
   private final EventLoopGroup boss = MyNettyEventLoopUtils.newEventLoopGroup(
@@ -67,13 +72,28 @@ public class MyRpcServer extends MyAbstractRemotingServer {
     final boolean flushConsolidationSwitch = getOption(
         MyBoltGenericOptions.NETTY_FLUSH_CONSOLIDATION);
 
-    final int idleTime = getOption(MyBoltServerOptions.TCP_SERVER_IDLE);
-    this.bootstrap.childHandler(new ChannelInitializer<>() {
-      @Override
-      protected void initChannel(final Channel channel) throws Exception {
-        final ChannelPipeline pipeline = channel.pipeline();
-        if (flushConsolidationSwitch) {
+    final MyServerIdleHandler serverIdleHandler = new MyServerIdleHandler();
 
+    final int idleTime = getOption(MyBoltServerOptions.TCP_SERVER_IDLE);
+    this.bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
+      @Override
+      protected void initChannel(final SocketChannel channel) throws Exception {
+        final ChannelPipeline pipeline = channel.pipeline();
+
+        if (flushConsolidationSwitch) {
+          pipeline.addLast(
+              /*Netty 实现的类似于 nagles 的 flush 算法、 开启的时候增加吞吐量而牺牲延迟*/
+              "flushConsolidationHandler", new FlushConsolidationHandler(1024, true)
+          );
+          pipeline.addLast("decoder", codec.newDecoder());
+          pipeline.addLast("encoder", codec.newEncoder());
+
+          if (idleSwitch) {
+            pipeline.addLast("idleStateHandler", new IdleStateHandler(
+                0, 0, idleTime, TimeUnit.MILLISECONDS
+            ));
+            pipeline.addLast("serverIdeleHandler", serverIdleHandler);
+          }
         }
       }
     });

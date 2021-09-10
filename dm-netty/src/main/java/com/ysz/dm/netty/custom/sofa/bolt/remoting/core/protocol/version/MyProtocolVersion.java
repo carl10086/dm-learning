@@ -1,4 +1,4 @@
-package com.ysz.dm.netty.custom.sofa.bolt.remoting.core.version;
+package com.ysz.dm.netty.custom.sofa.bolt.remoting.core.protocol.version;
 
 import lombok.Getter;
 import lombok.ToString;
