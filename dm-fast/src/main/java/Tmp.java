@@ -1,7 +1,10 @@
 public class Tmp {
 
   public static void main(String[] args) throws Exception {
-    final CrossThreadObj crossThreadObj = new CrossThreadObj();
+    final long l = System.nanoTime();
+
+    Thread.sleep(1000L);
+    System.out.println(System.nanoTime() - l);
   }
 
 

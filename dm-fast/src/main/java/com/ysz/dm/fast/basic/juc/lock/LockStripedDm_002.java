@@ -1,6 +1,8 @@
 package com.ysz.dm.fast.basic.juc.lock;
 
 import com.google.common.util.concurrent.Striped;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
 public class LockStripedDm_002 {
@@ -14,6 +16,13 @@ public class LockStripedDm_002 {
     System.out.println(getLock("AaAa"));
     System.out.println(getLock("BBBB"));
     System.out.println(getLock("CCCCC"));
+
+    Map<String, String> map = new HashMap<>();
+
+    map.put("AaAa", "AaAa");
+    map.put("BBBB", "BBBB");
+
+    System.out.println(map);
   }
 
 
