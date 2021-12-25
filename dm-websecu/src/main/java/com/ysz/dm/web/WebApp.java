@@ -11,12 +11,12 @@ import org.springframework.context.annotation.PropertySource;
  */
 @SpringBootApplication
 @Configuration
-@PropertySource(
-    value = {
-        "file:///Users/carl/Projects/IdeaProjects/dm-learning/dm-websecu/conf/a.properties"
-    }
-
-)
+//@PropertySource(
+//    value = {
+//        "file:///Users/carl/Projects/IdeaProjects/dm-learning/dm-websecu/conf/a.properties"
+//    }
+//
+//)
 public class WebApp {
 
   public static void main(String[] args) throws Exception {

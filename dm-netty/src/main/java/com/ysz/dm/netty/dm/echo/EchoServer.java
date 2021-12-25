@@ -8,6 +8,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -34,26 +35,22 @@ public class EchoServer {
               new ChannelInitializer<SocketChannel>() {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
-                  ch.pipeline(  )
+                  ch.pipeline()
                       .addLast(
                           new ChannelInboundHandlerAdapter() {
-
                             @Override
-                            public void channelRead(ChannelHandlerContext ctx, Object msg)
-                                throws Exception {
-                              ctx.write(msg); // 仅仅是加入到缓冲 ...
-                              ctx.write(msg); // 仅仅是加入到缓冲 ...
+                            public void channelRead(ChannelHandlerContext ctx, Object msg) {
+                              ctx.write(msg);
                             }
 
                             @Override
-                            public void channelReadComplete(ChannelHandlerContext ctx)
-                                throws Exception {
+                            public void channelReadComplete(ChannelHandlerContext ctx) {
                               ctx.flush();
                             }
 
                             @Override
-                            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-                                throws Exception {
+                            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+                              // Close the connection when an exception is raised.
                               cause.printStackTrace();
                               ctx.close();
                             }
