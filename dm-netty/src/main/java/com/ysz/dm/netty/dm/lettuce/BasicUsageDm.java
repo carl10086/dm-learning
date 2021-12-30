@@ -56,7 +56,7 @@ public class BasicUsageDm {
         redisClient, StringCodec.UTF8,
         Lists.newArrayList(
             RedisURI.Builder.redis("10.200.64.4", 6379).withDatabase(0).build(),
-            RedisURI.Builder.redis("10.200.64.5", 6379).withDatabase(0).build()
+            RedisURI.Builder.redis("10.200.64.4", 6379).withDatabase(0).build()
         )
     );
 
