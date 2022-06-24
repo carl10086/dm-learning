@@ -279,6 +279,16 @@
     </dependency>
     <!--   ===================== maxwell end=====================-->
 
+
+    <!--    yauua ,  http agent parser-->
+    <!-- https://mvnrepository.com/artifact/nl.basjes.parse.useragent/yauaa -->
+    <dependency>
+      <groupId>nl.basjes.parse.useragent</groupId>
+      <artifactId>yauaa</artifactId>
+      <version>6.12</version>
+    </dependency>
+
+
   </dependencies>
 
   <artifactId>dm-biz</artifactId>

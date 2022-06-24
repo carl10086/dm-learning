@@ -26,8 +26,7 @@ public class Tmp {
   public static void main(String[] args) throws Exception {
 //    System.out.println(URLDecoder.decode("%CE%A2%D0%C5%CA%B1%C9%D0%B0%C5%C9%AF%B5%E7%D7%D3%BF%AF", "utf-8"));
 //    System.out.println(URLDecoder.decode("%CE%A2%D0%C5%CA%B1%C9%D0%B0%C5%C9%AF%B5%E7%D7%D3%BF%AF", "gbk"));
-    System.out.println(URLEncoder.encode(",什么贵哈哈哈\n\r..fdsf///", "utf-8"));
-    System.out.println(URLEncoder.encode(",什么贵哈哈哈\n\r..fdsf///", "gbk"));
+    System.out.println(URLEncoder.encode("something for nothing", "utf-8"));
 
   }
 
