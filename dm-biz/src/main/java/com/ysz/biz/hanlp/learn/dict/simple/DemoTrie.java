@@ -1,8 +1,12 @@
-package com.ysz.biz.hanlp.learn.dict;
+package com.ysz.biz.hanlp.learn.dict.simple;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 最简单版本的 trie 树实现, 基于 HashMap
+ * @param <V>
+ */
 public class DemoTrie<V> {
 
   private Map<Character, DemoTrie<V>> children = new HashMap<>();
