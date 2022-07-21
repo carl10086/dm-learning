@@ -1,7 +1,9 @@
 package com.ysz.dm.fast.algorithm.string.bm.custom;
 
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class MyBmV2 {
@@ -25,6 +27,25 @@ public class MyBmV2 {
     return map;
   }
 
+  public void generateGS(char[] b, int[] suffix, boolean[] prefix) {
+    int m = b.length;
+    for (int i = 0; i < m; ++i) { // 初始化
+      suffix[i] = -1;
+      prefix[i] = false;
+    }
+    for (int i = 0; i < m - 1; ++i) { // b[0, i]
+      int j = i;
+      int k = 0; // 公共后缀子串长度
+      while (j >= 0 && b[j] == b[m - 1 - k]) { // 与b[0, m-1]求公共后缀子串
+        --j;
+        ++k;
+        suffix[k] = j + 1; //j+1表示公共后缀子串在b[0, i]中的起始下标
+      }
+      if (j == -1) {
+        prefix[k] = true; //如果公共后缀子串也是模式串的前缀子串
+      }
+    }
+  }
 
   /**
    * <pre>
@@ -75,19 +96,31 @@ public class MyBmV2 {
         return start - patternLen + 1;
       }
 
-      char badChar = source[badCharIndex];
-      int step = 0;
-      if (!charLastIndexMap.containsKey(badChar)) {
-        step = patternLen;
-      } else {
-        step = patternLen - 1 - charLastIndexMap.get(badChar);
-      }
+      /*优化: 使用坏字符规则计算移动位数*/
+      int calStepByBadChar = getStep(charLastIndexMap, patternLen, source[badCharIndex]);
 
-      log.info("badchar step:{}", step);
+      log.info("badchar step:{}", calStepByBadChar);
 
-      start = start + step;
+      start = start + calStepByBadChar;
     }
     return -1;
+  }
+
+  /**
+   * 利用坏字符算法规则计算移动长度
+   *
+   * @param charLastIndexMap 坏子符使用的 hash 表, 记录了 char 最后一次出现的位置
+   * @param patternLen 模式串长度
+   * @param badChar 查找到的坏字符
+   */
+  private int getStep(Char2IntOpenHashMap charLastIndexMap, int patternLen, char badChar) {
+    int step = 0;
+    if (!charLastIndexMap.containsKey(badChar)) {
+      step = patternLen;
+    } else {
+      step = patternLen - 1 - charLastIndexMap.get(badChar);
+    }
+    return step;
   }
 
 
@@ -99,9 +132,11 @@ public class MyBmV2 {
 
 
   public static void main(String[] args) throws Exception {
-    System.out.println(
-        new MyBmV2().search("baaa", "aaaaaaaaaaaaaaaa")
-    );
+    char[] pattern = "cabcab".toCharArray();
+    int[] suffix = new int[pattern.length];
+    boolean[] prefix = new boolean[pattern.length];
+    new MyBmV2().generateGS(pattern, suffix, prefix);
+
   }
 
 }
