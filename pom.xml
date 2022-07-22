@@ -7,8 +7,7 @@
   <groupId>com.ysz</groupId>
   <artifactId>dm-learning</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
-
+  <version>220722.1732</version>
 
   <dependencies>
     <dependency>
@@ -27,8 +26,6 @@
 
   <build>
     <plugins>
-
-      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-archetype-plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-archetype-plugin</artifactId>
@@ -58,8 +55,9 @@
     <module>dm-es</module>
     <module>dm-netty</module>
     <module>dm-etl</module>
-    <module>dm-duitang</module>
     <module>dm-dubbo3</module>
+    <module>dm-ddd</module>
+    <module>dm-ddd/dm-ddd-gw</module>
   </modules>
 
 
