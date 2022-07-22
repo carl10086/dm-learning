@@ -6,19 +6,15 @@
     <artifactId>dm-learning</artifactId>
     <groupId>com.ysz</groupId>
     <version>220722.1732</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>dm-es</artifactId>
+  <artifactId>dm-ddd-gw</artifactId>
 
-
-  <dependencies>
-    <dependency>
-      <groupId>org.ansj</groupId>
-      <artifactId>ansj_seg</artifactId>
-      <version>5.1.6</version>
-    </dependency>
-  </dependencies>
-
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+  </properties>
 
 </project>
