@@ -57,7 +57,6 @@
     <module>dm-etl</module>
     <module>dm-dubbo3</module>
     <module>dm-ddd</module>
-    <module>dm-ddd/dm-ddd-gw</module>
   </modules>
 
 
