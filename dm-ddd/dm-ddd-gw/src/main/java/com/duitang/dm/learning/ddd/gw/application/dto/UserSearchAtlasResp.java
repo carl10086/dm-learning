@@ -1,6 +1,6 @@
 package com.duitang.dm.learning.ddd.gw.application.dto;
 
-import com.duitang.dm.learning.ddd.gw.domain.aggregate.AtlasTinyAggregate;
+import com.duitang.dm.learning.ddd.gw.domain.assemble.AtlasTinyAssemble;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
@@ -10,22 +10,22 @@ import lombok.ToString;
 @Getter
 public class UserSearchAtlasResp {
 
-  private List<AtlasTinyAggregate> atlasTinyAggregates;
+  private List<AtlasTinyAssemble> atlasTinyAssembles;
   private Map<Long, Boolean> atlasLikeMap;
   private Map<Long, Boolean> atlasFavMap;
 
   public UserSearchAtlasResp(
-      List<AtlasTinyAggregate> atlasTinyAggregates,
+      List<AtlasTinyAssemble> atlasTinyAssembles,
       Map<Long, Boolean> atlasLikeMap,
       Map<Long, Boolean> atlasFavMap
   ) {
-    this.atlasTinyAggregates = atlasTinyAggregates;
+    this.atlasTinyAssembles = atlasTinyAssembles;
     this.atlasLikeMap = atlasLikeMap;
     this.atlasFavMap = atlasFavMap;
   }
 
-  public UserSearchAtlasResp setAtlasTinyAggregates(List<AtlasTinyAggregate> atlasTinyAggregates) {
-    this.atlasTinyAggregates = atlasTinyAggregates;
+  public UserSearchAtlasResp setAtlasTinyAssembles(List<AtlasTinyAssemble> atlasTinyAssembles) {
+    this.atlasTinyAssembles = atlasTinyAssembles;
     return this;
   }
 

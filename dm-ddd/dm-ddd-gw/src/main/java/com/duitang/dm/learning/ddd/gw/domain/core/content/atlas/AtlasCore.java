@@ -1,4 +1,4 @@
-package com.duitang.dm.learning.ddd.gw.domain.core.atlas;
+package com.duitang.dm.learning.ddd.gw.domain.core.content.atlas;
 
 import java.time.Instant;
 import lombok.Getter;

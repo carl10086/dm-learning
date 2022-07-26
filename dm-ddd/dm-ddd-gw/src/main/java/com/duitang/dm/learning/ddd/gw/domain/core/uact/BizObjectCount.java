@@ -1,12 +1,15 @@
-package com.duitang.dm.learning.ddd.gw.domain.core.atlas;
+package com.duitang.dm.learning.ddd.gw.domain.core.uact;
 
 import java.time.Instant;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * 一个实体 在 用户行为下的计数 .
+ */
 @ToString
 @Getter
-public class AtlasCount {
+public class BizObjectCount {
 
   private Long id;
 
@@ -24,42 +27,42 @@ public class AtlasCount {
 
   private Instant lastLikeAt;
 
-  public AtlasCount setId(Long id) {
+  public BizObjectCount setId(Long id) {
     this.id = id;
     return this;
   }
 
-  public AtlasCount setFavCnt(Integer favCnt) {
+  public BizObjectCount setFavCnt(Integer favCnt) {
     this.favCnt = favCnt;
     return this;
   }
 
-  public AtlasCount setLikeCnt(Integer likeCnt) {
+  public BizObjectCount setLikeCnt(Integer likeCnt) {
     this.likeCnt = likeCnt;
     return this;
   }
 
-  public AtlasCount setCommentCnt(Integer commentCnt) {
+  public BizObjectCount setCommentCnt(Integer commentCnt) {
     this.commentCnt = commentCnt;
     return this;
   }
 
-  public AtlasCount setCommentUserCnt(Integer commentUserCnt) {
+  public BizObjectCount setCommentUserCnt(Integer commentUserCnt) {
     this.commentUserCnt = commentUserCnt;
     return this;
   }
 
-  public AtlasCount setLastFavAt(Instant lastFavAt) {
+  public BizObjectCount setLastFavAt(Instant lastFavAt) {
     this.lastFavAt = lastFavAt;
     return this;
   }
 
-  public AtlasCount setLastCommentAt(Instant lastCommentAt) {
+  public BizObjectCount setLastCommentAt(Instant lastCommentAt) {
     this.lastCommentAt = lastCommentAt;
     return this;
   }
 
-  public AtlasCount setLastLikeAt(Instant lastLikeAt) {
+  public BizObjectCount setLastLikeAt(Instant lastLikeAt) {
     this.lastLikeAt = lastLikeAt;
     return this;
   }
