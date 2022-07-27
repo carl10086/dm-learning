@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="YOUR_NAME_SPACE">
+  <resultMap id="RM" type="YOUR-DATAOBJECT-NAME">
+    {{#pks}}
+      <result property="{{javaName}}" column="{{colName}}"/>
+    {{/pks}}
+    {{#cols}}
+      <result property="{{javaName}}" column="{{colName}}"/>
+    {{/cols}}
+  </resultMap>
+
+  <sql id="COLS">
+    {{allCols}}
+  </sql>
+
+  {{#findByPk}}
+    <select id="findByPk" parameterType="{{parameterType}}" resultMap="RM">
+      SELECT
+      <include refid="COLS"/>
+      FROM {{tableName}}
+      WHERE {{{whereSql}}}
+    </select>
+  {{/findByPk}}
+
+  {{#updateByVersion}}
+    {{=<% %>=}}
+    <update id="updateByVersion" parameterType="java.util.Map">
+      UPDATE
+      <trim prefix="SET" suffixOverrides=",">
+        <%#cols%>
+        <if test="<%javaName%> != null"><%colName%>=#{<%javaName%>},</if>
+        <%/cols%>
+        <if test="<%version.javaName%> != null"><%version.colName%>=#{<%version.colName%>} + 1,</if>
+
+      </trim>
+    </update>
+    <%={{ }}=%>
+    WHERE {{{whereSql}}}
+  {{/updateByVersion}}
+
+  {{#InsertOne}}
+    <insert id="insertOne" parameterType="{{classId.pkgName}}.{{classId.className}}"
+      {{{useGeneratedKeysStr}}}
+    >
+      INSERT INTO {{tableName}}
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+        {{#cols}}
+          <if test="{{javaName}}!= null">{{colName}},</if>
+        {{/cols}}
+      </trim>
+      <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
+        {{=<% %>=}}
+        <%#cols%>
+        <if test="<%javaName%> != null"><%colName%>=#{<%javaName%>},</if>
+        <%/cols%>
+        <%={{ }}=%>
+      </trim>
+    </insert>
+  {{/InsertOne}}
+
+</mapper>
