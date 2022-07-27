@@ -26,8 +26,8 @@
   {{/findByPk}}
 
   {{#updateByVersion}}
-    {{=<% %>=}}
     <update id="updateByVersion" parameterType="java.util.Map">
+    {{=<% %>=}}
       UPDATE
       <trim prefix="SET" suffixOverrides=",">
         <%#cols%>
@@ -36,9 +36,10 @@
         <if test="<%version.javaName%> != null"><%version.colName%>=#{<%version.colName%>} + 1,</if>
 
       </trim>
-    </update>
     <%={{ }}=%>
-    WHERE {{{whereSql}}}
+      WHERE {{{whereSql}}}
+    </update>
+
   {{/updateByVersion}}
 
   {{#InsertOne}}
