@@ -11,7 +11,7 @@ public class MybatisCodeMakerTest {
   public void execute() throws Exception {
     String jdbcUrl = "jdbc:mysql://10.200.68.3:3306/zcwdb?zeroDateTimeBehavior=convertToNull&useSSL=false";
     String username = "adm";
-    String password = "oK1@cM2]dB2!";
+    String password = "123456";
 
     MysqlCfg mysqlCfg = new MysqlCfg()
         .setJdbcUrl(jdbcUrl)
