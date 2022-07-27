@@ -1,0 +1,17 @@
+package {{id.pkgName}}
+
+
+import lombok.Getter;
+import lombok.ToString;
+import lombok.Setter;
+
+
+@Getter
+@ToString
+@Setter
+public class {{id.className}}{
+
+{{#cols}}
+  private {{javaTypeName}} {{javaName}};
+{{/cols}}
+}
