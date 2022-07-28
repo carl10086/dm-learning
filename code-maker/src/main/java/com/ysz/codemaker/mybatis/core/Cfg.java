@@ -2,6 +2,7 @@ package com.ysz.codemaker.mybatis.core;
 
 import com.ysz.codemaker.toos.common.JavaClassId;
 import com.ysz.codemaker.toos.mysql.core.MysqlCfg;
+import java.io.File;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -25,6 +26,13 @@ public class Cfg {
   private String versionColName;
 
   private JavaClassId dataObjectClass;
+
+  private String mapperXmlMustache = classpathFile("tpl/mybatis/mapper_xml.mustache");
+
+
+  public static String classpathFile(String path) {
+    return Cfg.class.getClassLoader().getResource(path).getFile();
+  }
 
 
   public Cfg setMysql(MysqlCfg mysql) {
@@ -54,6 +62,11 @@ public class Cfg {
 
   public Cfg setDataObjectClass(JavaClassId dataObjectClass) {
     this.dataObjectClass = dataObjectClass;
+    return this;
+  }
+
+  public Cfg setMapperXmlMustache(String mapperXmlMustache) {
+    this.mapperXmlMustache = mapperXmlMustache;
     return this;
   }
 }

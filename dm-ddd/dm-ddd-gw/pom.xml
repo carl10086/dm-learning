@@ -5,7 +5,7 @@
   <parent>
     <artifactId>dm-ddd</artifactId>
     <groupId>com.ysz</groupId>
-    <version>220722.1732</version>
+    <version>220728.1508</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>

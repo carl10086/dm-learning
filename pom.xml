@@ -7,7 +7,7 @@
   <groupId>com.ysz</groupId>
   <artifactId>dm-learning</artifactId>
   <packaging>pom</packaging>
-  <version>220722.1732</version>
+  <version>220728.1508</version>
 
   <dependencies>
     <dependency>

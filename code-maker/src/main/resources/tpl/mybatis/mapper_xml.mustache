@@ -4,16 +4,13 @@
 
 <mapper namespace="YOUR_NAME_SPACE">
   <resultMap id="RM" type="YOUR-DATAOBJECT-NAME">
-    {{#pks}}
+    {{#allCols}}
       <result property="{{javaName}}" column="{{colName}}"/>
-    {{/pks}}
-    {{#cols}}
-      <result property="{{javaName}}" column="{{colName}}"/>
-    {{/cols}}
+    {{/allCols}}
   </resultMap>
 
   <sql id="COLS">
-    {{allCols}}
+    {{allColJoinString}}
   </sql>
 
   {{#findByPk}}
@@ -27,8 +24,8 @@
 
   {{#updateByVersion}}
     <update id="updateByVersion" parameterType="java.util.Map">
-    {{=<% %>=}}
-      UPDATE
+      {{=<% %>=}}
+      UPDATE {{tableName}}
       <trim prefix="SET" suffixOverrides=",">
         <%#cols%>
         <if test="<%javaName%> != null"><%colName%>=#{<%javaName%>},</if>
@@ -36,7 +33,7 @@
         <if test="<%version.javaName%> != null"><%version.colName%>=#{<%version.colName%>} + 1,</if>
 
       </trim>
-    <%={{ }}=%>
+      <%={{ }}=%>
       WHERE {{{whereSql}}}
     </update>
 
@@ -55,7 +52,7 @@
       <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
         {{=<% %>=}}
         <%#cols%>
-        <if test="<%javaName%> != null"><%colName%>=#{<%javaName%>},</if>
+        <if test="<%javaName%> != null">#{<%javaName%>},</if>
         <%/cols%>
         <%={{ }}=%>
       </trim>
