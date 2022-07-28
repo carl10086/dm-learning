@@ -41,8 +41,7 @@ public class MybatisCodeMaker {
   }
 
   private String renderMybatisMapperXml(MysqlMeta mysqlMeta, Cfg cfg) throws Exception {
-    Mustache m = factory.compile(
-        "/Users/carl/IdeaProjects/dm-learning/code-maker/src/main/resources/tpl/mybatis/mapper_xml.mustache");
+    Mustache m = factory.compile(cfg.getMapperXmlMustache());
 
     StringWriter stringWriter = new StringWriter();
 
@@ -60,86 +59,110 @@ public class MybatisCodeMaker {
     int pkSize = pks.size();
 
     /*1. render mybatis result map*/
-    List<RenderColumn> pksOutput = pks.stream().map(x -> toOutputColumn(x, cfg)).collect(Collectors.toList());
-    renderContext.setPks(pksOutput);
-
-    List<RenderColumn> colsOutput = columns.stream().map(x -> toOutputColumn(x, cfg)).collect(Collectors.toList());
-    renderContext.setCols(colsOutput);
-
-    /*2. render mybatis all cols*/
-    List<String> allCols = new ArrayList<>(columns.size() + pks.size());
-    allCols.addAll(pks.stream().map(MysqlColumn::getColumnName).collect(Collectors.toList()));
-    allCols.addAll(columns.stream().map(MysqlColumn::getColumnName).collect(Collectors.toList()));
-    renderContext.setAllCols(StringTools.JOINER.join(allCols));
+    renderContext.setAllCols(allCols(cfg, mysqlMeta));
 
 
+    /*2. render find by pk*/
 
+    renderContext.setFindByPk(new FindByPk().setParameterType(parameterType(pks)).setTableName(cfg.getTableName())
+                                  .setWhereSql(findByPkWhereSql(cfg, pks)));
 
-    /*3. render find by pk*/
-
-    String parameterType = "java.util.Map";
-    if (pkSize == 1) {
-      parameterType = pks.get(0).getJavaTypeMapping().getJavaClass().getName();
-    }
-
-    FindByPk findByPk = new FindByPk().setParameterType(parameterType).setTableName(cfg.getTableName())
-        .setWhereSql(Joiner.on(" AND ")
-                         .join(pksOutput.stream().map(x -> String.format("%s=#{%s}", x.getColName(), x.getJavaName()))
-                                   .collect(Collectors.toList())));
-
-    renderContext.setFindByPk(findByPk);
-
-    /*4. render update by version*/
+    /*3. render update by version*/
     if (cfg.getVersionColName() != null) {
-      List<RenderColumn> otherColumns = new ArrayList<>();
-      RenderColumn versionCol = null;
-
-      for (RenderColumn renderColumn : colsOutput) {
-        if (Objects.equals(renderColumn.getColName(), cfg.getVersionColName())) {
-          versionCol = renderColumn;
-        } else {
-          otherColumns.add(renderColumn);
-        }
+      UpdateByVersion updateByVersion = updateByVersion(cfg, mysqlMeta);
+      if (updateByVersion != null) {
+        renderContext.setUpdateByVersion(updateByVersion);
       }
-
-      if (versionCol != null) {
-        List<RenderColumn> whereCols = new ArrayList<>();
-        whereCols.addAll(pksOutput);
-        whereCols.add(versionCol);
-
-        String whereSql = Joiner.on(" AND ")
-            .join(whereCols.stream().map(x -> String.format("%s=#{%s}", x.getColName(), x.getJavaName()))
-                      .collect(Collectors.toList()));
-        renderContext.setUpdateByVersion(new UpdateByVersion().setCols(otherColumns).setVersion(versionCol)
-                                             .setWhereSql(whereSql).setTableName(cfg.getTableName()));
-
-
-      } else {
-        log.warn("can't find version col , colName:{}, tableName:{}", cfg.getVersionColName(), cfg.getTableName());
-      }
-
-
-      /*5. render insertOne*/
-      List<RenderColumn> allColsOutput = new ArrayList<>();
-      String useGeneratedKeysStr = "";
-      for (MysqlColumn pk : pks) {
-        if (pk.auto()) {
-          RenderColumn renderColumn = toOutputColumn(pk, cfg);
-          useGeneratedKeysStr = String.format("keyProperty=\"%s\" keyColumn=\"%s\" useGeneratedKeys=\"true\"",
-                                              renderColumn.getJavaName(),
-                                              renderColumn.getColName()
-          );
-        } else {
-          allColsOutput.add(toOutputColumn(pk, cfg));
-        }
-      }
-
-      allColsOutput.addAll(colsOutput);
-      renderContext.setInsertOne(new InsertOne().setClassId(cfg.getDataObjectClass()).setCols(allColsOutput)
-                                     .setTableName(cfg.getTableName()).setUseGeneratedKeysStr(useGeneratedKeysStr));
     }
+
+
+    /*4. 渲染 insertOne*/
+    renderContext.setInsertOne(insertOne(cfg, mysqlMeta));
 
     return renderContext;
+  }
+
+  private InsertOne insertOne(Cfg cfg, MysqlMeta mysqlMeta) {
+    List<RenderColumn> allColsOutput = new ArrayList<>();
+    String useGeneratedKeysStr = "";
+    for (MysqlColumn pk : mysqlMeta.getPks()) {
+      if (pk.auto()) {
+        RenderColumn renderColumn = toOutputColumn(pk, cfg);
+        useGeneratedKeysStr = String.format("keyProperty=\"%s\" keyColumn=\"%s\" useGeneratedKeys=\"true\"",
+                                            renderColumn.getJavaName(),
+                                            renderColumn.getColName()
+        );
+      } else {
+        allColsOutput.add(toOutputColumn(pk, cfg));
+      }
+    }
+
+    allColsOutput.addAll(mysqlMeta.getColumns().stream().map(x1 -> toOutputColumn(x1, cfg))
+                             .collect(Collectors.toList()));
+    InsertOne insertOne = new InsertOne().setClassId(cfg.getDataObjectClass()).setCols(allColsOutput)
+        .setTableName(cfg.getTableName()).setUseGeneratedKeysStr(useGeneratedKeysStr);
+    return insertOne;
+  }
+
+  private UpdateByVersion updateByVersion(Cfg cfg, MysqlMeta mysqlMeta) {
+    List<MysqlColumn> columns = mysqlMeta.getColumns();
+    List<MysqlColumn> pks = mysqlMeta.getPks();
+    UpdateByVersion updateByVersion = null;
+
+    /*要区分 version 列和 非 version 列, version 的 set 是 version ++ , 其他列是 = */
+    List<RenderColumn> otherColumns = new ArrayList<>();
+    RenderColumn versionCol = null;
+
+    for (RenderColumn renderColumn : columns.stream().map(x1 -> toOutputColumn(x1, cfg)).collect(Collectors.toList())) {
+      if (Objects.equals(renderColumn.getColName(), cfg.getVersionColName())) {
+        versionCol = renderColumn;
+      } else {
+        otherColumns.add(renderColumn);
+      }
+    }
+
+    /*找到了 version 列*/
+    if (versionCol != null) {
+      List<RenderColumn> whereCols = new ArrayList<>();
+      whereCols.addAll(pks.stream().map(x1 -> toOutputColumn(x1, cfg)).collect(Collectors.toList()));
+      whereCols.add(versionCol);
+
+      String whereSql = Joiner.on(" AND ")
+          .join(whereCols.stream().map(x -> String.format("%s=#{%s}", x.getColName(), x.getJavaName()))
+                    .collect(Collectors.toList()));
+      updateByVersion = new UpdateByVersion().setCols(otherColumns).setVersion(versionCol).setWhereSql(whereSql)
+          .setTableName(cfg.getTableName());
+
+
+    } else {
+      log.warn("can't find version col , colName:{}, tableName:{}", cfg.getVersionColName(), cfg.getTableName());
+    }
+    return updateByVersion;
+  }
+
+  private String findByPkWhereSql(Cfg cfg, List<MysqlColumn> pks) {
+    return Joiner.on(" AND ")
+        .join(pks.stream().map(x11 -> toOutputColumn(x11, cfg)).collect(Collectors.toList()).stream()
+                  .map(x -> String.format("%s=#{%s}", x.getColName(), x.getJavaName())).collect(Collectors.toList()));
+  }
+
+  private String parameterType(List<MysqlColumn> pks) {
+    String parameterType = "java.util.Map";
+    if (pks.size() == 1) {
+      parameterType = pks.get(0).getJavaTypeMapping().getJavaClass().getName();
+    }
+    return parameterType;
+  }
+
+  private List<RenderColumn> allCols(
+      Cfg cfg, MysqlMeta mysqlMeta
+  ) {
+    List<MysqlColumn> pks = mysqlMeta.getPks();
+    List<MysqlColumn> columns = mysqlMeta.getColumns();
+    final List<RenderColumn> allCols = new ArrayList<>(pks.size() + columns.size());
+    allCols.addAll(pks.stream().map(x11 -> toOutputColumn(x11, cfg)).collect(Collectors.toList()));
+    allCols.addAll(columns.stream().map(x1 -> toOutputColumn(x1, cfg)).collect(Collectors.toList()));
+    return allCols;
   }
 
 

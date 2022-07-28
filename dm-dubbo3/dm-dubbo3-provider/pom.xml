@@ -5,7 +5,7 @@
   <parent>
     <artifactId>dm-dubbo3</artifactId>
     <groupId>com.ysz</groupId>
-    <version>220722.1732</version>
+    <version>220728.1508</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -49,12 +49,12 @@
     <dependency>
       <groupId>com.ysz</groupId>
       <artifactId>dm-dubbo3</artifactId>
-      <version>220722.1732</version>
+      <version>220728.1508</version>
     </dependency>
     <dependency>
       <groupId>com.ysz</groupId>
       <artifactId>dm-dubbo3-cli</artifactId>
-      <version>220722.1732</version>
+      <version>220728.1508</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
