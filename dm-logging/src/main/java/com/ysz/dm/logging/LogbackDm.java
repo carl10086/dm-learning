@@ -9,6 +9,8 @@ public class LogbackDm {
   @Test
   public void tst() {
     Logger logger = LoggerFactory.getLogger(LogbackDm.class);
-    logger.info("tst ......");
+    for (int i = 0; i < 10; i++) {
+      logger.info("tst ......:" + i);
+    }
   }
 }

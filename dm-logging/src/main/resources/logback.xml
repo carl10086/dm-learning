@@ -1,10 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <!--  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-      </encoder>
-    </appender>-->
+
+
+  <appender name="custom" class="com.ysz.dm.logging.logback.MyTstAppender">
+    <httpUrl>http://localhost:8080/log</httpUrl>
+    <carl>abc</carl>
+  </appender>
+
+
+  <appender name="GrayLog" class="de.siegmar.logbackgelf.GelfUdpAppender" additivity="false">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>ERROR</level>
+    </filter>
+    <graylogHost>std-1.gl.infra.duitang.net</graylogHost>
+    <graylogPort>12201</graylogPort>
+    <maxChunkSize>508</maxChunkSize>
+    <useCompression>true</useCompression>
+    <encoder class="de.siegmar.logbackgelf.GelfEncoder">
+      <!--<originHost>localhost</originHost>-->
+      <includeRawMessage>false</includeRawMessage>
+      <includeMarker>true</includeMarker>
+      <includeMdcData>true</includeMdcData>
+      <includeCallerData>false</includeCallerData>
+      <includeRootCauseData>false</includeRootCauseData>
+      <includeLevelName>false</includeLevelName>
+      <shortPatternLayout class="ch.qos.logback.classic.PatternLayout">
+        <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</pattern>
+      </shortPatternLayout>
+      <fullPatternLayout class="ch.qos.logback.classic.PatternLayout">
+        <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%class{16} %line] - %msg%n</pattern>
+      </fullPatternLayout>
+      <numbersAsString>false</numbersAsString>
+      <staticField>app:dm-logging</staticField>
+      <staticField>env:release</staticField>
+    </encoder>
+  </appender>
+
   <appender name="main" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>/Users/carl/tmp/useless/main.log</file>
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -20,6 +51,8 @@
     </rollingPolicy>
   </appender>
   <root level="INFO">
-    <appender-ref ref="main"/>
+    <!--    <appender-ref ref="main"/>-->
+    <appender-ref ref="custom"/>
+    <!--    <appender-ref ref="GrayLog"/>-->
   </root>
 </configuration>
