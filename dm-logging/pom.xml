@@ -16,7 +16,6 @@
     <logback.version>1.2.3</logback.version>
   </properties>
 
-
   <dependencies>
 
     <dependency>

@@ -21,6 +21,7 @@ public class NettyHandler extends SimpleChannelInboundHandler<Object> {
   @Override
   public void channelActive(ChannelHandlerContext ctx) throws Exception {
     super.channelActive(ctx);
+    System.err.println("channel Active");
   }
 
 }
