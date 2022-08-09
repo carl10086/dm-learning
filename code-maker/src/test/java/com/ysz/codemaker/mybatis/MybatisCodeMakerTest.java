@@ -4,6 +4,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.ysz.codemaker.mybatis.core.Cfg;
 import com.ysz.codemaker.mybatis.core.Output;
+import com.ysz.codemaker.toos.common.JavaClassId;
 import com.ysz.codemaker.toos.mysql.core.MysqlCfg;
 import java.io.File;
 import org.junit.Before;
@@ -26,7 +27,11 @@ public class MybatisCodeMakerTest {
 
     MysqlCfg mysqlCfg = new MysqlCfg().setJdbcUrl(jdbcUrl).setUsername(username).setPassword(password);
 
-    Cfg cfg = new Cfg().setMysql(mysqlCfg).setDatabase("uactdb").setTableName("uact_likes_0")
+    Cfg cfg = new Cfg().setMysql(mysqlCfg).setDatabase("uactdb").setTableName("uact_user_cnt_0")
+        .setDataObjectClass(new JavaClassId(
+            "com.duitang.uact.srv.port.persist.dataobject",
+            "UserCntDO"
+        ))
         .setVersionColName("version");
 
     Output output = new MybatisCodeMaker().execute(cfg);

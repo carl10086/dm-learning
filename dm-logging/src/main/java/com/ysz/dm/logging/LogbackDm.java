@@ -6,9 +6,22 @@ import org.slf4j.LoggerFactory;
 
 public class LogbackDm {
 
-  @Test
-  public void tst() {
+  public static void main(String[] args) {
     Logger logger = LoggerFactory.getLogger(LogbackDm.class);
-    logger.info("tst ......");
+    logger.error(bigString(3_000));
+//    for (int i = 0; i < 10; i++) {
+//      logger.error("tst netty ......:" + i);
+//    }
+  }
+
+
+  public static String bigString(int length) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < length; i++) {
+      sb.append('x');
+    }
+    sb.append("" + length);
+
+    return sb.toString();
   }
 }
