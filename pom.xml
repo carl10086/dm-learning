@@ -7,7 +7,7 @@
   <groupId>com.ysz</groupId>
   <artifactId>dm-learning</artifactId>
   <packaging>pom</packaging>
-  <version>220728.1508</version>
+  <version>220815.1444</version>
 
   <dependencies>
     <dependency>
@@ -45,18 +45,17 @@
   </build>
   <modules>
     <module>dm-resilience4j</module>
-    <module>dm-websecu</module>
     <module>dm-fast</module>
     <module>dm-agent</module>
     <module>dm-jaeger</module>
     <module>dm-logging</module>
-    <module>dm-clickhouse</module>
     <module>dm-biz</module>
-    <module>dm-es</module>
     <module>dm-netty</module>
     <module>dm-etl</module>
     <module>dm-dubbo3</module>
     <module>dm-ddd</module>
+    <module>code-maker</module>
+    <module>dm-arm</module>
   </modules>
 
 

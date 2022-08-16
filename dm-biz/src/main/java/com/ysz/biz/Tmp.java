@@ -1,13 +1,7 @@
 package com.ysz.biz;
 
-import com.google.common.base.Joiner;
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.io.FileUtils;
 
 public class Tmp {
 
@@ -28,13 +22,9 @@ public class Tmp {
 
 
   public static void main(String[] args) throws Exception {
-    List<String> tmp = new ArrayList<>();
+    String src = "data:_;;;:;base64_______%2CPHNDcklwdCA%2BcHJvbXB0KDk2ODgpPCAvU2NSaXBUPg== HTTP/1.";
 
-    for (int i = 0; i < 16; i++) {
-      tmp.add("uact_likes_" + i);
-    }
 
-    System.out.println(Joiner.on(",").join(tmp));
   }
 
   private static void jdMemSteal() {

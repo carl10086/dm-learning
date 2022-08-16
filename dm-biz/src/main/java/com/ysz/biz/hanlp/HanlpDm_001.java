@@ -24,11 +24,11 @@ public class HanlpDm_001 {
     CustomDictionary.add("习近平", "duitang 1024");
     CustomDictionary.insert("白富美", "duitang 1024");
     CustomDictionary.insert("尼玛", "duitang 1024");
-    CustomDictionary.remove("尼玛");
+    CustomDictionary.insert("单身狗", "duitang 1024");
     if (CustomDictionary.contains("尼玛")) {
       CustomDictionary.insert("尼玛", "other 1024");
     }
-    showCustomOnly(text);
+//    showCustomOnly(text);
 
 //    System.err.println("包含尼玛：" + CustomDictionary.contains("尼玛"));
 //    System.err.println("包含尼玛：" + CustomDictionary.contains("尼玛"));
@@ -42,7 +42,8 @@ public class HanlpDm_001 {
 
 //    System.out.println("-----增加自定义词库后----");
 
-    showAll(text);
+    indexToken(text);
+//    showAll(text);
   }
 
   private static void showAll(String text) {
@@ -50,8 +51,8 @@ public class HanlpDm_001 {
 //    showNormal(text);
 //    showNshort(text);
 //    indexToken(text);
-    showCustomOnly(text);
-    System.out.println("---end---");
+//    showCustomOnly(text);
+//    System.out.println("---end---");
   }
 
 
@@ -59,9 +60,10 @@ public class HanlpDm_001 {
     final char[] chars = text.toCharArray();
     final ObjectArrayList<String> objectArrayList = new ObjectArrayList<>();
     CustomDictionary.parseText(text,
-        (begin, end, value) -> objectArrayList
-            .add(new String(chars, begin, end - begin) + "<-" + Arrays
-                .toString(value.nature)));
+                               (begin, end, value) -> objectArrayList
+                                   .add(new String(chars, begin, end - begin) + "<-" + Arrays
+                                       .toString(value.nature))
+    );
     return objectArrayList;
   }
 
@@ -91,8 +93,7 @@ public class HanlpDm_001 {
 
   public static void indexToken(final String text) {
     final List<Term> segment = IndexTokenizer.segment(text);
-//    System.out.println("全 offset 分词:" + segment);
-//    segment.forEach(System.out::println);
+    System.out.println("全 offset 分词:" + segment);
   }
 
 }
