@@ -11,6 +11,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>dm-ddd-gw</module>
+    <module>dm-ddd-vshop</module>
   </modules>
 
   <artifactId>dm-ddd</artifactId>
