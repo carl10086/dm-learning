@@ -21,6 +21,7 @@ public class Inventory {
    */
   private InventoryTitle title;
 
+  private InventoryCateProperty cateProperties;
 
 
 }
