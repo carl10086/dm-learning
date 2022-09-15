@@ -1,9 +1,10 @@
 package com.ysz.dm.ddd.vshop.domain.core.inventory;
 
-import com.ysz.dm.ddd.vshop.domain.core.common.CreateUpdate;
+import com.ysz.dm.ddd.vshop.domain.core.common.lang.CreateUpdate;
 import com.ysz.dm.ddd.vshop.domain.core.common.richtext.RichText;
 import com.ysz.dm.ddd.vshop.domain.core.inventory.cate.InventoryCateId;
 import com.ysz.dm.ddd.vshop.domain.core.inventory.cate.InventoryCateProperties;
+import com.ysz.dm.ddd.vshop.domain.core.inventory.tag.InventoryTagId;
 import java.util.List;
 import lombok.Getter;
 import lombok.ToString;
@@ -50,6 +51,8 @@ public class Inventory {
    * 商品 sku, 可覆盖 部分参数 .
    */
   private List<InventorySku> skus;
+
+  private List<InventoryTagId> tags;
 
 
   private InventoryCateProperties inventoryCateProperties;
