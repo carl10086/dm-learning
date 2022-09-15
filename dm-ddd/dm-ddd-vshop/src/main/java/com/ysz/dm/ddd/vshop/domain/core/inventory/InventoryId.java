@@ -1,16 +1,14 @@
 package com.ysz.dm.ddd.vshop.domain.core.inventory;
 
-import lombok.Getter;
-import lombok.ToString;
+import com.ysz.dm.ddd.vshop.domain.core.common.lang.BaseLongId;
 
 /**
  * @author carl
  * @create 2022-09-09 2:30 PM
  **/
-@ToString
-@Getter
-public class InventoryId {
+public class InventoryId extends BaseLongId {
 
-  private Long id;
-
+  public InventoryId(Long id) {
+    super(id);
+  }
 }

@@ -11,5 +11,9 @@ import lombok.ToString;
 @Getter
 public class SkuId {
 
-  private Long id;
+  private final Long id;
+
+  public SkuId(Long id) {
+    this.id = id;
+  }
 }

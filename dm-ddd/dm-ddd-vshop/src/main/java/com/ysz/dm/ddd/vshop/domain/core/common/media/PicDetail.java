@@ -4,11 +4,19 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
+ * 图片详情
+ *
  * @author carl
- * @create 2022-09-09 2:40 PM
+ * @create 2022-09-15 11:42 AM
  **/
 @ToString
 @Getter
-public class PictureId {
+public class PicDetail {
+
+  private int width;
+
+  private int height;
+
+  private int size;
 
 }

@@ -16,6 +16,9 @@ public class InventoryTitle {
   /**
    * 一级标题
    */
-  private String levelOne;
+  private final String levelOne;
 
+  public InventoryTitle(String levelOne) {
+    this.levelOne = levelOne;
+  }
 }

@@ -1,6 +1,7 @@
 package com.ysz.dm.ddd.vshop.domain.core.inventory;
 
 import com.ysz.dm.ddd.vshop.domain.core.common.sku.SkuId;
+import com.ysz.dm.ddd.vshop.domain.core.inventory.cate.InventoryCateProperties;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -13,11 +14,26 @@ import lombok.ToString;
 public class InventorySku {
 
   /**
-   * 对应的 sku
+   * sku id
    */
-  private SkuId id;
+  private final SkuId id;
 
-  private Integer quantity;
+  private InventoryCateProperties inventoryCateProperties;
+
+  private InventoryPrice price;
 
 
+  public InventorySku(SkuId id) {
+    this.id = id;
+  }
+
+  public InventorySku setInventoryCateProperties(InventoryCateProperties inventoryCateProperties) {
+    this.inventoryCateProperties = inventoryCateProperties;
+    return this;
+  }
+
+  public InventorySku setPrice(InventoryPrice price) {
+    this.price = price;
+    return this;
+  }
 }

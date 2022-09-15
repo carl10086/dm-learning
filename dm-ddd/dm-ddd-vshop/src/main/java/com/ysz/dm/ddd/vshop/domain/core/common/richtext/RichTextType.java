@@ -8,5 +8,7 @@ package com.ysz.dm.ddd.vshop.domain.core.common.richtext;
  **/
 public enum RichTextType {
   markdown,
-  simple
+  simple,
+  html,
+  html_with_render
 }

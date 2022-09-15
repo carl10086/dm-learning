@@ -6,7 +6,10 @@ import lombok.ToString;
 /**
  * 富文本类型 .
  *
- * content 和  type 决定了 文本的渲染方式
+ * <pre>
+ *  1. content 和  type 决定了 文本的渲染方式
+ *  2. bucket + key 是支持 cdh + oss 缓存的 .
+ * </pre>
  *
  * @author carl
  * @create 2022-09-09 10:30 AM
@@ -17,12 +20,13 @@ public class RichText {
 
   private RichTextType type;
 
+  private String bucket;
+  private String key;
+
   private String content;
   private Long createAt;
 
   private Long updateAt;
-
-
   private String updateBy;
 
   public RichText setType(RichTextType type) {
@@ -47,6 +51,16 @@ public class RichText {
 
   public RichText setUpdateBy(String updateBy) {
     this.updateBy = updateBy;
+    return this;
+  }
+
+  public RichText setBucket(String bucket) {
+    this.bucket = bucket;
+    return this;
+  }
+
+  public RichText setKey(String key) {
+    this.key = key;
     return this;
   }
 }
