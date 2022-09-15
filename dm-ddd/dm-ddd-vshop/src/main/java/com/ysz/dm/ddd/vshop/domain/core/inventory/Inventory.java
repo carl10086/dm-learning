@@ -1,6 +1,7 @@
 package com.ysz.dm.ddd.vshop.domain.core.inventory;
 
 import com.ysz.dm.ddd.vshop.domain.core.common.lang.CreateUpdate;
+import com.ysz.dm.ddd.vshop.domain.core.common.media.Medias;
 import com.ysz.dm.ddd.vshop.domain.core.common.richtext.RichText;
 import com.ysz.dm.ddd.vshop.domain.core.inventory.cate.InventoryCateId;
 import com.ysz.dm.ddd.vshop.domain.core.inventory.cate.InventoryCateProperties;
@@ -98,21 +99,24 @@ public class Inventory {
   private RichText agreement;
 
   /**
-   * 商品价格
-   */
-  private InventoryPrices prices;
-
-
-  /**
    * 商品预售时间
    */
   private InventorySaleTime saleTime;
+
+  /**
+   * 详情页 ..
+   */
+  private Medias medias;
+
+  /**
+   * 轮转图
+   */
+  private Medias covers;
 
 
   /**
    * 商品相关图片
    */
-  private InventoryPictures pictures;
 
   private CreateUpdate createUpdate;
 

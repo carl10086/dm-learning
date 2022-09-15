@@ -1,6 +1,5 @@
 package com.ysz.dm.ddd.vshop.domain.core.inventory;
 
-import com.ysz.dm.ddd.vshop.domain.core.common.sku.SkuId;
 import com.ysz.dm.ddd.vshop.domain.core.inventory.cate.InventoryCateProperties;
 import lombok.Getter;
 import lombok.ToString;
