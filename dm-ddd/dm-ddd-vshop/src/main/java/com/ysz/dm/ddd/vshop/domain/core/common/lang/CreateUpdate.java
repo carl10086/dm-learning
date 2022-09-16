@@ -1,4 +1,4 @@
-package com.ysz.dm.ddd.vshop.domain.core.common;
+package com.ysz.dm.ddd.vshop.domain.core.common.lang;
 
 import java.time.Instant;
 import lombok.Getter;
