@@ -5,7 +5,6 @@ import com.ysz.dm.ddd.vshop.domain.core.common.lang.MapBuilder;
 import com.ysz.dm.ddd.vshop.domain.core.common.richtext.RichText;
 import com.ysz.dm.ddd.vshop.domain.core.common.richtext.RichTextType;
 import com.ysz.dm.ddd.vshop.domain.core.common.rmb.Rmb;
-import com.ysz.dm.ddd.vshop.domain.core.common.sku.SkuId;
 import com.ysz.dm.ddd.vshop.domain.core.inventory.cate.InventoryCate;
 import com.ysz.dm.ddd.vshop.domain.core.inventory.cate.InventoryCateId;
 import com.ysz.dm.ddd.vshop.domain.core.inventory.cate.InventoryCateProperties;
