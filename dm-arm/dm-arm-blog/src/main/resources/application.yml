@@ -1,0 +1,21 @@
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: true # In order to inject PrometheusMeterRegistry
+
+
+server:
+  shutdown: graceful
+
+# Additional server ports specified with Armeria configuration.
+armeria:
+  enable-auto-injection: true
+  ports:
+    - port: 8888
+      protocols:
+        - http
+#  internal-services:
+#    include: metrics, health, docs
+#    port: 10001
+#    protocols: http
