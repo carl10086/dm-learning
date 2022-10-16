@@ -1,10 +1,13 @@
 package com.ysz.arm.blog.server;
 
+import com.google.common.base.Strings;
+import com.google.rpc.Code;
 import com.linecorp.armeria.common.RequestContext;
 import com.ysz.arm.blog.client.BlogPost;
 import com.ysz.arm.blog.client.BlogServiceGrpc;
 import com.ysz.arm.blog.client.CreateBlogPostRequest;
 import com.ysz.arm.blog.server.config.ArmeriaGrpc;
+import io.grpc.protobuf.StatusProto;
 import io.grpc.stub.StreamObserver;
 import java.time.Instant;
 import java.util.Map;
@@ -33,6 +36,17 @@ public class BlogService extends BlogServiceGrpc.BlogServiceImplBase {
     if (log.isDebugEnabled()) {
       log.debug("createBlogPost:{}", request);
     }
+
+    /*1. check title*/
+    if (Strings.isNullOrEmpty(request.getTitle())) {
+      com.google.rpc.Status status = com.google.rpc.Status.newBuilder()
+          .setCode(Code.INVALID_ARGUMENT.getNumber())
+          .setMessage("title is empty or null")
+          .build();
+      responseObserver.onError(StatusProto.toStatusRuntimeException(status));
+      return;
+    }
+
     final int id = idGenerator.getAndIncrement();
     final Instant now = Instant.now();
     final BlogPost updated = BlogPost.newBuilder()
@@ -46,5 +60,6 @@ public class BlogService extends BlogServiceGrpc.BlogServiceImplBase {
     final BlogPost stored = updated;
     responseObserver.onNext(stored);
     responseObserver.onCompleted();
+
   }
 }

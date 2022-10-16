@@ -1,4 +1,9 @@
 management:
+  endpoints:
+    web:
+      exposure:
+        include: beans,health,env,metrics,prometheus
+      base-path: /console
   metrics:
     export:
       prometheus:
@@ -7,12 +12,14 @@ management:
 
 server:
   shutdown: graceful
+  port: 10000
+
 
 # Additional server ports specified with Armeria configuration.
 armeria:
   enable-auto-injection: true
   ports:
-    - port: 8888
+    - port: 10005
       protocols:
         - http
 #  internal-services:

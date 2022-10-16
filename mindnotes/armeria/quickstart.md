@@ -4,6 +4,7 @@
 - Server Builder & Server
 - each config for what ..
 - quickstart for grpc
+- integration with spring
 
 ## generate code from grpc proto file
 
@@ -37,57 +38,68 @@ message BlogPost {
 - why need java_package : because grpc `package` is not perfect for java pkgs ;
 - grpc file is easy to understand .
 
-
 we can use maven plugin , it's the recommend way it **production env .**
 
 ```xml
-  <build>
-    <extensions>
-      <extension>
-        <groupId>kr.motd.maven</groupId>
-        <artifactId>os-maven-plugin</artifactId>
-        <version>1.6.2</version>
-      </extension>
-    </extensions>
-    <plugins>
-      <plugin>
-        <groupId>org.xolstice.maven.plugins</groupId>
-        <artifactId>protobuf-maven-plugin</artifactId>
-        <version>0.6.1</version>
-        <configuration>
-          <protocArtifact>com.google.protobuf:protoc:3.21.1:exe:${os.detected.classifier}</protocArtifact>
-          <pluginId>grpc-java</pluginId>
-          <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.48.1:exe:${os.detected.classifier}</pluginArtifact>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>compile-custom</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+
+<build>
+  <extensions>
+    <extension>
+      <groupId>kr.motd.maven</groupId>
+      <artifactId>os-maven-plugin</artifactId>
+      <version>1.6.2</version>
+    </extension>
+  </extensions>
+  <plugins>
+    <plugin>
+      <groupId>org.xolstice.maven.plugins</groupId>
+      <artifactId>protobuf-maven-plugin</artifactId>
+      <version>0.6.1</version>
+      <configuration>
+        <protocArtifact>com.google.protobuf:protoc:3.21.1:exe:${os.detected.classifier}</protocArtifact>
+        <pluginId>grpc-java</pluginId>
+        <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.48.1:exe:${os.detected.classifier}</pluginArtifact>
+      </configuration>
+      <executions>
+        <execution>
+          <goals>
+            <goal>compile</goal>
+            <goal>compile-custom</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
 ```
 
 - in 2018. fuck .
 
-## server & client 
+## server & client
 
 - hello server
 - hello client
 - thread pool to execute server
 - about dt-monitor plan
-
+- metrics collect ?
 
 ## monitor
 
 **refer**
 
-- it is removed now . fuck . [how to get threadlocal variables for async thrift service](https://github.com/line/armeria/issues/1067)
+- it is removed now . fuck
+  . [how to get threadlocal variables for async thrift service](https://github.com/line/armeria/issues/1067)
 - removed in [2375](https://github.com/line/armeria/pull/2375)
 - hooks back to Request Context in [2514](https://github.com/line/armeria/issues/2514)
 
+## error handling
 
+**refer**
+
+- [grpc error handling](https://www.baeldung.com/grpcs-error-handling)
+
+errors in grpc are first-class entities, i,e, every call in gRPC is either a payload message or a status error message .
+
+- grpc common error handling
+
+## anti layer patterns
