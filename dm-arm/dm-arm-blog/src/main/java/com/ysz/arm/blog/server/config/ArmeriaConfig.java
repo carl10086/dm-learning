@@ -4,6 +4,9 @@ import com.linecorp.armeria.common.grpc.GrpcSerializationFormats;
 import com.linecorp.armeria.server.docs.DocService;
 import com.linecorp.armeria.server.grpc.GrpcService;
 import com.linecorp.armeria.server.grpc.GrpcServiceBuilder;
+import com.linecorp.armeria.server.zookeeper.ZooKeeperRegistrationSpec;
+import com.linecorp.armeria.server.zookeeper.ZooKeeperUpdatingListener;
+import com.linecorp.armeria.server.zookeeper.ZooKeeperUpdatingListenerBuilder;
 import com.linecorp.armeria.spring.ArmeriaServerConfigurator;
 import io.grpc.BindableService;
 import java.util.Map;
@@ -47,6 +50,7 @@ public class ArmeriaConfig implements ApplicationContextAware {
 
     /*3. user blocking Task Executor*/
     builder.useBlockingTaskExecutor(true);
+
     return builder.build();
   }
 
@@ -73,6 +77,19 @@ public class ArmeriaConfig implements ApplicationContextAware {
 //      builder.annotatedService(service);
       builder.blockingTaskExecutor(300);
       builder.verboseResponses(true);
+
+      String zkConnectionStr = "wvr-zk-67-4.duitang.net:3881";
+      String znodePath = "/armeria/server";
+      String serviceName = "catalog";
+      ZooKeeperRegistrationSpec registrationSpec =
+          ZooKeeperRegistrationSpec.curator(serviceName);
+
+      ZooKeeperUpdatingListener listener =
+          ZooKeeperUpdatingListener.builder(zkConnectionStr, znodePath, registrationSpec)
+              .sessionTimeoutMillis(10000)
+              .build();
+
+      builder.serverListener(listener);
       builder.service(grpcService());
     };
   }
