@@ -44,6 +44,12 @@
       <artifactId>micrometer-registry-prometheus</artifactId>
     </dependency>
 
+
+    <dependency>
+      <groupId>com.linecorp.armeria</groupId>
+      <artifactId>armeria-zookeeper3</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>com.linecorp.armeria</groupId>
       <artifactId>armeria</artifactId>

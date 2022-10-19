@@ -102,4 +102,17 @@ errors in grpc are first-class entities, i,e, every call in gRPC is either a pay
 
 - grpc common error handling
 
-## anti layer patterns
+aop way :
+
+- spring aop ..
+- armeria decorator way ..
+- functional model .
+
+## anti layer patterns in client .
+
+## zk
+
+- -Dzookeeper.sasl.client=false
+
+```xml
+```

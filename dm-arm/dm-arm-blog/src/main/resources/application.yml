@@ -17,7 +17,7 @@ server:
 
 # Additional server ports specified with Armeria configuration.
 armeria:
-  enable-auto-injection: true
+  enable-auto-injection: false
   ports:
     - port: 10005
       protocols:

@@ -1,13 +1,12 @@
 package com.ysz.arm.blog.server;
 
 import com.google.common.base.Strings;
-import com.google.rpc.Code;
 import com.linecorp.armeria.common.RequestContext;
 import com.ysz.arm.blog.client.BlogPost;
 import com.ysz.arm.blog.client.BlogServiceGrpc;
 import com.ysz.arm.blog.client.CreateBlogPostRequest;
 import com.ysz.arm.blog.server.config.ArmeriaGrpc;
-import io.grpc.protobuf.StatusProto;
+import com.ysz.arm.blog.server.core.exceptions.CustomInvalidException;
 import io.grpc.stub.StreamObserver;
 import java.time.Instant;
 import java.util.Map;
@@ -39,23 +38,18 @@ public class BlogService extends BlogServiceGrpc.BlogServiceImplBase {
 
     /*1. check title*/
     if (Strings.isNullOrEmpty(request.getTitle())) {
-      com.google.rpc.Status status = com.google.rpc.Status.newBuilder()
-          .setCode(Code.INVALID_ARGUMENT.getNumber())
-          .setMessage("title is empty or null")
-          .build();
-      responseObserver.onError(StatusProto.toStatusRuntimeException(status));
-      return;
+//      com.google.rpc.Status status = com.google.rpc.Status.newBuilder()
+//          .setCode(Code.INVALID_ARGUMENT.getNumber())
+//          .setMessage("title is empty or null")
+//          .build();
+//      responseObserver.onError(StatusProto.toStatusRuntimeException(status));
+      throw new CustomInvalidException("title is empty or null");
     }
 
     final int id = idGenerator.getAndIncrement();
     final Instant now = Instant.now();
-    final BlogPost updated = BlogPost.newBuilder()
-        .setId(id)
-        .setTitle(request.getTitle())
-        .setContent(request.getContent())
-        .setModifiedAt(now.toEpochMilli())
-        .setCreatedAt(now.toEpochMilli())
-        .build();
+    final BlogPost updated = BlogPost.newBuilder().setId(id).setTitle(request.getTitle())
+        .setContent(request.getContent()).setModifiedAt(now.toEpochMilli()).setCreatedAt(now.toEpochMilli()).build();
     blogPosts.put(id, updated);
     final BlogPost stored = updated;
     responseObserver.onNext(stored);
