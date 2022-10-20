@@ -3,6 +3,7 @@ target/
 *.iml
 
 mindnotes/.obsidian
-
+mindnotes/uml/*.png
+mindnotes/uml/*.jpg
 
 dependency-reduced-pom.xml
