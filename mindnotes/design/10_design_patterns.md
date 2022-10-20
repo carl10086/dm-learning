@@ -42,10 +42,16 @@ the following is the recommendations :
 - Compensate failed transactions . In general, avoid distributed transactions, as they require coordination across
   services and resources. Instead, compose an operation from smaller individual transactions. If the operation fails
   midway through, use Compensating Transactions to undo any step that already completed.
-- Checkpoint long-running transactions. Checkpoints can provide resiliency if a long-running operation fails. 
+- Checkpoint of long-running transactions. Checkpoints can provide resiliency if a long-running operation fails.
 - Degrade gracefully. Entire subsystems might be noncritical for the application .
-
-
+- Throttle clients: sometimes a small number of users create excessive load, which can reduce your application's
+  availability for other users. In this situtation, throttle the client for a certain period of time.See the Throttling
+  pattern.
+- Block bad actors .
+- Use leader election : when you need to coordinate a task , Use a leader election to select a coordinator. That way,  the coo
+- Test fail fault injection .
+- Embrace chaos engineering . Chaos engineering extends the notion of fault injection, by randomly injecting failures or
+  abnormal conditions into production .
 
 ## refer
 

@@ -1,0 +1,38 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+
+actor "客户端" as User #red
+' The only difference between actor
+'and participant is the drawing
+participant "订单系统" as Order #yellow
+participant "支付系统" as Payment #orange
+participant "支付网关" as PaymentGateway #gray
+participant "派发系统" as Dispatch #pink
+participant "三方支付渠道" as third
+/' You can also declare:
+   participant L as "I have a really\nlong name"  #99FF99
+  '/
+
+
+User -> Order: 创建订单
+Order -> Order: 校验订单
+Order -> Payment : 申请 paymentId
+Payment --> Order : 返回 paymentId
+Order --> User: 返回成功创建的订单
+
+User -> third: 三方支付
+
+third -> PaymentGateway: 支付宝回调
+PaymentGateway -> Payment: 解析三方结果[解耦]
+Payment -> Payment: 修改支付状态
+Payment -> Order : 修改订单状态
+Payment -> Dispatch : 派发商品
+PaymentGateway --> third : 返回回调结果
+third --> User :  返回支付结果
+@enduml
+
+
+
+
+

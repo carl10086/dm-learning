@@ -1,12 +1,13 @@
 package com.ysz.arm.blog.server.config;
 
+import com.linecorp.armeria.common.grpc.GrpcMeterIdPrefixFunction;
 import com.linecorp.armeria.common.grpc.GrpcSerializationFormats;
 import com.linecorp.armeria.server.docs.DocService;
 import com.linecorp.armeria.server.grpc.GrpcService;
 import com.linecorp.armeria.server.grpc.GrpcServiceBuilder;
+import com.linecorp.armeria.server.metric.MetricCollectingService;
 import com.linecorp.armeria.server.zookeeper.ZooKeeperRegistrationSpec;
 import com.linecorp.armeria.server.zookeeper.ZooKeeperUpdatingListener;
-import com.linecorp.armeria.server.zookeeper.ZooKeeperUpdatingListenerBuilder;
 import com.linecorp.armeria.spring.ArmeriaServerConfigurator;
 import io.grpc.BindableService;
 import java.util.Map;
@@ -89,8 +90,10 @@ public class ArmeriaConfig implements ApplicationContextAware {
               .sessionTimeoutMillis(10000)
               .build();
 
-      builder.serverListener(listener);
-      builder.service(grpcService());
+//      builder.serverListener(listener);
+      builder.service(grpcService()).decorator(MetricCollectingService.newDecorator(
+          GrpcMeterIdPrefixFunction.of("grpc.service")
+      ));
     };
   }
 
