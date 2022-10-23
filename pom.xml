@@ -61,6 +61,7 @@
     <module>dm-ddd</module>
     <module>code-maker</module>
     <module>dm-arm</module>
+    <module>dm-llib</module>
   </modules>
 
 

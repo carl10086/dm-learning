@@ -93,13 +93,15 @@ public class CustomArmeriaAutoConfiguration {
 
     final ServerBuilder serverBuilder = Server.builder();
 
-    final List<Port> ports = armeriaSettings.getPorts();
+    final List<Port> ports = armeriaSettings.getPorts(); /*init default ports*/
     if (ports.isEmpty()) {
       assert DEFAULT_PORT.getProtocols() != null;
       serverBuilder.port(new ServerPort(DEFAULT_PORT.getPort(), DEFAULT_PORT.getProtocols()));
     }
 
-    configureServerWithArmeriaSettings(serverBuilder, armeriaSettings, internalService,
+    configureServerWithArmeriaSettings(serverBuilder,
+                                       armeriaSettings,
+                                       internalService,
                                        armeriaServerConfigurators.orElse(ImmutableList.of()),
                                        armeriaServerBuilderConsumers.orElse(ImmutableList.of()),
                                        meterRegistry.orElse(Metrics.globalRegistry),
