@@ -1,4 +1,4 @@
-package com.ysz.dm.ddd.vshop.domain.domain.inventory.inventory;
+package com.ysz.dm.ddd.vshop.domain.domain.inventory.attrs;
 
 /**
  * @author carl

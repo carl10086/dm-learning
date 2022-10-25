@@ -11,7 +11,7 @@ pic
             - duration: 1月, 1年, 3月
         - material
             - material_id .
-
+        - topic .
 
 
 

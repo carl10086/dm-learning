@@ -1,6 +1,8 @@
 package com.ysz.dm.ddd.vshop.domain.domain.inventory.inventory;
 
 import com.ysz.dm.ddd.vshop.domain.domain.common.BaseEntity;
+import com.ysz.dm.ddd.vshop.domain.domain.inventory.attrs.InventoryAttr;
+import com.ysz.dm.ddd.vshop.domain.domain.inventory.attrs.InventoryAttrKey;
 import com.ysz.dm.ddd.vshop.domain.domain.inventory.cate.InventoryCateId;
 import com.ysz.dm.ddd.vshop.domain.domain.inventory.cate.InventoryCatePropId;
 import java.util.Map;
