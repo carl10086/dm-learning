@@ -8,4 +8,5 @@ import com.ysz.dm.ddd.vshop.domain.infra.spring.CommandHandler;
  **/
 @CommandHandler
 public class CreateOrderCommandHandler {
+
 }

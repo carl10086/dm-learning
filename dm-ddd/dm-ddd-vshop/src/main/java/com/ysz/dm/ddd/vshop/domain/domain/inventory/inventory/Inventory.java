@@ -1,11 +1,9 @@
 package com.ysz.dm.ddd.vshop.domain.domain.inventory.inventory;
 
 import com.ysz.dm.ddd.vshop.domain.domain.common.BaseEntity;
-import com.ysz.dm.ddd.vshop.domain.domain.inventory.attrs.InventoryAttr;
-import com.ysz.dm.ddd.vshop.domain.domain.inventory.attrs.InventoryAttrKey;
+import com.ysz.dm.ddd.vshop.domain.domain.inventory.attrs.InventoryAttrs;
 import com.ysz.dm.ddd.vshop.domain.domain.inventory.cate.InventoryCateId;
-import com.ysz.dm.ddd.vshop.domain.domain.inventory.cate.InventoryCatePropId;
-import java.util.Map;
+import com.ysz.dm.ddd.vshop.domain.domain.inventory.cate.InventoryCateProps;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -15,9 +13,9 @@ import lombok.ToString;
  **/
 @ToString
 @Getter
-public class Inventory extends BaseEntity {
+public class Inventory extends BaseEntity<InventoryId> {
 
-  private InventoryId id;
+  private final InventoryId id;
 
   private InventoryName name;
 
@@ -26,34 +24,14 @@ public class Inventory extends BaseEntity {
   private InventoryCateId cateId;
 
   /**
-   * props maybe unstable
+   * dynamic props decided by inventory category
    */
-  private Map<InventoryCatePropId, String> props;
+  private InventoryCateProps cateProps;
 
-  private Map<InventoryAttrKey, InventoryAttr> attrs;
+  private InventoryAttrs attrs;
 
-  public Inventory setId(InventoryId id) {
+
+  public Inventory(InventoryId id) {
     this.id = id;
-    return this;
-  }
-
-  public Inventory setCateId(InventoryCateId cateId) {
-    this.cateId = cateId;
-    return this;
-  }
-
-  public Inventory setProps(Map<InventoryCatePropId, String> props) {
-    this.props = props;
-    return this;
-  }
-
-  public Inventory setName(InventoryName name) {
-    this.name = name;
-    return this;
-  }
-
-  public Inventory setSaleTime(InventorySaleTime saleTime) {
-    this.saleTime = saleTime;
-    return this;
   }
 }

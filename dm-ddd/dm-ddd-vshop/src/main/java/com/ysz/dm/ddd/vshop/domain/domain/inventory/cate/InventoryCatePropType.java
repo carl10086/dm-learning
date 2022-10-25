@@ -6,7 +6,7 @@ package com.ysz.dm.ddd.vshop.domain.domain.inventory.cate;
  **/
 public enum InventoryCatePropType {
   /*普通文本*/
-  text,
+  plaintext,
   /*选择文本*/
   selected
 }

@@ -1,8 +1,8 @@
 package com.ysz.dm.ddd.vshop.domain.domain.inventory.cate;
 
 import com.ysz.dm.ddd.vshop.domain.domain.common.BaseEntity;
-import java.util.List;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -13,21 +13,20 @@ import lombok.ToString;
  **/
 @Getter
 @ToString
-public final class InventoryCate extends BaseEntity {
+@Setter
+public final class InventoryCate extends BaseEntity<InventoryCateId> {
 
   private final InventoryCateId id;
-  private final InventoryCateId parentId;
 
-  private List<InventoryCateProp> props;
+  /*all ids to represent full inherited relationships*/
+  private final InventoryCateIds ids;
 
-  public InventoryCate(InventoryCateId id, InventoryCateId parentId) {
-    this.id = id;
-    this.parentId = parentId;
-  }
+  /*all props*/
+  private InventoryCateProps props;
 
-  public InventoryCate setProps(List<InventoryCateProp> props) {
-    this.props = props;
-    return this;
+  public InventoryCate(InventoryCateIds ids) {
+    this.ids = ids;
+    this.id = ids.currentId();
   }
 
   @Override

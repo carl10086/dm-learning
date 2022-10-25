@@ -16,7 +16,7 @@ public enum BizObjectType {
 
   public static BizObjectType fromVal(byte val) {
     for (BizObjectType value : BizObjectType.values()) {
-      if (value.getVal() == val) {
+      if (value.val() == val) {
         return value;
       }
     }

@@ -1,6 +1,8 @@
 package com.ysz.dm.ddd.vshop.domain.domain.inventory.attrs;
 
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -9,24 +11,8 @@ import lombok.ToString;
  **/
 @ToString
 @Getter
+@RequiredArgsConstructor
 public class InventoryAttr {
 
-  private InventoryAttrKey key;
-  private InventoryAttrValueType type;
-  private Object value;
 
-  public InventoryAttr setKey(InventoryAttrKey key) {
-    this.key = key;
-    return this;
-  }
-
-  public InventoryAttr setType(InventoryAttrValueType type) {
-    this.type = type;
-    return this;
-  }
-
-  public InventoryAttr setValue(Object value) {
-    this.value = value;
-    return this;
-  }
 }

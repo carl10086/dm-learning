@@ -3,7 +3,10 @@ package com.ysz.dm.ddd.vshop.domain.domain.inventory.cate;
 import com.ysz.dm.ddd.vshop.domain.domain.common.BaseEntity;
 import java.util.List;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * @author carl
@@ -11,14 +14,16 @@ import lombok.ToString;
  **/
 @ToString
 @Getter
-public final class InventoryCateProp extends BaseEntity {
+@Setter
+public final class InventoryCateProp extends BaseEntity<InventoryCatePropId> {
 
+  @NonNull
   private final InventoryCatePropId id;
 
-  /***
-   * key name
-   */
+  @NonNull
   private final String name;
+
+  private String desc = Strings.EMPTY;
 
   /**
    * optional , this inventory is needed ?
@@ -41,30 +46,9 @@ public final class InventoryCateProp extends BaseEntity {
   private List<String> selectedValues;
 
 
-  public InventoryCateProp(String name, InventoryCatePropId id) {
+  public InventoryCateProp(@NonNull Long id, @NonNull String name) {
+    this.id = new InventoryCatePropId(id);
     this.name = name;
-    this.id = id;
-  }
-
-  public InventoryCateProp setOptional(boolean optional) {
-    this.optional = optional;
-    return this;
-  }
-
-  public InventoryCateProp setSku(boolean sku) {
-    this.sku = sku;
-    return this;
-  }
-
-
-  public InventoryCateProp setType(InventoryCatePropType type) {
-    this.type = type;
-    return this;
-  }
-
-  public InventoryCateProp setSelectedValues(List<String> selectedValues) {
-    this.selectedValues = selectedValues;
-    return this;
   }
 
   @Override

@@ -22,11 +22,5 @@ public class InventoryTest {
 
   @Test
   public void testCreateVip() {
-    var id = 1L;
-    Inventory vip = new Inventory();
-    vip.setId(new InventoryId(id));
-    vip.setCateId(this.cate.vip().getId());
-
-    log.info("vip:{}", vip);
   }
 }

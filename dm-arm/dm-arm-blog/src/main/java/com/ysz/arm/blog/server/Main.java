@@ -1,10 +1,8 @@
 package com.ysz.arm.blog.server;
 
-import com.linecorp.armeria.spring.ArmeriaAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.PropertySource;
 
 /**
  * <pre>
@@ -17,7 +15,7 @@ import org.springframework.context.annotation.PropertySource;
 @Slf4j
 @SpringBootApplication(
     exclude = {
-        ArmeriaAutoConfiguration.class
+//        ArmeriaAutoConfiguration.class
     }
 )
 public class Main {

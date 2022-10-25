@@ -8,6 +8,9 @@ management:
     export:
       prometheus:
         enabled: true # In order to inject PrometheusMeterRegistry
+  endpoint:
+    health:
+      show-details: always
 
 
 server:
@@ -23,6 +26,7 @@ armeria:
       protocols:
         - http
 #  internal-services:
+#    include: all
 #    include: metrics, health, docs
 #    port: 10001
 #    protocols: http
