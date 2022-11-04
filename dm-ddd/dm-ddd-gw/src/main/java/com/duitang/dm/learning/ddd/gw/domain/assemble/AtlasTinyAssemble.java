@@ -36,12 +36,12 @@ public class AtlasTinyAssemble {
   }
 
   public Long userId() {
-    return this.author.getId();
+    return this.author.id();
   }
 
 
   public Long id() {
-    return this.atlasCore.getId();
+    return this.atlasCore.id();
   }
 
   public AtlasTinyAssemble setAtlasCore(AtlasCore atlasCore) {

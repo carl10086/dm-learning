@@ -42,9 +42,9 @@ import org.springframework.context.annotation.Configuration;
  * @author carl.yu
  * @createAt 2022/10/23
  **/
-@Configuration
-@ConditionalOnProperty(name = "armeria.server-enabled", havingValue = "true", matchIfMissing = true)
-@EnableConfigurationProperties(ArmeriaSettings.class)
+//@Configuration
+//@ConditionalOnProperty(name = "armeria.server-enabled", havingValue = "true", matchIfMissing = true)
+//@EnableConfigurationProperties(ArmeriaSettings.class)
 public class CustomArmeriaAutoConfiguration {
 
   private static final Port DEFAULT_PORT = new Port().setPort(8080)
