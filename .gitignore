@@ -1,6 +1,8 @@
 target/
 .idea
+.gradle
 *.iml
+build/
 
 mindnotes/.obsidian
 mindnotes/uml/*.png

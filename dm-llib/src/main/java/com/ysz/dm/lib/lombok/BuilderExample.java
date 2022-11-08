@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
+import lombok.With;
 
 /**
  * @author carl
@@ -13,6 +14,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @Getter
+@With
 public class BuilderExample {
 
   @Builder.Default
@@ -21,4 +23,5 @@ public class BuilderExample {
   private int age;
   @Singular
   private Set<String> occupations;
+
 }
