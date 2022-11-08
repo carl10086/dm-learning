@@ -14,7 +14,7 @@ import lombok.ToString;
 @RequiredArgsConstructor(staticName = "of")
 public class SetterExample {
 
-  private @NonNull long userId;
+  private @NonNull Long userId;
 
 
 }

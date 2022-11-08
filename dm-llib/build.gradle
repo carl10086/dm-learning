@@ -7,9 +7,15 @@ plugins {
 }
 
 dependencies {
-    implementation 'ch.qos.logback:logback-core:1.2.11'
-    implementation 'ch.qos.logback:logback-classic:1.2.11'
-    implementation 'org.slf4j:slf4j-api:1.7.36'
+
+    implementation platform('org.springframework.boot:spring-boot-dependencies:2.7.5')
+
+    implementation 'org.passay:passay:1.6.2'
+    implementation 'org.hibernate.validator:hibernate-validator'
+    implementation 'org.glassfish:javax.el:3.0.0'
+    implementation 'ch.qos.logback:logback-core'
+    implementation 'ch.qos.logback:logback-classic'
+    implementation 'org.slf4j:slf4j-api'
     implementation 'io.github.resilience4j:resilience4j-core:1.7.1'
     implementation 'io.github.resilience4j:resilience4j-circuitbreaker:1.7.1'
     implementation 'io.github.resilience4j:resilience4j-retry:1.7.1'
