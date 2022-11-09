@@ -7,7 +7,7 @@ import lombok.ToString;
 
 /**
  * <pre>
- * class desc here
+ * 代表用户在首单支付之后的 每次续订
  * </pre>
  *
  * @author carl.yu
@@ -19,5 +19,10 @@ import lombok.ToString;
 public class SubRenew extends BaseEntity<SubRenewId> {
 
   private final SubRenewId id;
+
+  private final SubRenewLimitation limitation;
+
+  private final SubRenewStatus status;
+
 
 }

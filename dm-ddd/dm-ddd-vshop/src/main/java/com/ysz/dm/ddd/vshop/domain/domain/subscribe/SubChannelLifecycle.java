@@ -5,6 +5,7 @@ import com.ysz.dm.ddd.vshop.domain.domain.distribution.domain.AccountId;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -32,17 +33,15 @@ public class SubChannelLifecycle extends BaseEntity<SubChannelLifecycleId> {
   /**
    * 一次签约
    */
+  @Setter
   private SubSign sign;
-
-  /**
-   * 续订约束， 目前是基于时间的策略
-   */
-  private SubRenewLimitation renewLimitation;
 
   /**
    * 一次签约，多次续订
    */
-  private List<SubRenewId> subRenews;
+  private transient List<SubRenewId> subRenews;
+
+  private SubRenewLimitation latestLimitation;
 
   /**
    * 签约时间
