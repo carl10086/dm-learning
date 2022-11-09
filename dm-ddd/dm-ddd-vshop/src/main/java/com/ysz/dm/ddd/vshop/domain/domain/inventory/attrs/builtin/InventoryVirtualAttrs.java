@@ -2,7 +2,7 @@ package com.ysz.dm.ddd.vshop.domain.domain.inventory.attrs.builtin;
 
 import com.ysz.dm.ddd.vshop.domain.domain.common.Rmb;
 import com.ysz.dm.ddd.vshop.domain.domain.inventory.virtual.InventoryVirtualType;
-import com.ysz.dm.ddd.vshop.domain.domain.payment.PaymentType;
+import com.ysz.dm.ddd.vshop.domain.domain.payment.PaymentChannel;
 import java.util.Set;
 
 /**
@@ -17,7 +17,7 @@ public record InventoryVirtualAttrs(
     /*virtual inventory type*/
     InventoryVirtualType virtualType,
     /*payment channels*/
-    Set<PaymentType> payments
+    Set<PaymentChannel> payments
 ) {
 
 }
