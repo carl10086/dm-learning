@@ -5,3 +5,53 @@ subprojects {
     apply 'plugin': 'io.freefair.lombok'
 }
 
+
+ext {
+    /*current no kotlin projects*/
+    javaProjects = subprojects
+}
+
+
+group = "com.ysz"
+
+tasks.register("carlAll") {
+    doLast {
+        println("javaProjects:$javaProjects")
+    }
+}
+
+subprojects {
+    apply plugin: "java"
+
+    test {
+        useJUnitPlatform()
+        systemProperty("java.awt.headless", "true")
+        systemProperty("testGroups", project.properties.get("testGroups"))
+        systemProperty("io.netty.leakDetection.level", "paranoid")
+        systemProperty("io.netty5.leakDetectionLevel", "paranoid")
+        systemProperty("io.netty5.leakDetection.targetRecords", "32")
+        systemProperty("io.netty5.buffer.lifecycleTracingEnabled", "true")
+        systemProperty("io.netty5.buffer.leakDetectionEnabled", "true")
+        jvmArgs(["--add-opens=java.base/java.lang=ALL-UNNAMED",
+                 "--add-opens=java.base/java.util=ALL-UNNAMED"])
+    }
+}
+
+
+/*configure for javaProjects*/
+configure(javaProjects) {
+    project ->
+        {
+            apply plugin: "java-library"
+            java {
+                toolchain {
+                    languageVersion = JavaLanguageVersion.of(17)
+                }
+            }
+
+
+            tasks.withType(JavaCompile) {
+                options.encoding = 'UTF-8'
+            }
+        }
+}
