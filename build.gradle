@@ -1,5 +1,7 @@
 plugins {
     id 'io.freefair.lombok' version '6.5.1' apply false
+    id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
+    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion" apply false
 }
 subprojects {
     apply 'plugin': 'io.freefair.lombok'
@@ -7,33 +9,23 @@ subprojects {
 
 
 ext {
+    rbProjects = [project(":rb-apigw") , project(":rb-base-core")]
+    /*all kotlin projects*/
+    kotlinProjects = rbProjects
+
+
     /*current no kotlin projects*/
-    javaProjects = subprojects
+    javaProjects = subprojects - rbProjects - project(":rb-platform")
 }
 
 
 group = "com.ysz"
 
-tasks.register("carlAll") {
+tasks.register("carl") {
     doLast {
+        println("rbProjects:$rbProjects")
+        println("kotlinProjects:$kotlinProjects")
         println("javaProjects:$javaProjects")
-    }
-}
-
-subprojects {
-    apply plugin: "java"
-
-    test {
-        useJUnitPlatform()
-        systemProperty("java.awt.headless", "true")
-        systemProperty("testGroups", project.properties.get("testGroups"))
-        systemProperty("io.netty.leakDetection.level", "paranoid")
-        systemProperty("io.netty5.leakDetectionLevel", "paranoid")
-        systemProperty("io.netty5.leakDetection.targetRecords", "32")
-        systemProperty("io.netty5.buffer.lifecycleTracingEnabled", "true")
-        systemProperty("io.netty5.buffer.leakDetectionEnabled", "true")
-        jvmArgs(["--add-opens=java.base/java.lang=ALL-UNNAMED",
-                 "--add-opens=java.base/java.util=ALL-UNNAMED"])
     }
 }
 
@@ -42,7 +34,7 @@ subprojects {
 configure(javaProjects) {
     project ->
         {
-            apply plugin: "java-library"
+            apply plugin: "java"
             java {
                 toolchain {
                     languageVersion = JavaLanguageVersion.of(17)
@@ -53,5 +45,39 @@ configure(javaProjects) {
             tasks.withType(JavaCompile) {
                 options.encoding = 'UTF-8'
             }
+        }
+}
+
+
+/*configure for all kotlin jobs*/
+configure(kotlinProjects) {
+    project ->
+        {
+            apply plugin: 'org.jetbrains.kotlin.jvm'
+            apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+
+            kotlin {
+                jvmToolchain {
+                    languageVersion.set(JavaLanguageVersion.of(17)) // "8"
+                }
+            }
+
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}"
+            }
+
+            test {
+                useJUnitPlatform()
+                systemProperty("java.awt.headless", "true")
+                systemProperty("testGroups", project.properties.get("testGroups"))
+                systemProperty("io.netty.leakDetection.level", "paranoid")
+                systemProperty("io.netty5.leakDetectionLevel", "paranoid")
+                systemProperty("io.netty5.leakDetection.targetRecords", "32")
+                systemProperty("io.netty5.buffer.lifecycleTracingEnabled", "true")
+                systemProperty("io.netty5.buffer.leakDetectionEnabled", "true")
+                jvmArgs(["--add-opens=java.base/java.lang=ALL-UNNAMED",
+                         "--add-opens=java.base/java.util=ALL-UNNAMED"])
+            }
+
         }
 }

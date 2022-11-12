@@ -1,6 +1,13 @@
+# https://zhuanlan.zhihu.com/p/52885189
+
 target/
 .idea
 *.iml
+
+
+## for obsidian
+manual/.obsidian/
+
 
 ## for gradle
 **/build/
@@ -21,8 +28,5 @@ gradle-app.setting
 # Cache of project
 .gradletasknamecache
 
-mindnotes/.obsidian
-mindnotes/uml/*.png
-mindnotes/uml/*.jpg
 
 dependency-reduced-pom.xml
