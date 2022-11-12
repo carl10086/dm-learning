@@ -21,8 +21,9 @@ gradle-app.setting
 # Cache of project
 .gradletasknamecache
 
+## for obsidian
 **/.obsidian/
-manual/.obsidian/
+manual/.obsidian/**
 
 
 dependency-reduced-pom.xml
