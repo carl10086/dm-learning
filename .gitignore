@@ -21,8 +21,8 @@ gradle-app.setting
 # Cache of project
 .gradletasknamecache
 
-mindnotes/.obsidian
-mindnotes/uml/*.png
-mindnotes/uml/*.jpg
+**/.obsidian/
+manual/.obsidian/
+
 
 dependency-reduced-pom.xml
