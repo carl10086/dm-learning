@@ -1,11 +1,20 @@
 
-## refer
-
-[homepage](https://docs.spring.io/spring-security/reference/index.html)
-
-
+#java #java_lib #spring
 
 ## 1. intro
+
+### 1.1 refer
+
+[homepage](https://docs.spring.io/spring-security/reference/index.html)
+[baeldung-spring-security](https://www.baeldung.com/security-spring)
+
+
+
+> [!NOTE] What is Authentication ?
+> 
+Authentication is **how we verify the identity** of who is trying to access a particular resource .
+
+
 
 
 
@@ -76,8 +85,9 @@ fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterCh
 
 spring use a `DelegatingFilterProxy` that allows bridges between the servlet container and spring `ApplicationContext` .
 
-![delegating filter proxy](https://docs.spring.io/spring-security/reference/_images/servlet/architecture/delegatingfilterproxy.png)
 
+![]()
+![](https://docs.spring.io/spring-security/reference/_images/servlet/architecture/multi-securityfilterchain.png)
 
 ```kotlin
 fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
@@ -90,6 +100,113 @@ delegate
 	delegate.doFilter(request, response)
 }
 ```
+
+
+- [So many filters](https://docs.spring.io/spring-security/reference/servlet/architecture.html#servlet-security-filters)
+
+
+1. If u want to debug src code . `FilterChainProxy` is great . 
+2. `FilterChainProxy` is more powerful than `Filter` because of `RequestMatcher` interface, you can use everything of HttpServletRequest for routing jobs .
+
+
+
+
+
+### 2.3 Authentication
+
+
+#### 2.3.0 quick start by self
+
+
+
+> [!NOTE] Tips
+> after open debug in annotation `@EnableWebSecurity(debug = true)` . you can see follows
+
+
+
+```kotlin
+Security filter chain: [
+  DisableEncodeUrlFilter
+  WebAsyncManagerIntegrationFilter
+  SecurityContextPersistenceFilter
+  HeaderWriterFilter
+  LogoutFilter
+  RequestCacheAwareFilter
+  SecurityContextHolderAwareRequestFilter
+  AnonymousAuthenticationFilter
+  SessionManagementFilter
+  ExceptionTranslationFilter
+  **FilterSecurityInterceptor**
+]
+
+```
+
+
+**SO what happen if authentication is failed . **
+
+
+when we got authenticated failed . the path is as following -> `DelegatingAuthenticationEntryPoint` -> `BasicAuthenticationEntryPoint`
+
+```bash
+02:00:31.239 [http-nio-8080-exec-5] DEBUG o.s.s.w.a.DelegatingAuthenticationEntryPoint - **No match found. Using default entry point** org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint@1d591b15
+// ....
+```
+
+
+the default implementation is : 
+
+```java
+@Override
+
+public void commence(HttpServletRequest request, HttpServletResponse response,
+
+AuthenticationException authException) throws IOException {
+
+response.addHeader("WWW-Authenticate", "Basic realm=\"" + this.realmName + "\"");
+
+response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+
+}
+```
+
+
+
+so . go to forward to another request `/error` . this is go to **BasicErrorController**
+
+```
+02:00:40.119 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+02:00:40.119 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+```
+
+
+
+
+> [!NOTE] The default entryPoint is redirect to error page
+> IF we are a simple rest api , may we should just failed with json api .
+
+
+
+
+#### 2.3.1 arch
+
+mechanisms :
+
+
+- username-password: how to authentication with  a  username/password
+- oAuth2.0 Login : login with a openId connect and non-standard OAuth 2.0
+- SAML 2.0 
+- CAS Support : Central Authentication Server .
+- Remember Me : How to remember a user past session expiration
+- JAAS 
+- OpenId
+- X509 .
+- Pre-Authentication : Only use spring security for authorization . *with authentication by other mechanism*
+
+
+#### Persistence 
+
+
+
 
 
 

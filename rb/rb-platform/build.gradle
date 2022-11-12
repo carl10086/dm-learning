@@ -1,0 +1,27 @@
+plugins {
+    id 'java-platform'
+    id 'maven-publish'
+}
+
+
+javaPlatform {
+    allowDependencies()
+}
+
+
+dependencies {
+    api platform("org.springframework.boot:spring-boot-dependencies:2.7.5")
+}
+
+publishing {
+    publications {
+//        mavenJava(MavenPublication) {
+//            artifactId = "dm-platform"
+//        }
+        maven(MavenPublication) {
+//            group = "com.ysz"
+//            artifactId = "dm-platform"
+            from components.javaPlatform
+        }
+    }
+}
