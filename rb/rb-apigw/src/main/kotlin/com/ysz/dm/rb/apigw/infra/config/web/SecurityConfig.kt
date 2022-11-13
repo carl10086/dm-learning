@@ -42,8 +42,10 @@ open class SecurityConfig {
                 CustomAuthenticationMatcher(
                     /*direct allow if patterns matches*/
                     directorAllowPatterns = listOf(
-                        AntPathRequestMatcher("/index/hello")
-                    )
+                        AntPathRequestMatcher("/index/hello"),
+                        AntPathRequestMatcher("/users/register/**"),
+
+                        )
                 )
             )
             .authenticated()

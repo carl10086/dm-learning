@@ -1,0 +1,15 @@
+plugins {
+    id "java-library"
+}
+
+dependencies {
+    api platform(project(":rb-platform"))
+
+    compileOnly("org.springframework:spring-context:")
+
+    implementation('it.unimi.dsi:fastutil:')
+    implementation('org.passay:passay:')
+    implementation('com.googlecode.libphonenumber:libphonenumber:')
+    implementation("org.hibernate.validator:hibernate-validator")
+
+}

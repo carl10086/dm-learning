@@ -11,6 +11,12 @@ javaPlatform {
 
 dependencies {
     api platform("org.springframework.boot:spring-boot-dependencies:2.7.5")
+
+    constraints {
+        api 'org.passay:passay:1.6.2'
+        api 'it.unimi.dsi:fastutil:8.5.9'
+        api 'com.googlecode.libphonenumber:libphonenumber:8.13.0'
+    }
 }
 
 publishing {
