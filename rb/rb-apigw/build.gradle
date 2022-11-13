@@ -1,12 +1,11 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.7.21'
-}
 description = 'rb-apigw'
 
 dependencies {
     api platform(project(":rb-platform"))
 
     implementation(project(":rb-base-core"))
+
+
 
     implementation("org.springframework.boot:spring-boot-starter-web:")
     implementation("org.springframework.boot:spring-boot-starter-security:")

@@ -38,5 +38,14 @@ class HibernateValidateTools {
                 }
             }
         }
+
+
+        /**
+         * @return true: means check success
+         */
+        fun chkSuccess(bean: Any): Boolean {
+            var validate = validator.validate(bean)
+            return validate.isNullOrEmpty()
+        }
     }
 }

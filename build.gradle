@@ -1,6 +1,7 @@
 plugins {
     id 'io.freefair.lombok' version '6.5.1' apply false
     id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
+    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion" apply false
 }
 subprojects {
     apply 'plugin': 'io.freefair.lombok'
@@ -53,6 +54,7 @@ configure(kotlinProjects) {
     project ->
         {
             apply plugin: 'org.jetbrains.kotlin.jvm'
+            apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 
             kotlin {
                 jvmToolchain {
