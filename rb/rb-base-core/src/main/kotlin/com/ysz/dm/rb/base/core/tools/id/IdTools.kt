@@ -1,4 +1,7 @@
-package com.ysz.et.rd.user.infra.base.core.id
+package com.ysz.dm.rb.base.core.tools.id
+
+import com.ysz.et.rd.user.infra.base.core.id.Snowflake
+import java.util.*
 
 /**
  *<pre>
@@ -9,8 +12,12 @@ package com.ysz.et.rd.user.infra.base.core.id
  **/
 class IdTools {
 
+
     companion object {
         val snowflake = Snowflake()
 
+        fun uuid(): String = UUID.randomUUID().toString().replace("-", "")
     }
+
+
 }

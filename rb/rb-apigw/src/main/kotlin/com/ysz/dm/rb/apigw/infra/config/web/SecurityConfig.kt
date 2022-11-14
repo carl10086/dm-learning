@@ -1,8 +1,11 @@
 package com.ysz.dm.rb.apigw.infra.config.web
 
+import com.ysz.dm.rb.apigw.infra.web.security.CustomJwtFilter
+import com.ysz.dm.rb.apigw.infra.web.security.Roles
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.core.AuthenticationException
@@ -10,7 +13,9 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.security.web.util.matcher.RequestMatcher
 import javax.servlet.http.HttpServletRequest
@@ -24,7 +29,12 @@ import javax.servlet.http.HttpServletResponse
  *@createAt 2022/11/12
  **/
 @Configuration
-@EnableWebSecurity(debug = false)
+@EnableWebSecurity(debug = true)
+@EnableGlobalMethodSecurity(
+    prePostEnabled = true,
+    securedEnabled = true,
+    jsr250Enabled = true
+)
 open class SecurityConfig {
 
     @Bean
@@ -32,29 +42,39 @@ open class SecurityConfig {
         return CustomAuthenticationEntryPoint()
     }
 
+    @Bean
+    open fun customJwtFilter() = CustomJwtFilter()
+
 
     @Bean
     open fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf().disable()
+//            .sessionManagement().disable()
+            .sessionManagement().enableSessionUrlRewriting(false)
+            .and()
             .authorizeRequests()
+//            .antMatchers("/index/post").access("hasRole('ADMIN')")
             .requestMatchers(
                 CustomAuthenticationMatcher(
                     /*direct allow if patterns matches*/
                     directorAllowPatterns = listOf(
                         AntPathRequestMatcher("/index/hello"),
                         AntPathRequestMatcher("/users/register/**"),
-
-                        )
+                    )
                 )
             )
-            .authenticated()
+            .permitAll()
             /*just let it go*/
             .anyRequest()
-            .permitAll()
+            .authenticated()
             .and()
             .httpBasic()
             .authenticationEntryPoint(customAuthenticationEntryPoint())
+
+
+
+        http.addFilterBefore(customJwtFilter(), BasicAuthenticationFilter::class.java)
         return http.build()
     }
 
@@ -80,15 +100,15 @@ open class SecurityConfig {
         override fun matches(request: HttpServletRequest): Boolean {
 
             directorAllowPatterns.firstOrNull { x -> x.matches(request) }?.let {
-                return false
+                return true
             }
 
             var httpMethod = HttpMethod.valueOf(request.method)
 
 
             return when (httpMethod) {
-                HttpMethod.POST, HttpMethod.PUT, HttpMethod.PATCH -> true
-                else -> false
+                HttpMethod.POST, HttpMethod.PUT, HttpMethod.PATCH -> false
+                else -> true
             }
         }
     }

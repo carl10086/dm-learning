@@ -1,4 +1,4 @@
-package com.ysz.dm.rb.apigw.infra.web.base
+package com.ysz.dm.rb.apigw.infra.web.dto.common
 
 /**
  *<pre>
