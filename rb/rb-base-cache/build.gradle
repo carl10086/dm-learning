@@ -1,0 +1,19 @@
+plugins {
+    id "java-library"
+}
+description = 'rb-base-cache'
+
+dependencies {
+    api platform(project(":rb-platform"))
+
+    implementation(project(":rb-base-core"))
+    implementation 'io.lettuce:lettuce-core:'
+
+    implementation("ch.qos.logback:logback-classic:")
+    implementation("ch.qos.logback:logback-core::")
+    implementation("org.slf4j:slf4j-api:")
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("com.github.kstyrc:embedded-redis:0.6")
+}
