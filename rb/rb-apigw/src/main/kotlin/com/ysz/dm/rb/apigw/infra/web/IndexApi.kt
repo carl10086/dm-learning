@@ -1,9 +1,12 @@
 package com.ysz.dm.rb.apigw.infra.web
 
+import com.ysz.dm.rb.apigw.infra.web.security.Roles
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.annotation.security.RolesAllowed
+import javax.servlet.http.HttpServletRequest
 
 /**
  *<pre>
@@ -14,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
  **/
 @RestController
 @RequestMapping("/index")
-class IndexApi {
+open class IndexApi {
 
 
     @GetMapping("/hello")
@@ -22,5 +25,11 @@ class IndexApi {
 
 
     @PostMapping("/post")
-    fun post() = "post"
+    @RolesAllowed(Roles.ADMIN)
+    open fun post(
+        req: HttpServletRequest
+    ): String {
+        var principal = req.userPrincipal
+        return "ok"
+    }
 }

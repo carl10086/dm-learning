@@ -1,6 +1,6 @@
 package com.ysz.dm.rb.apigw.infra.web.users
 
-import com.ysz.dm.rb.apigw.infra.web.base.ApiResp
+import com.ysz.dm.rb.apigw.infra.web.dto.common.ApiResp
 import com.ysz.dm.rb.apigw.infra.web.users.req.CheckUsernameReq
 import com.ysz.dm.rb.base.core.tools.hibernate.HibernateValidateTools
 import org.springframework.web.bind.annotation.PostMapping
