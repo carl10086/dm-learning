@@ -4,10 +4,6 @@ plugins {
 
 dependencies {
     api platform(project(":rb-platform"))
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 
     compileOnly("org.springframework:spring-context:")
 

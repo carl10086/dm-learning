@@ -1,0 +1,24 @@
+plugins {
+    id "application"
+    id "org.jetbrains.kotlin.plugin.jpa" version "$kotlinVersion"
+    id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion"
+}
+
+
+//allOpen {
+//    annotation("javax.persistence.Entity")
+//    annotation("javax.persistence.Embeddable")
+//    annotation("javax.persistence.MappedSuperclass")
+//}
+
+dependencies {
+    api platform(project(":rb-platform"))
+
+    implementation(project(":rb-base-core"))
+    implementation("org.springframework.boot:spring-boot-starter-web:")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:")
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.assertj:assertj-core")
+    testImplementation 'com.h2database:h2'
+}
