@@ -8,6 +8,7 @@ dependencies {
 
     implementation(project(":rb-base-core"))
     implementation 'io.lettuce:lettuce-core:'
+    implementation 'com.squareup.okhttp3:okhttp:'
 
     implementation("ch.qos.logback:logback-classic:")
     implementation("ch.qos.logback:logback-core::")
