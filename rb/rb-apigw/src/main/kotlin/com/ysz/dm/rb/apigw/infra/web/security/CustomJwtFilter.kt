@@ -5,10 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.web.filter.OncePerRequestFilter
 import java.time.Instant
@@ -37,7 +35,7 @@ class CustomJwtFilter : OncePerRequestFilter() {
             return
         }
 
-        /*2. */
+        /*2. token*/
         val token = header.substring(BEARER.length)
         var payload = verify(token)
 
@@ -45,7 +43,7 @@ class CustomJwtFilter : OncePerRequestFilter() {
             chain.doFilter(request, response)
             return
         } else {
-            val authUser = User.withUsername(payload.subject).password("1234567").roles("abc").build()
+            val authUser = User.withUsername(payload.subject).password("1234567").roles(Roles.ADMIN).build()
             val authentication = UsernamePasswordAuthenticationToken(
                 authUser, "", authUser.authorities
             )
@@ -55,13 +53,9 @@ class CustomJwtFilter : OncePerRequestFilter() {
             SecurityContextHolder.getContext().authentication = authentication
 
             chain.doFilter(request, response)
-
         }
     }
 
-    private fun valid(src: String?): Boolean {
-        return src?.startsWith(BEARER) ?: false
-    }
 
     companion object {
         private val log = LoggerFactory.getLogger(CustomJwtFilter::class.java)

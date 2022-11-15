@@ -9,7 +9,11 @@ subprojects {
 
 
 ext {
-    rbProjects = [project(":rb-apigw") , project(":rb-base-core"), project(":rb-base-cache")]
+    rbProjects = [
+            project(":rb-apigw") ,
+            project(":rb-user") ,
+            project(":rb-base-core"),
+            project(":rb-base-cache")]
     /*all kotlin projects*/
     kotlinProjects = rbProjects
 
