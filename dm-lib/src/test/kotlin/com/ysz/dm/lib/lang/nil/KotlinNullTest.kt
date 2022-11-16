@@ -1,4 +1,4 @@
-package com.ysz.dm.lib.lang
+package com.ysz.dm.lib.lang.nil
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

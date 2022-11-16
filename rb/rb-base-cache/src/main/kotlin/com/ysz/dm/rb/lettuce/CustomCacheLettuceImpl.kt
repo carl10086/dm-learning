@@ -19,5 +19,21 @@ class CustomCacheLettuceImpl<K, V>(
         this.sync.shutdown(false)
     }
 
+    override fun doGet(k: K): V? {
+        TODO("Not yet implemented")
+    }
+
+    override fun doPut(k: K, v: V) {
+        TODO("Not yet implemented")
+    }
+
+    override fun doMultiGet(keys: Collection<K>): Map<K, V> {
+        TODO("Not yet implemented")
+    }
+
+    override fun rm(k: K): Boolean {
+        TODO("Not yet implemented")
+    }
+
 
 }

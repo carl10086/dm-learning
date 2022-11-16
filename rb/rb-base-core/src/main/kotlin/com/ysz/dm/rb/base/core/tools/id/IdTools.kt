@@ -1,6 +1,5 @@
 package com.ysz.dm.rb.base.core.tools.id
 
-import com.ysz.et.rd.user.infra.base.core.id.Snowflake
 import java.util.*
 
 /**

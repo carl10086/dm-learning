@@ -2,7 +2,7 @@ package com.ysz.dm.rb.user.domain.service
 
 import com.ysz.dm.rb.base.core.ddd.DomainService
 import com.ysz.dm.rb.user.domain.user.UserId
-import com.ysz.et.rd.user.infra.base.core.id.Snowflake
+import com.ysz.dm.rb.base.core.tools.id.Snowflake
 
 /**
  *<pre>

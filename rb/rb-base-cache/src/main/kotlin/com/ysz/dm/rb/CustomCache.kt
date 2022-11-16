@@ -13,9 +13,13 @@ interface CustomCache<K, V> {
      *    load data from cache .
      * </pre>
      */
-    fun get(k: K, sorLoader: Function<K, V>, penetrationProtect: Boolean = false, fallback: Function<K, V>? = null): V?
+    fun get(k: K, sorLoader: Function<K, V?>, penetrationProtect: Boolean = false, fallback: Function<K, V>? = null): V?
 
-    fun multiGet(keys: Collection<K>, loader: Function<Collection<K>, Map<K, V>>, fallback: Function<K, V>? = null)
+    fun multiGet(
+        keys: Collection<K>,
+        loader: Function<Collection<K>, Map<K, V>>,
+        fallback: Function<K, V>? = null
+    ): Map<K, V>
 
     fun rm(k: K): Boolean
 

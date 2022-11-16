@@ -1,4 +1,4 @@
-package com.ysz.et.rd.user.infra.base.core.id
+package com.ysz.dm.rb.base.core.tools.id
 
 import java.net.NetworkInterface
 import java.security.SecureRandom
