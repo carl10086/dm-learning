@@ -9,19 +9,19 @@ dependencies {
 
     // we do not use this
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:")
-    implementation("com.fasterxml.jackson.core:jackson-core:")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:")
-    implementation("com.fasterxml.jackson.core:jackson-databind:")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:")
+    api("com.fasterxml.jackson.core:jackson-core:")
+    api("com.fasterxml.jackson.core:jackson-annotations:")
+    api("com.fasterxml.jackson.core:jackson-databind:")
 
     implementation("ch.qos.logback:logback-classic:")
     implementation("ch.qos.logback:logback-core::")
     implementation("org.slf4j:slf4j-api:")
 
-    implementation('it.unimi.dsi:fastutil:')
-    implementation('org.passay:passay:')
-    implementation('com.googlecode.libphonenumber:libphonenumber:')
-    implementation("org.hibernate.validator:hibernate-validator")
+    api('it.unimi.dsi:fastutil:')
+    api('org.passay:passay:')
+    api('com.googlecode.libphonenumber:libphonenumber:')
+    api("org.hibernate.validator:hibernate-validator")
 
 
     testImplementation("org.junit.jupiter:junit-jupiter")

@@ -15,8 +15,11 @@ ext {
             project(":rb-user") ,
             project(":rb-base-core"),
             project(":rb-base-cache")]
+
+
     /*all kotlin projects*/
     kotlinProjects = rbProjects
+    kotlinProjects.addAll([project(":dm-lib")])
 
     /*current no kotlin projects*/
     javaProjects = subprojects - rbProjects - project(":rb-platform")
