@@ -28,7 +28,7 @@ project(":dm-arm-blog").projectDir = file('dm-arm/dm-arm-blog')
 //include(':rb-user')
 //project(":rb-user").projectDir = file('rb/rb-user')
 
-def rb_projects = ["rb-user", "rb-apigw", "rb-base-cache", "rb-base-core", "rb-platform"]
+def rb_projects = ["rb-user", "rb-apigw", "rb-base-cache", "rb-base-core", "rb-platform", "rb-protos"]
 
 for (rb_project in rb_projects) {
     include(":${rb_project}")

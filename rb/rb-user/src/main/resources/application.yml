@@ -1,0 +1,32 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: beans,health,env,metrics,prometheus
+      base-path: /console
+  metrics:
+    export:
+      prometheus:
+        enabled: true # In order to inject PrometheusMeterRegistry
+  endpoint:
+    health:
+      show-details: always
+
+
+server:
+  shutdown: graceful
+  port: 10000
+
+
+# Additional server ports specified with Armeria configuration.
+armeria:
+  enable-auto-injection: false
+  ports:
+    - port: 10005
+      protocols:
+        - http
+  blocking-task-executor: 300
+  internal-services:
+    include: metrics, health, docs
+    port: 10001
+    protocols: http
