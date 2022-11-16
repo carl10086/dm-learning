@@ -11,6 +11,7 @@ javaPlatform {
 
 dependencies {
     api platform("org.springframework.boot:spring-boot-dependencies:2.7.5")
+    api platform("com.linecorp.armeria:armeria-bom:1.20.1")
 
     constraints {
         api 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'

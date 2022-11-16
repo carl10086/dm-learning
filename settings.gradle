@@ -3,8 +3,8 @@
  */
 
 rootProject.name = 'dm-learning'
+include(':dm-lib')
 include(':dm-biz')
-include(':dm-llib')
 include(':dm-fast')
 include(':code-maker')
 include(':dm-netty')
@@ -12,7 +12,6 @@ include(':dm-ddd-vshop')
 include(':dm-arm')
 include(':dm-ddd-gw')
 include(':dm-arm-blog')
-//include(':dm-ddd')
 project(":dm-ddd-vshop").projectDir = file('dm-ddd/dm-ddd-vshop')
 project(":dm-ddd-gw").projectDir = file('dm-ddd/dm-ddd-gw')
 project(":dm-arm-blog").projectDir = file('dm-arm/dm-arm-blog')
@@ -28,7 +27,7 @@ project(":dm-arm-blog").projectDir = file('dm-arm/dm-arm-blog')
 //include(':rb-user')
 //project(":rb-user").projectDir = file('rb/rb-user')
 
-def rb_projects = ["rb-user", "rb-apigw", "rb-base-cache", "rb-base-core", "rb-platform"]
+def rb_projects = ["rb-user", "rb-apigw", "rb-base-cache", "rb-base-core", "rb-platform", "rb-protos"]
 
 for (rb_project in rb_projects) {
     include(":${rb_project}")
