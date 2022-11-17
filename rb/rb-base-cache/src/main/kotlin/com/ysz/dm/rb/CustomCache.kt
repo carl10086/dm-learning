@@ -6,6 +6,9 @@ import java.util.function.Function
  * @author carl
  * @create 2022-11-15 3:15 PM
  **/
+@Deprecated(
+    message = "design has changed"
+)
 interface CustomCache<K, V> {
 
     /***

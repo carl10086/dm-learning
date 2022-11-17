@@ -14,9 +14,9 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-annotations:")
     api("com.fasterxml.jackson.core:jackson-databind:")
 
-    implementation("ch.qos.logback:logback-classic:")
-    implementation("ch.qos.logback:logback-core::")
-    implementation("org.slf4j:slf4j-api:")
+    api("ch.qos.logback:logback-classic:")
+    api("ch.qos.logback:logback-core::")
+    api("org.slf4j:slf4j-api:")
 
     api('it.unimi.dsi:fastutil:')
     api('org.passay:passay:')
