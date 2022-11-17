@@ -4,12 +4,10 @@
 
 rootProject.name = 'dm-learning'
 include(':dm-lib')
-include(':dm-biz')
 include(':dm-fast')
 include(':code-maker')
 include(':dm-netty')
 include(':dm-ddd-vshop')
-include(':dm-arm')
 include(':dm-ddd-gw')
 include(':dm-arm-blog')
 project(":dm-ddd-vshop").projectDir = file('dm-ddd/dm-ddd-vshop')
