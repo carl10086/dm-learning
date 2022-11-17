@@ -1,4 +1,4 @@
-package com.ysz.dm.rb
+package com.ysz.dm.rb.base.cache
 
 import com.ysz.dm.rb.base.core.exceptions.BaseRbException
 

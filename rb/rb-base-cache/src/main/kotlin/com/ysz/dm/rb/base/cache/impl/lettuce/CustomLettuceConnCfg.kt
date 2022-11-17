@@ -1,4 +1,4 @@
-package com.ysz.dm.rb.lettuce
+package com.ysz.dm.rb.base.cache.impl.lettuce
 
 import io.lettuce.core.ReadFrom
 import io.lettuce.core.RedisClient
