@@ -1,4 +1,4 @@
-package com.ysz.dm.rb.v2
+package com.ysz.dm.rb.base.cache
 
 /**
  * <pre>
@@ -14,11 +14,11 @@ interface CustomCache<K, V> {
      */
     fun get(key: K): V?
 
-    fun multiGet(keys: Collection<K>): Map<K, V?>
+    fun multiGet(keys: Collection<K>): Map<K, V>
 
     fun invalidate(k: K)
 
-    fun multiInvalidate(keys: Collection<K>)
+    fun multiInvalidate(keys: Collection<K>) = run { keys.forEach { invalidate(it) } }
 
     fun put(k: K, v: V)
 

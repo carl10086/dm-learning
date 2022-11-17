@@ -1,5 +1,6 @@
-package com.ysz.dm.rb.lettuce.codec
+package com.ysz.dm.rb.base.cache.lettuce.codec
 
+import com.ysz.dm.rb.base.cache.impl.lettuce.codec.CustomPrefixCodec
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

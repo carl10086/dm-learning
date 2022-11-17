@@ -1,4 +1,4 @@
-package com.ysz.dm.rb
+package com.ysz.dm.rb.base.cache
 
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory

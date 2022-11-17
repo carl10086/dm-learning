@@ -1,4 +1,4 @@
-package com.ysz.dm.rb.lettuce.codec
+package com.ysz.dm.rb.base.cache.impl.lettuce.codec
 
 import com.ysz.dm.rb.base.core.tools.json.JsonTools
 import io.lettuce.core.codec.RedisCodec

@@ -1,4 +1,4 @@
-package com.ysz.dm.rb.base.cache.lettuce
+package com.ysz.dm.rb.base.cache.lettuce.codec
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
