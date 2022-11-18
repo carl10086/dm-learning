@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
  *@author carl.yu
  *@createAt 2022/11/17
  **/
-class FunctionsBasicTest {
+internal class FunctionsBasicTest {
     val a = fun(vararg ts: Int): List<Int> {
         val result = ArrayList<Int>()
         for (t in ts) // ts is an Array
@@ -34,8 +34,7 @@ class FunctionsBasicTest {
 
 
     fun <T, R> Collection<T>.fold(
-        initial: R,
-        combine: (acc: R, nextElement: T) -> R
+        initial: R, combine: (acc: R, nextElement: T) -> R
     ): R {
         var accumulator: R = initial
 
@@ -61,6 +60,40 @@ class FunctionsBasicTest {
 
         /*function reference can also be used for higher-order function calls: */
         val product = items.fold(1, Int::times)
+    }
+
+
+    /*how to declare a function type ? */
+    class IntTransformer : (Int) -> Int {
+        override fun invoke(p1: Int): Int {
+            TODO("Not yet implemented")
+        }
+    }
+
+    val intFunction: (Int) -> Int = IntTransformer()
+
+
+    @Test
+    internal fun `test_highOrderFunc`() {
+
+        /*no has receiver*/
+        val stringPlus: (String, String) -> String = String::plus
+
+        /*has receiver*/
+        val intPlus: Int.(Int) -> Int = Int::plus
+
+
+        println(stringPlus.invoke("<-", "->"))
+        println(stringPlus("Hello", "world!"))
+
+        println(intPlus.invoke(1, 1))
+        println(2.intPlus(3)) // extension-like call
+    }
+
+
+    @Test
+    internal fun `test_lambda`() {
+//        max(strings, { a, b -> a.length < b.length })
     }
 
     companion object {
