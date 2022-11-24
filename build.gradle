@@ -9,13 +9,16 @@ subprojects {
 
 
 ext {
-    rbProjects = [
-            project(":rb-protos") ,
-            project(":rb-apigw") ,
-            project(":rb-user") ,
-            project(":rb-base-core"),
-            project(":rb-base-cache")]
+//    rbProjects = [
+//            project(":rb-protos") ,
+//            project(":rb-apigw") ,
+//            project(":rb-user") ,
+//            project(":rb-base-core"),
+//            project(":rb-base-cache")]
 
+
+    rbProjects = subprojects.findAll { it.name.startsWith("rb-") } - project("rb-platform")
+    rbProjects.add(project(":integration-tests"))
 
     /*all kotlin projects*/
     kotlinProjects = rbProjects
@@ -34,7 +37,7 @@ ext {
 
 group = "com.ysz"
 
-tasks.register("carl") {
+tasks.register("showProjects") {
     doLast {
         println("rbProjects:$rbProjects")
         println("kotlinProjects:$kotlinProjects")

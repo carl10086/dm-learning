@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory
 
 /**
  *<pre>
+ *
+ *
+ * https://medium.com/mobile-app-development-publication/kotlin-dont-just-use-let-7e91f544e27f
  * class desc here
  *</pre>
  *@author carl.yu
@@ -98,5 +101,29 @@ internal class FunctionsBasicTest {
 
     companion object {
         private val log = LoggerFactory.getLogger(FunctionsBasicTest.javaClass)
+    }
+
+
+    data class Item(var username: String?)
+
+
+    inline fun <T> Item.applyIfNotNull(
+        item: T?,
+        consumer: (t: T?, target: Item) -> Unit,
+    ) {
+        item?.let {
+            consumer.invoke(item, this)
+        }
+    }
+
+    @Test
+    internal fun `test_updateIfNotNull`() {
+        val item = Item("111")
+
+        var item2 = Item("222")
+
+
+
+
     }
 }
