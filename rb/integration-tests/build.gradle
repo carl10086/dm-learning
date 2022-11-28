@@ -1,14 +1,6 @@
-plugins {
-    id "java-library"
-}
-description = 'rb-base-cache'
-
 dependencies {
-    api platform(project(":rb-platform"))
 
     implementation(project(":rb-base-core"))
-    api 'io.lettuce:lettuce-core:'
-    api 'com.squareup.okhttp3:okhttp:'
 
     implementation("ch.qos.logback:logback-classic:")
     implementation("ch.qos.logback:logback-core::")
@@ -16,5 +8,4 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core")
-    testImplementation("com.github.kstyrc:embedded-redis:0.6")
 }
