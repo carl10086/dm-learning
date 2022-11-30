@@ -1,0 +1,7 @@
+dependencies {
+    implementation(project(":dm-arm-api"))
+
+    implementation("com.linecorp.armeria:armeria:")
+    implementation("com.linecorp.armeria:armeria-grpc:")
+    implementation("com.linecorp.armeria:armeria-logback:")
+}

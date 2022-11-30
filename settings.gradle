@@ -9,10 +9,8 @@ include(':code-maker')
 include(':dm-netty')
 include(':dm-ddd-vshop')
 include(':dm-ddd-gw')
-include(':dm-arm-blog')
 project(":dm-ddd-vshop").projectDir = file('dm-ddd/dm-ddd-vshop')
 project(":dm-ddd-gw").projectDir = file('dm-ddd/dm-ddd-gw')
-project(":dm-arm-blog").projectDir = file('dm-arm/dm-arm-blog')
 
 //include(':rb-apigw')
 //project(":rb-apigw").projectDir = file('rb/rb-apigw')
@@ -30,4 +28,12 @@ def rb_projects = ["rb-user", "rb-apigw", "rb-base-cache", "rb-base-core", "rb-p
 for (rb_project in rb_projects) {
     include(":${rb_project}")
     project(":${rb_project}").projectDir = file("rb/${rb_project}")
+}
+
+
+def arm_projects = ["api", "client", "server"]
+for (pro in arm_projects) {
+    def projectName = "dm-arm-${pro}"
+    include(":${projectName}")
+    project(":${projectName}").projectDir = file("dm-arm/${pro}")
 }

@@ -2,6 +2,7 @@ plugins {
     id 'io.freefair.lombok' version '6.5.1' apply false
     id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion" apply false
+    id "com.google.protobuf" version "0.9.1" apply false
 }
 subprojects {
     apply 'plugin': 'io.freefair.lombok'
@@ -20,18 +21,24 @@ ext {
     rbProjects = subprojects.findAll { it.name.startsWith("rb-") } - project("rb-platform")
     rbProjects.add(project(":integration-tests"))
 
+
+    armProjects = subprojects.findAll { it.name.startsWith("dm-arm") }
+
     /*all kotlin projects*/
-    kotlinProjects = rbProjects
+    kotlinProjects = []
+    kotlinProjects.addAll(rbProjects)
     kotlinProjects.addAll([project(":dm-lib")])
+    kotlinProjects.addAll(armProjects)
 
     /*current no kotlin projects*/
     javaProjects = subprojects - rbProjects - project(":rb-platform")
 
 
     /**/
-    grpcVersion = "1.49.1"
-    protobufVersion = "3.21.1"
+    grpcVersion = "1.51.0"
+    protobufVersion = "3.21.9"
     grpcKotlinVersion = "1.3.0"
+    armeriacVersion = "1.20.3"
 }
 
 
@@ -39,6 +46,7 @@ group = "com.ysz"
 
 tasks.register("showProjects") {
     doLast {
+        println("armProject:$armProjects")
         println("rbProjects:$rbProjects")
         println("kotlinProjects:$kotlinProjects")
         println("javaProjects:$javaProjects")
@@ -81,6 +89,7 @@ configure(kotlinProjects) {
 
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}"
+
             }
 
             test {
@@ -96,5 +105,32 @@ configure(kotlinProjects) {
                          "--add-opens=java.base/java.util=ALL-UNNAMED"])
             }
 
+        }
+}
+
+
+/*configure for all dm-arm-projects*/
+configure(armProjects) {
+    project ->
+        {
+
+            dependencies {
+                api platform("com.linecorp.armeria:armeria-bom:${armeriacVersion}")
+                api platform("io.grpc:grpc-bom:${grpcVersion}")
+                api platform("com.google.protobuf:protobuf-bom:${protobufVersion}")
+
+
+                implementation("io.grpc:grpc-services:")
+                implementation("io.grpc:grpc-protobuf:")
+                implementation("io.grpc:grpc-stub:")
+                implementation("com.google.protobuf:protobuf-java-util:")
+                implementation 'javax.annotation:javax.annotation-api:1.3.2'
+
+
+
+
+                testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+                testImplementation("org.assertj:assertj-core:3.22.0")
+            }
         }
 }
