@@ -23,7 +23,7 @@ project(":dm-ddd-gw").projectDir = file('dm-ddd/dm-ddd-gw')
 //include(':rb-user')
 //project(":rb-user").projectDir = file('rb/rb-user')
 
-def rb_projects = ["rb-user", "rb-apigw", "rb-base-cache", "rb-base-core", "rb-platform", "rb-protos", "integration-tests"]
+def rb_projects = ["rb-user", "rb-apigw", "rb-base-cache", "rb-base-core", "rb-platform", "rb-protos", "integration-tests", "rb-base-redis"]
 
 for (rb_project in rb_projects) {
     include(":${rb_project}")

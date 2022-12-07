@@ -1,11 +1,12 @@
 dependencies {
 
-    implementation(project(":rb-base-core"))
+    testImplementation(project(":rb-base-core"))
 
-    implementation("ch.qos.logback:logback-classic:")
-    implementation("ch.qos.logback:logback-core::")
-    implementation("org.slf4j:slf4j-api:")
+    testImplementation("ch.qos.logback:logback-classic:")
+    testImplementation("ch.qos.logback:logback-core::")
+    testImplementation("org.slf4j:slf4j-api:")
 
+    testImplementation("io.lettuce:lettuce-core:")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core")
 }
