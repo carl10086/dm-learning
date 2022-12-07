@@ -1,6 +1,7 @@
 ext {
     logbackVersion = "1.4.4"
     slf4jVersion = "2.0.3"
+    resilience4jVersion = "2.0.0"
 }
 
 test {
@@ -25,6 +26,8 @@ dependencies {
     testImplementation "ch.qos.logback:logback-classic:${logbackVersion}"
     testImplementation "ch.qos.logback:logback-core:${logbackVersion}"
     testImplementation "org.slf4j:slf4j-api:${slf4jVersion}"
+
+    testImplementation("io.github.resilience4j:resilience4j-circuitbreaker:${resilience4jVersion}")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("org.assertj:assertj-core:3.22.0")

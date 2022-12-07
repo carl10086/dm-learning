@@ -32,4 +32,29 @@ internal class AssociateMapTest {
     }
 
 
+    @Test
+    fun `test_containsKey`() {
+        val map: Map<String, List<String>> = buildMap {
+            put("a", listOf("a"))
+        }
+
+        map["b"]
+            ?.
+            let {
+            println("out : $it")
+            it.forEach { x ->
+                println("why :$x")
+            }
+            for (s in it) {
+                println("what :$s")
+            }
+        } ?: let {
+            println("no data")
+        }
+
+
+        var b: String? = null
+
+        b?.let { println("b is not null") } ?: let { println("b is null") }
+    }
 }
