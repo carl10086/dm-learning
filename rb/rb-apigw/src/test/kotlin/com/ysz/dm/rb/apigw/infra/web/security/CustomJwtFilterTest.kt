@@ -18,6 +18,7 @@ internal class CustomJwtFilterTest {
         Assertions.assertTrue(invalid(null))
         Assertions.assertTrue(invalid("abadf"))
         Assertions.assertFalse(invalid("${BEARER}"))
+
     }
 
 

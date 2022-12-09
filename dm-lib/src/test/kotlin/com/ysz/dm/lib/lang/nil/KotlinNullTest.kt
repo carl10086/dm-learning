@@ -12,16 +12,17 @@ internal class KotlinNullTest {
 
     private fun nullSupplier(arg: Int): String? = if (arg == 1) null else arg.toString()
 
-    @org.junit.jupiter.api.Test
-    internal fun `test_returnIfNull`() {
+    @Test
+    internal fun test_returnIfNull() {
         Assertions.assertEquals(nullSupplier(1) ?: "null", "null")
         Assertions.assertEquals(nullSupplier(2) ?: "null", "2")
     }
 
 
     @Test
-    internal fun `test_logicAndReturnIfNull`() {
-        nullSupplier(1) ?: let { }
+    internal fun test_logicAndReturnIfNull() {
+        val len: Int? = nullSupplier(2)?.length
+        println("$len")
     }
 
     companion object {
