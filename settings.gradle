@@ -37,3 +37,8 @@ for (pro in arm_projects) {
     include(":${projectName}")
     project(":${projectName}").projectDir = file("dm-arm/${pro}")
 }
+
+
+// after this we be keep
+
+include(":dm-platform")

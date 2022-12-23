@@ -10,12 +10,6 @@ subprojects {
 
 
 ext {
-//    rbProjects = [
-//            project(":rb-protos") ,
-//            project(":rb-apigw") ,
-//            project(":rb-user") ,
-//            project(":rb-base-core"),
-//            project(":rb-base-cache")]
 
 
     rbProjects = subprojects.findAll { it.name.startsWith("rb-") } - project("rb-platform")
@@ -31,7 +25,8 @@ ext {
     kotlinProjects.addAll(armProjects)
 
     /*current no kotlin projects*/
-    javaProjects = subprojects - rbProjects - project(":rb-platform")
+//    javaProjects = subprojects - rbProjects - project(":rb-platform") - project(":dm-platform")
+    javaProjects = [project(":code-maker"), project(":dm-ddd-gw"), project(":dm-ddd-vshop"), project(":dm-fast"), project(":dm-netty")]
 
 
     /*other versions*/
@@ -126,8 +121,6 @@ configure(armProjects) {
                 implementation("io.grpc:grpc-stub:")
                 implementation("com.google.protobuf:protobuf-java-util:")
                 implementation 'javax.annotation:javax.annotation-api:1.3.2'
-
-
 
 
                 testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
