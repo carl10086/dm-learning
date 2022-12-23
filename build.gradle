@@ -18,15 +18,23 @@ ext {
 
     armProjects = subprojects.findAll { it.name.startsWith("dm-arm") }
 
+    dmBaseProjects = subprojects.findAll { it.name.startsWith("dm-base") }
+
     /*all kotlin projects*/
     kotlinProjects = []
     kotlinProjects.addAll(rbProjects)
     kotlinProjects.addAll([project(":dm-lib")])
     kotlinProjects.addAll(armProjects)
+    kotlinProjects.addAll(dmBaseProjects)
+
+    dmLibProjects = []
+    dmLibProjects.addAll(dmBaseProjects)
+
+
 
     /*current no kotlin projects*/
 //    javaProjects = subprojects - rbProjects - project(":rb-platform") - project(":dm-platform")
-    javaProjects = [project(":code-maker"), project(":dm-ddd-gw"), project(":dm-ddd-vshop"), project(":dm-fast"), project(":dm-netty")]
+    javaProjects = [project(":dm-ddd-gw"), project(":dm-ddd-vshop"), project(":dm-fast"), project(":dm-netty")]
 
 
     /*other versions*/
@@ -128,3 +136,23 @@ configure(armProjects) {
             }
         }
 }
+
+
+configure(dmLibProjects) {
+    pro ->
+        {
+            apply plugin: "maven-publish"
+            apply plugin: "java-library"
+
+            dependencies {
+                api platform(project(":dm-platform"))
+
+//                testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+//                testImplementation("org.assertj:assertj-core:3.22.0")
+                testImplementation("org.junit.jupiter:junit-jupiter:")
+                testImplementation("org.assertj:assertj-core:")
+            }
+        }
+}
+
+
