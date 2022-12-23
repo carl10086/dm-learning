@@ -10,7 +10,7 @@ javaPlatform {
 
 
 dependencies {
-    api platform("org.springframework.boot:spring-boot-dependencies:2.7.5")
+    api platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
     api platform("com.linecorp.armeria:armeria-bom:${armeriacVersion}")
 
     constraints {
