@@ -1,0 +1,6 @@
+dependencies {
+    api(project(":dm-base-core"))
+    api("io.lettuce:lettuce-core:")
+    api 'commons-io:commons-io:'
+    compileOnly('org.slf4j:slf4j-api:')
+}

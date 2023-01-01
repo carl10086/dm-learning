@@ -10,12 +10,6 @@ subprojects {
 
 
 ext {
-//    rbProjects = [
-//            project(":rb-protos") ,
-//            project(":rb-apigw") ,
-//            project(":rb-user") ,
-//            project(":rb-base-core"),
-//            project(":rb-base-cache")]
 
 
     rbProjects = subprojects.findAll { it.name.startsWith("rb-") } - project("rb-platform")
@@ -24,14 +18,23 @@ ext {
 
     armProjects = subprojects.findAll { it.name.startsWith("dm-arm") }
 
+    dmBaseProjects = subprojects.findAll { it.name.startsWith("dm-base") }
+
     /*all kotlin projects*/
     kotlinProjects = []
     kotlinProjects.addAll(rbProjects)
     kotlinProjects.addAll([project(":dm-lib")])
     kotlinProjects.addAll(armProjects)
+    kotlinProjects.addAll(dmBaseProjects)
+
+    dmLibProjects = []
+    dmLibProjects.addAll(dmBaseProjects)
+
+
 
     /*current no kotlin projects*/
-    javaProjects = subprojects - rbProjects - project(":rb-platform")
+//    javaProjects = subprojects - rbProjects - project(":rb-platform") - project(":dm-platform")
+    javaProjects = [project(":dm-ddd-gw"), project(":dm-ddd-vshop"), project(":dm-fast"), project(":dm-netty")]
 
 
     /*other versions*/
@@ -39,7 +42,8 @@ ext {
     protobufVersion = "3.21.12"
     grpcKotlinVersion = "1.3.0"
     armeriacVersion = "1.20.3"
-    springBootVersion = "3.0.0"
+    springBootVersion = "3.0.1"
+
 }
 
 
@@ -128,10 +132,28 @@ configure(armProjects) {
                 implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
 
-
-
                 testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
                 testImplementation("org.assertj:assertj-core:3.22.0")
             }
         }
 }
+
+
+configure(dmLibProjects) {
+    pro ->
+        {
+            apply plugin: "maven-publish"
+            apply plugin: "java-library"
+
+            dependencies {
+                api platform(project(":dm-platform"))
+
+//                testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+//                testImplementation("org.assertj:assertj-core:3.22.0")
+                testImplementation("org.junit.jupiter:junit-jupiter:")
+                testImplementation("org.assertj:assertj-core:")
+            }
+        }
+}
+
+

@@ -1,0 +1,19 @@
+dependencies {
+
+    api 'org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:'
+
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:")
+    api("com.fasterxml.jackson.core:jackson-core:")
+    api("com.fasterxml.jackson.core:jackson-annotations:")
+    api("com.fasterxml.jackson.core:jackson-databind:")
+
+
+    implementation('it.unimi.dsi:fastutil:')
+
+    //    validator part
+    implementation 'jakarta.validation:jakarta.validation-api:'
+    implementation('org.passay:passay:')
+    implementation('com.googlecode.libphonenumber:libphonenumber:')
+    implementation("org.hibernate.validator:hibernate-validator:")
+
+}
