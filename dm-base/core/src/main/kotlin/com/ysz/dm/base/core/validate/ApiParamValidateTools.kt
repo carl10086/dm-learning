@@ -12,6 +12,11 @@ import com.ysz.dm.base.core.exceptions.ApiParamException
 class ApiParamValidateTools {
 
     companion object {
+        fun <T> notNull(src: T?, errorMsg: String): T {
+            chk(src != null, errorMsg)
+            return src!!
+        }
+
         fun chk(expression: Boolean, errorMsg: String) {
             if (!expression) throw ApiParamException(errorMsg)
         }
