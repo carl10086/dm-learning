@@ -1,0 +1,33 @@
+-- 这个算法有个漏洞, 算法基于递归, 如果递归中间的链端了, 会有 bug, 需要后续优化
+local cur_key = ARGV[2] .. ARGV[3]
+local cur_count = redis.call("HGET", cur_key, "cur")
+if not cur_count then
+  local base_count = 0
+  local prev_key = ARGV[2] .. tostring(tonumber(ARGV[3]) - 1)
+  local prev_cur = redis.call("HGET", prev_key, "cur")
+  if prev_cur then
+    base_count = tonumber(prev_cur) + tonumber(redis.call("HGET", prev_key, "base"))
+  end
+  local rm_key = ARGV[2] .. tostring(tonumber(ARGV[3]) - tonumber(ARGV[4]))
+  local rm_cur = redis.call("HGET", rm_key, "cur")
+  if rm_cur then
+    base_count = base_count - tonumber(rm_cur)
+  end
+  if base_count >= tonumber(ARGV[1]) then
+    redis.call("HMSET", cur_key, "base", base_count, "cur", 0)
+    redis.call("EXPIRE", cur_key, ARGV[5])
+    return -base_count
+  else
+    redis.call("HMSET", cur_key, "base", base_count, "cur", 1)
+    redis.call("EXPIRE", cur_key, ARGV[5])
+    return base_count + 1
+  end
+else
+  local total_cnt  = cur_count + tonumber(redis.call("HGET", cur_key, "base"))
+  if total_cnt >= tonumber(ARGV[1]) then
+    return -total_cnt
+  else
+    redis.call("HINCRBY", cur_key, "cur" , 1)
+    return total_cnt + 1
+  end
+end

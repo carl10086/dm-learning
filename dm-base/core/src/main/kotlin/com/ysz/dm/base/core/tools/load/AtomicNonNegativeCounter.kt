@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /**
  *<pre>
- * class desc here
+ * always positive counter ~
  *</pre>
  *@author carl.yu
  *@since 2022/12/24

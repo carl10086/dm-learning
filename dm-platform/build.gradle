@@ -18,11 +18,14 @@ dependencies {
     api platform("com.google.protobuf:protobuf-bom:${protobufVersion}")
 
     constraints {
-        api 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
+//        api 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
+//        api 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
+        api 'org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.4.1'
         api 'org.passay:passay:1.6.2'
         api 'it.unimi.dsi:fastutil:8.5.9'
         api 'com.googlecode.libphonenumber:libphonenumber:8.13.0'
         api 'com.auth0:java-jwt:4.2.1'
+        api 'commons-io:commons-io:2.11.0'
     }
 }
 
