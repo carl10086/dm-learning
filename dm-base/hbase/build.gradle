@@ -1,0 +1,8 @@
+dependencies {
+    api(project(":dm-base-core"))
+    api('org.apache.hbase:hbase-client:') {
+        exclude group: "slf4j-api", module: "*"
+    }
+
+    compileOnly("org.springframework:spring-context:")
+}
