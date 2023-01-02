@@ -6,6 +6,9 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-core:")
     api("com.fasterxml.jackson.core:jackson-annotations:")
     api("com.fasterxml.jackson.core:jackson-databind:")
+    api("ch.qos.logback:logback-classic:")
+    api("ch.qos.logback:logback-core:")
+    api("org.slf4j:slf4j-api:")
 
 
     implementation('it.unimi.dsi:fastutil:')
@@ -15,5 +18,6 @@ dependencies {
     implementation('org.passay:passay:')
     implementation('com.googlecode.libphonenumber:libphonenumber:')
     implementation("org.hibernate.validator:hibernate-validator:")
+
 
 }
