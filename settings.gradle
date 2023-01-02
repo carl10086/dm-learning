@@ -43,7 +43,7 @@ for (pro in arm_projects) {
 include(":dm-platform")
 
 
-def dmBaseProjects = ["core", "redis"]
+def dmBaseProjects = ["core", "redis", "hbase"]
 for (pro in dmBaseProjects) {
     def projectName = "dm-base-${pro}"
     include(":${projectName}")

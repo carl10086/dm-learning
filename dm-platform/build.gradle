@@ -9,7 +9,6 @@ javaPlatform {
 }
 
 
-
 dependencies {
     api platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
     api platform("com.linecorp.armeria:armeria-bom:${armeriacVersion}")
@@ -26,6 +25,9 @@ dependencies {
         api 'com.googlecode.libphonenumber:libphonenumber:8.13.0'
         api 'com.auth0:java-jwt:4.2.1'
         api 'commons-io:commons-io:2.11.0'
+        api('org.apache.hbase:hbase-client:2.2.4')
+
+
     }
 }
 

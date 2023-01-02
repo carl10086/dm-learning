@@ -22,6 +22,10 @@ define gradle
 ./gradlew $(1)
 endef
 
-.PHONY: pub pub2local
+.PHONY: pub2local clean build
 pub2local:
 	$(call gradle, clean publishToMavenLocal  -x test)
+clean:
+	$(call gradle, clean -x test)
+build:
+	$(call gradle, clean build-x test)
