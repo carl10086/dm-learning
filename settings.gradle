@@ -3,42 +3,7 @@
  */
 
 rootProject.name = 'dm-learning'
-include(':dm-lib')
-include(':dm-fast')
-include(':dm-netty')
-include(':dm-ddd-vshop')
-include(':dm-ddd-gw')
-project(":dm-ddd-vshop").projectDir = file('dm-ddd/dm-ddd-vshop')
-project(":dm-ddd-gw").projectDir = file('dm-ddd/dm-ddd-gw')
 
-//include(':rb-apigw')
-//project(":rb-apigw").projectDir = file('rb/rb-apigw')
-//include(':rb-platform')
-//project(":rb-platform").projectDir = file('rb/rb-platform')
-//include(':rb-base-core')
-//project(":rb-base-core").projectDir = file('rb/rb-base-core')
-//include(':rb-base-cache')
-//project(":rb-base-cache").projectDir = file('rb/rb-base-cache')
-//include(':rb-user')
-//project(":rb-user").projectDir = file('rb/rb-user')
-
-def rb_projects = ["rb-user", "rb-apigw", "rb-base-cache", "rb-base-core", "rb-platform", "rb-protos", "integration-tests", "rb-base-redis"]
-
-for (rb_project in rb_projects) {
-    include(":${rb_project}")
-    project(":${rb_project}").projectDir = file("rb/${rb_project}")
-}
-
-
-def arm_projects = ["api", "client", "server"]
-for (pro in arm_projects) {
-    def projectName = "dm-arm-${pro}"
-    include(":${projectName}")
-    project(":${projectName}").projectDir = file("dm-arm/${pro}")
-}
-
-
-// after this we be keep
 
 include(":dm-platform")
 
@@ -49,3 +14,5 @@ for (pro in dmBaseProjects) {
     include(":${projectName}")
     project(":${projectName}").projectDir = file("dm-base/${pro}")
 }
+
+include(':dm-lib')

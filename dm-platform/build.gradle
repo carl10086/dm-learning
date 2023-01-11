@@ -15,14 +15,15 @@ dependencies {
     api platform("com.linecorp.armeria:armeria-bom:${armeriacVersion}")
     api platform("io.grpc:grpc-bom:${grpcVersion}")
     api platform("com.google.protobuf:protobuf-bom:${protobufVersion}")
+    api platform("io.github.resilience4j:resilience4j-bom:${resilience4jVersion}")
 
     constraints {
 //        api 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
 //        api 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
         api 'org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.4.1'
         api 'org.passay:passay:1.6.2'
-        api 'it.unimi.dsi:fastutil:8.5.9'
-        api 'com.googlecode.libphonenumber:libphonenumber:8.13.0'
+        api "it.unimi.dsi:fastutil:${fastutilVersion}"
+        api "com.googlecode.libphonenumber:libphonenumber:${libphonenumberVersion}"
         api 'com.auth0:java-jwt:4.2.1'
         api 'commons-io:commons-io:2.11.0'
         api('org.apache.hbase:hbase-client:2.2.4')
