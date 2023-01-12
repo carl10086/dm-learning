@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
  *@author carl.yu
  *@createAt 2022/11/16
  **/
-internal class AssociateMapTest {
+internal class AssociateMapDm {
 
 
     @Test

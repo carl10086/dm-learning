@@ -1,8 +1,8 @@
 package com.ysz.dm.lib.lang.nil
 
+import com.ysz.dm.lib.common.atomictest.eq
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.platform.commons.logging.LoggerFactory
 
 /**
  * @author carl
@@ -46,7 +46,14 @@ internal class KotlinNullDm {
         assertEquals("---", (s2 ?: "---"))
     }
 
-    companion object {
-        private val log = LoggerFactory.getLogger(KotlinNullDm::class.java)
+
+    private fun String?.isNullOrLessThen2(): Boolean = this == null || this.length < 2
+
+    @Test
+    fun `test nullExtension`() {
+        null.isNullOrLessThen2() eq true
+        "".isNullOrLessThen2() eq true
+        " ".isNullOrLessThen2() eq true
+        "  ".isNullOrLessThen2() eq false
     }
 }

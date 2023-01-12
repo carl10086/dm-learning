@@ -1,6 +1,6 @@
-package com.ysz.dm.lib.juc.parallel
+package com.ysz.dm.lib.lang.juc.parallel
 
-import com.ysz.dm.lib.juc.timer.Timer
+import com.ysz.dm.lib.lang.juc.timer.Timer
 import java.util.function.LongSupplier
 
 /**

@@ -1,4 +1,4 @@
-package com.ysz.dm.lib.juc.execute
+package com.ysz.dm.lib.lang.juc.execute
 
 import java.util.concurrent.Executors
 
