@@ -19,5 +19,7 @@ dependencies {
     implementation('com.googlecode.libphonenumber:libphonenumber:')
     implementation("org.hibernate.validator:hibernate-validator:")
 
+    compileOnly("org.springframework:spring-context:")
+
 
 }
