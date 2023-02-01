@@ -28,3 +28,43 @@ gradle-app.setting
 
 
 dependency-reduced-pom.xml
+
+
+## Python
+*.py[cod]
+.venv/
+.ipynb_checkpoints
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+var
+sdist
+develop-eggs
+.installed.cfg
+lib64
+__pycache__
+
+# Installer logs
+pip-log.txt
+
+
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+
+## Vim ##
+
+*.swp
+*.swo
+*.un~
+Session.vim
+.netrwhist
+*~
