@@ -1,0 +1,10 @@
+dependencies {
+    api project(':dm-base-core')
+    api 'org.springframework.data:spring-data-mongodb:'
+    api 'org.mongodb:mongodb-driver-sync:'
+    api 'org.mongodb:mongodb-driver-core:'
+    api 'org.mongodb:bson:'
+
+    testImplementation(project(":dm-base-test"))
+}
+
