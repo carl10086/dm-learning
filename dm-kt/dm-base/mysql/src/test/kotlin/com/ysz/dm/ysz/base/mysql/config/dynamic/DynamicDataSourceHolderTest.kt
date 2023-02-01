@@ -21,4 +21,5 @@ internal class DynamicDataSourceHolderTest {
         DynamicDataSourceHolder.reset()
         assertEquals(DynamicDataSourceHolder.get(), DynamicDataSourceType.SECONDARY)
     }
+
 }
