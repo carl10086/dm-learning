@@ -37,15 +37,16 @@ class LeeCode1664 {
                 evenAfter = evenSum - evenBefore
                 if (index % 2 == 0) {
                     // 偶数
-                    oddNew = oddBefore + evenAfter - i
                     evenNew = evenBefore + oddAfter
+                    oddNew = oddBefore + evenAfter - i
 
                     println("index:${index}, i:${i}, evenBefore: $evenBefore, evenAfter: $evenAfter , oddBefore:${oddBefore} , oddAfter: $oddAfter")
 
                     evenBefore += i
                 } else {
-                    oddNew = oddBefore + evenAfter
+                    // 奇数
                     evenNew = evenBefore + oddAfter - i
+                    oddNew = oddBefore + evenAfter
 
                     println("index:${index}, i:${i}, evenBefore: $evenBefore, evenAfter: $evenAfter , oddBefore:${oddBefore} , oddAfter: $oddAfter")
                     oddBefore += i
