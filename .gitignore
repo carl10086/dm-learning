@@ -33,6 +33,7 @@ dependency-reduced-pom.xml
 ## Python
 *.py[cod]
 .venv/
+.ipynb_checkpoints
 
 # Packages
 *.egg
