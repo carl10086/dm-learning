@@ -18,7 +18,7 @@ internal class DynamicDataSourceSupplierTest {
         DynamicDataSourceHolder.forcePrimary()
 
         assertEquals(CompletableFuture.supplyAsync(
-            DynamicDataSourceSupplier {
+            DynamicDataSourceSupplier gs{
                 /*return the child thread*/
                 DynamicDataSourceHolder.get()
             }
