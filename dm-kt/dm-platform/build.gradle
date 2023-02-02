@@ -16,6 +16,7 @@ dependencies {
     api platform("io.grpc:grpc-bom:${grpcVersion}")
     api platform("com.google.protobuf:protobuf-bom:${protobufVersion}")
     api platform("io.github.resilience4j:resilience4j-bom:${resilience4jVersion}")
+    api platform("io.micrometer:micrometer-tracing-bom:${micrometerTracingVersion}")
 
     constraints {
 //        api 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'

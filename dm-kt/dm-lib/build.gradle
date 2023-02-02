@@ -2,6 +2,9 @@ dependencies {
 
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.github.ben-manes.caffeine:caffeine:")
+    implementation("io.micrometer:micrometer-tracing")
+    testImplementation("io.micrometer:micrometer-tracing-test")
+    testImplementation("io.micrometer:micrometer-tracing-integration-test")
 
 
     testImplementation "ch.qos.logback:logback-classic:"
