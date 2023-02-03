@@ -1,0 +1,24 @@
+[Unit]
+Description=dragonfly service
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+LimitCORE=infinity
+LimitNOFILE=infinity
+LimitNPROC=infinity
+
+User=admin
+Group=admin
+
+Type=forking
+PIDFile=/duitang/dist/sys/dragonfly/run.pid
+ExecStartPre=/usr/bin/rm -f /duitang/dist/sys/dragonfly/run.pid
+ExecStart=/bin/bash -c "/duitang/dist/sys/dragonfly/dragonfly.sh start"
+KillSignal=SIGQUIT
+KillMode=process
+Restart=always
+TimeoutStopSec=5
+
+
+[Install]
+WantedBy=multi-user.target
