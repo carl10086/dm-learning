@@ -68,3 +68,7 @@ nosetests.xml
 Session.vim
 .netrwhist
 *~
+
+
+## custom
+./dm-algebra/chapters/figures/
