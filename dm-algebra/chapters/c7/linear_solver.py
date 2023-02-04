@@ -4,6 +4,11 @@ from chapters.internal.tools.vectors import *
 
 
 def standard_form(v1, v2):
+    """
+    1个函数表达的形式是 ax + by = c .
+    我们通过代数的方式计算出来 .
+    而这个 算出来的值 刚好能够被 numpy 帮助我们计算 .
+    """
     x1, y1 = v1
     x2, y2 = v2
     a = y2 - y1
@@ -13,6 +18,11 @@ def standard_form(v1, v2):
 
 
 def intersection(u1, u2, v1, v2):
+    """
+    u1, u2 决定了1条直线
+    v1 ,v2 决定了另外1条
+    通过矩阵运算
+    """
     a1, b1, c1 = standard_form(u1, u2)
     a2, b2, c2 = standard_form(v1, v2)
     m = np.array(((a1, b1), (a2, b2)))
