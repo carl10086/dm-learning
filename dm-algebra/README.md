@@ -13,5 +13,6 @@
 
 **D系列: 微积分和基础物理**
 
+- d1: [导数和积分](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/d1.ipynb)
 
 **E系列: 机器学习基础玩法** 
