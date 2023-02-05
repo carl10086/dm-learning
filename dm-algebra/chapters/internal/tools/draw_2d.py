@@ -39,7 +39,7 @@ dino_vectors = [
 ]
 
 
-class Polygon:
+class Polygon2D:
 
     def __init__(self, *vertices, color=blue, fill=None, alpha=0.4):
         self.vertices = vertices
@@ -48,20 +48,20 @@ class Polygon:
         self.alpha = alpha
 
 
-class Points():
+class Points2D():
     def __init__(self, *vectors, color=black):
         self.vectors = list(vectors)
         self.color = color
 
 
-class Arrow:
+class Arrow2D:
     def __init__(self, tip, tail=(0, 0), color=red):
         self.tip = tip
         self.tail = tail
         self.color = color
 
 
-class Segment:
+class Segment2D:
     def __init__(self, start_point, end_point, color=blue):
         self.start_point = start_point
         self.end_point = end_point
@@ -71,16 +71,16 @@ class Segment:
 # helper function to extract all the vectors from a list of objects
 def extract_vectors(objects):
     for item in objects:
-        if type(item) == Polygon:
+        if type(item) == Polygon2D:
             for v in item.vertices:
                 yield v
-        elif type(item) == Points:
+        elif type(item) == Points2D:
             for v in item.vectors:
                 yield v
-        elif type(item) == Arrow:
+        elif type(item) == Arrow2D:
             yield item.tip
             yield item.tail
-        elif type(item) == Segment:
+        elif type(item) == Segment2D:
             yield item.start_point
             yield item.end_point
         else:
@@ -123,7 +123,7 @@ def draw2d(*objects, origin=True, axes=True, grid=(1, 1), nice_aspect_ratio=True
         plt.gca().axvline(linewidth=2, color='k')
 
     for item in objects:
-        if type(item) == Polygon:
+        if type(item) == Polygon2D:
             for i in range(0, len(item.vertices)):
                 x1, y1 = item.vertices[i]
                 x2, y2 = item.vertices[(i + 1) % len(item.vertices)]
@@ -132,11 +132,11 @@ def draw2d(*objects, origin=True, axes=True, grid=(1, 1), nice_aspect_ratio=True
                 xs = [v[0] for v in item.vertices]
                 ys = [v[1] for v in item.vertices]
                 plt.gca().fill(xs, ys, item.fill, alpha=item.alpha)
-        elif type(item) == Points:
+        elif type(item) == Points2D:
             xs = [v[0] for v in item.vectors]
             ys = [v[1] for v in item.vectors]
             plt.scatter(xs, ys, color=item.color)
-        elif type(item) == Arrow:
+        elif type(item) == Arrow2D:
             tip, tail = item.tip, item.tail
             tip_length = (xlim()[1] - xlim()[0]) / 20.
             length = sqrt((tip[1] - tail[1]) ** 2 + (tip[0] - tail[0]) ** 2)
@@ -146,7 +146,7 @@ def draw2d(*objects, origin=True, axes=True, grid=(1, 1), nice_aspect_ratio=True
             plt.gca().arrow(tail[0], tail[1], new_x, new_y,
                             head_width=tip_length / 1.5, head_length=tip_length,
                             fc=item.color, ec=item.color)
-        elif type(item) == Segment:
+        elif type(item) == Segment2D:
             x1, y1 = item.start_point
             x2, y2 = item.end_point
             plt.plot([x1, x2], [y1, y2], color=item.color)
