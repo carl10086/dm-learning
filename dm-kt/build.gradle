@@ -30,6 +30,7 @@ ext {
     grpcVersion = "1.51.1"
     fastutilVersion = "8.5.11"
     libphonenumberVersion = "8.13.4"
+    micrometerTracingVersion = "1.0.1"
 
 }
 
