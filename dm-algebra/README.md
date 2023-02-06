@@ -24,6 +24,6 @@
 
 **E系列: 机器学习基础玩法**
 
-- e1: [!函数拟合](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/d1.ipynb)
-- e2: [!logistic 回归和数据分类]()
-- e3: [!神经网络]()
+- e1: [函数拟合](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/d1.ipynb)
+- e2: [logistic 回归和数据分类]()
+- e3: [神经网络]()
