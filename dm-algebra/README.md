@@ -16,8 +16,12 @@
 - d1: [导数和积分](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/d1.ipynb)
 - d2: [欧拉方法-模拟运动的对象](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/d2.ipynb)
 - d3: [符号表达式和精确微积分](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/d3.ipynb)
-
+- d4: [梯度连接力场和势能场](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/d4.ipynb)
+- d5: [物理系统和梯度下降](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/d5.ipynb)
+- d6: [傅里叶变换模拟声波]()
 
 **E系列: 机器学习基础玩法**
 
-- e1: 
+- e1: [函数拟合](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/d1.ipynb)
+- e2: [logistic 回归和数据分类]()
+- e3: [神经网络]()
