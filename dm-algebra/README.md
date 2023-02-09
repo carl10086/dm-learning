@@ -20,12 +20,13 @@ brew install lapack
 - 根据 `brew info openblas` 的提示进行环境变量的定制 .
 
 **B系列: Python基础**
- 
+
+- b1: [numpy](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/b1.ipynb)
 - b4: [matplotlib 基础画图](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/b4.ipynb)
 
 **C系列: 线性代数**
 
-- c1->c5: 后续补充. 对向量矩阵的基本理解. 
+- c1->c5: 后续补充. 对向量矩阵的基本理解.
 - c6: [高维泛化向量空间](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/c6.ipynb)
 - c7: [线性方程组求解和矩阵变换](https://github.com/carl10086/dm-learning/blob/master/dm-algebra/chapters/c7.ipynb)
 
