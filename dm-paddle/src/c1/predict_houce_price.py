@@ -84,7 +84,7 @@ print(
 def calculate_test_loss(n: Network):
     z = n.forward(test[:, :-1])
     loss = n.loss(z, test[:, -1:])
-    print(f"test data loss is {loss}")
+    return f"test data loss is {loss}"
 
 
 class NetworkV3(Network):
@@ -131,8 +131,6 @@ num_iterations = 1000
 # 启动训练
 losses = networkV3.train(x, y, iterations=num_iterations, eta=0.01)
 
-calculate_test_loss(networkV1)
-calculate_test_loss(networkV3)
 
 import matplotlib.pyplot as plt
 
@@ -141,4 +139,60 @@ plot_x = np.arange(num_iterations)
 plot_y = np.array(losses)
 plt.plot(plot_x, plot_y)
 plt.show()
+
+
+class NetworkV4(NetworkV3):
+    def train(self, training_data, num_epochs, batch_size=10, eta=0.01):
+        """
+        :param training_data:  被训练的数据
+        :param num_epochs:  当程序迭代的时候，按mini-batch逐渐抽取出样本，当把整个数据集都遍历到了的时候，则完成了一轮训练，也叫一个epoch。启动训练时，可以将训练的轮数num_epochs和batch_size作为参数传入
+        :param batch_size: 一个mini-batch所包含的样本数目称为batch_size
+        :param eta:
+        :return:
+        """
+        n = len(training_data)
+        losses = []
+        for epoch_id in range(num_epochs):
+            # 在每轮迭代开始之前，将训练数据的顺序随机打乱
+            # 然后再按每次取batch_size条数据的方式取出
+            np.random.shuffle(training_data)
+            # 将训练数据进行拆分，每个mini_batch包含batch_size条的数据
+            mini_batches = [training_data[k:k + batch_size] for k in range(0, n, batch_size)]
+            for iter_id, mini_batch in enumerate(mini_batches):
+                # print(self.w.shape)
+                # print(self.b)
+                x = mini_batch[:, :-1]
+                y = mini_batch[:, -1:]
+                a = self.forward(x)
+                loss = self.loss(a, y)
+                gradient_w, gradient_b = self.gradient(x, y)
+                self.update(gradient_w, gradient_b, eta)
+                losses.append(loss)
+                print('Epoch {:3d} / iter {:3d}, loss = {:.4f}'.
+                      format(epoch_id, iter_id, loss))
+
+        return losses
+
+
+# 创建网络
+netV4 = NetworkV4(13)
+# 启动训练
+losses = netV4.train(train_data, num_epochs=50, batch_size=100, eta=0.1)
+
+# 画出损失函数的变化趋势
+plot_x = np.arange(len(losses))
+plot_y = np.array(losses)
+plt.plot(plot_x, plot_y)
+plt.show()
+
+
+print(
+    f"""
+    normal distribution cost :  {calculate_test_loss(networkV1)}
+    accurate gradient down cost : {calculate_test_loss(networkV3)}
+    finally gradient down cost : {calculate_test_loss(netV4)}
+    """
+)
+
+
 print("finish")
