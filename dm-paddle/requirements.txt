@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 paddlepaddle == 2.3.2
+=======
+#paddlepaddle == 2.3.2
+>>>>>>> b8b18d6 (feat: use numpy to predict house price)
 matplotlib == 3.6.3
