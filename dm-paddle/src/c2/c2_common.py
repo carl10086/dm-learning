@@ -8,11 +8,7 @@ import matplotlib.pyplot as plt
 
 def load_data(mode='train', need_reshape=False):
     # 加载数据
-<<<<<<< HEAD
-    datafile = '/Users/carl/soft/tmp/mnist.json.gz'
-=======
     datafile = '/home/carl/Downloads/mnist.json.gz'
->>>>>>> b8b18d6 (feat: use numpy to predict house price)
     print('loading mnist dataset from {} ......'.format(datafile))
     data = json.load(gzip.open(datafile))
     print('mnist dataset load done')
@@ -103,8 +99,6 @@ def plot(loss_list):
     plt.legend(loc='upper right', fontsize='x-large')
 
     plt.show()
-<<<<<<< HEAD
-=======
 
 
 class MnistDataset(paddle.io.Dataset):
@@ -166,4 +160,3 @@ def get_train_loader(juan_ji=True, need_train=True):
         return test_loader
 
 
->>>>>>> b8b18d6 (feat: use numpy to predict house price)
