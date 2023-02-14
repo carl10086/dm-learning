@@ -53,11 +53,14 @@ class Regressor(paddle.nn.Layer):
         super(Regressor, self).__init__()
 
         # 定义一层全连接层，输入维度是13，输出维度是1
-        self.fc = Linear(in_features=13, out_features=1)
+        self.fc1 = Linear(in_features=13, out_features=9)
+
+        self.fc2 = Linear(in_features=9, out_features=1)
 
     # 网络的前向计算
     def forward(self, inputs):
-        x = self.fc(inputs)
+        x = self.fc1(inputs)
+        x = self.fc2(x)
         return x
 
 
@@ -74,6 +77,8 @@ opt = paddle.optimizer.SGD(learning_rate=0.01, parameters=model.parameters())
 EPOCH_NUM = 10  # 设置外层循环次数
 BATCH_SIZE = 10  # 设置batch大小
 
+loss_list = []
+norm_loss_list = []
 # 定义外层循环
 for epoch_id in range(EPOCH_NUM):
     # 在每轮迭代开始之前，将训练数据的顺序随机的打乱
@@ -95,7 +100,10 @@ for epoch_id in range(EPOCH_NUM):
         loss = F.square_error_cost(predicts, label=prices)
         avg_loss = paddle.mean(loss)
         if iter_id % 20 == 0:
-            print("epoch: {}, iter: {}, loss is: {}".format(epoch_id, iter_id, avg_loss.numpy()))
+            avg_loss_as_val = avg_loss.numpy()[0]
+            loss_list.append(avg_loss_as_val)
+            norm_loss_list.append(loss.flatten().norm())
+            print("epoch: {}, iter: {}, loss is: {}".format(epoch_id, iter_id, avg_loss_as_val))
 
         # 反向传播，计算每层参数的梯度值
         avg_loss.backward()
@@ -119,3 +127,6 @@ for epoch_id in range(EPOCH_NUM):
     print(f"loss:{paddle.mean(F.square_error_cost(test_data_predict, label=test_date_prices))}")
 
     print("finish")
+
+plot(loss_list)
+plot(norm_loss_list, "norm loss list")
