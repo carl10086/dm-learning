@@ -1,37 +1,12 @@
 import math
-import numpy as np
 import os
 
-from torch import nn
-from torch.utils.tensorboard import SummaryWriter
-from tqdm import tqdm
-import torch
 import pandas as pd
+from torch import nn
 from torch.utils.data import Dataset, DataLoader
-from torch.utils.data.dataset import T_co, random_split
+from tqdm import tqdm
 
-
-# For plotting learning curve
-
-
-def same_seed(seed):
-    """Fixes random number generator seeds for reproducibility."""
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
-
-
-def train_valid_split(data_set, valid_ratio, seed):
-    """Split provided training data into training set and validation set"""
-    valid_set_size = int(valid_ratio * len(data_set))
-    train_set_size = len(data_set) - valid_set_size
-    train_set, valid_set = random_split(data_set,
-                                        [train_set_size, valid_set_size],
-                                        generator=torch.Generator().manual_seed(seed))
-    return np.array(train_set), np.array(valid_set)
+from infra.train_toolkit import *
 
 
 def predict(test_loader, model, device):
@@ -48,18 +23,18 @@ def predict(test_loader, model, device):
 
 device = 'cuda' if torch.cuda.is_available() else "cpu"
 
-
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 config = {
-    'seed': 5201314,      # Your seed number, you can pick your lucky number. :)
-    'select_all': True,   # Whether to use all features.
-    'valid_ratio': 0.2,   # validation_size = train_size * valid_ratio
-    'n_epochs': 30,     # Number of epochs.
+    'seed': 5201314,  # Your seed number, you can pick your lucky number. :)
+    'select_all': True,  # Whether to use all features.
+    'valid_ratio': 0.2,  # validation_size = train_size * valid_ratio
+    'n_epochs': 3000,  # Number of epochs.
     'batch_size': 256,
+    # 'batch_size': 64,
     'learning_rate': 1e-5,
-    'early_stop': 400,    # If model has not improved for this many consecutive epochs, stop training.
+    'early_stop': 100,  # If model has not improved for this many consecutive epochs, stop training.
     'save_path': './models/model.ckpt'  # Your model will be saved here.
 }
+
 
 class COVID19Dataset(Dataset):
     '''
@@ -91,9 +66,9 @@ class My_Model(nn.Module):
         self.layers = nn.Sequential(
             nn.Linear(input_dim, 16),
             nn.ReLU(),
-            nn.Linear(16, 8),
+            # nn.Linear(16, 8),
             nn.ReLU(),
-            nn.Linear(8, 1)
+            nn.Linear(16, 1)
         )
 
     def forward(self, x):
@@ -102,15 +77,21 @@ class My_Model(nn.Module):
         return x
 
 
-def trainer(train_loader, valid_loader, model, config, device):
+def trainer(train_loader, valid_loader, model, config, device) -> TrainResult:
     criterion = nn.MSELoss(reduction='mean')  # Define your loss function, do not modify this.
 
+    loss_in_per_batch = []
+    norm_of_gradient_per_batch = []
     # Define your optimization algorithm.
     # TODO: Please check https://pytorch.org/docs/stable/optim.html to get more available algorithms.
     # TODO: L2 regularization (optimizer(weight decay...) or implement by your self).
-    optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'], momentum=0.9)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'], momentum=0.9)
+    # optimizer = torch.optim.AdamW(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters())
+    # optimizer = torch.optim.RAdam(model.parameters())
+    # optimizer = torch.optim.Adagrad(model.parameters())
 
-    writer = SummaryWriter()  # Writer of tensoboard.
+    # writer = SummaryWriter()  # Writer of tensoboard.
 
     if not os.path.isdir('./models'):
         os.mkdir('./models')  # Create directory of saving models.
@@ -132,14 +113,17 @@ def trainer(train_loader, valid_loader, model, config, device):
             loss.backward()  # Compute gradient(backpropagation).
             optimizer.step()  # Update parameters.
             step += 1
-            loss_record.append(loss.detach().item())
-
+            item = loss.detach().item()
+            loss_record.append(item)
+            loss_in_per_batch.append(item)
+            # for p in model.parameters():
+            #     param_norm = p.grad.detech().data.norm()
             # Display current epoch number and loss on tqdm progress bar.
             train_pbar.set_description(f'Epoch [{epoch + 1}/{n_epochs}]')
             train_pbar.set_postfix({'loss': loss.detach().item()})
 
         mean_train_loss = sum(loss_record) / len(loss_record)
-        writer.add_scalar('Loss/train', mean_train_loss, step)
+        # writer.add_scalar('Loss/train', mean_train_loss, step)
 
         model.eval()  # Set your model to evaluation mode.
         loss_record = []
@@ -153,19 +137,21 @@ def trainer(train_loader, valid_loader, model, config, device):
 
         mean_valid_loss = sum(loss_record) / len(loss_record)
         print(f'Epoch [{epoch + 1}/{n_epochs}]: Train loss: {mean_train_loss:.4f}, Valid loss: {mean_valid_loss:.4f}')
-        writer.add_scalar('Loss/valid', mean_valid_loss, step)
+        # writer.add_scalar('Loss/valid', mean_valid_loss, step)
 
         if mean_valid_loss < best_loss:
             best_loss = mean_valid_loss
-            torch.save(model.state_dict(), config['save_path'])  # Save your best model
+            # torch.save(model.state_dict(), config['save_path'])  # Save your best model
             print('Saving model with loss {:.3f}...'.format(best_loss))
             early_stop_count = 0
         else:
             early_stop_count += 1
 
+        # 连续多少次都没有得到优化 .byebye
         if early_stop_count >= config['early_stop']:
             print('\nModel is not improving, so we halt the training session.')
-            return
+            return TrainResult(loss_in_per_batch, best_loss, norm_of_gradient_per_batch)
+    return TrainResult(loss_in_per_batch, best_loss, norm_of_gradient_per_batch)
 
 
 def select_feat(train_data, valid_data, test_data, select_all=True):
@@ -229,4 +215,7 @@ test_loader = DataLoader(
     pin_memory=True)
 
 model = My_Model(input_dim=x_train.shape[1]).to(device)  # put your model and data on the same computation device.
-trainer(train_loader, valid_loader, model, config, device)
+trainResult = trainer(train_loader, valid_loader, model, config, device)
+
+print(f"global best loss: {trainResult.global_best_loss}")
+plot(trainResult.loss_in_per_batch, "loss_in_per_batch")
