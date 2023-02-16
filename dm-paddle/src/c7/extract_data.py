@@ -136,7 +136,7 @@ class MovieLen:
         return trainset
 
     def load_data(self, dataset=None, mode='train'):
-        use_poster = False
+        use_poster = True
 
         # 定义数据迭代Batch大小
         BATCHSIZE = 256
@@ -168,7 +168,8 @@ class MovieLen:
 
                 if use_poster:
                     # 不使用图像特征时，不读取图像数据，加快数据读取速度
-                    poster = Image.open(self.poster_path + 'mov_id{}.jpg'.format(str(mov_id[0])))
+                    # poster = Image.open(self.poster_path + 'mov_id{}.jpg'.format(str(mov_id[0])))
+                    poster = Image.open(self.poster_path + 'mov_id{}.jpg'.format(str(mov_id)))
                     poster = poster.resize([64, 64])
                     if len(poster.size) <= 2:
                         poster = poster.convert("RGB")
