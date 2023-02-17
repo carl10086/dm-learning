@@ -1,6 +1,6 @@
 package com.ysz.dm.ysz.base.mysql.config.dynamic
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CompletableFuture
 
@@ -18,7 +18,7 @@ internal class DynamicDataSourceSupplierTest {
         DynamicDataSourceHolder.forcePrimary()
 
         assertEquals(CompletableFuture.supplyAsync(
-            DynamicDataSourceSupplier gs{
+            DynamicDataSourceSupplier {
                 /*return the child thread*/
                 DynamicDataSourceHolder.get()
             }

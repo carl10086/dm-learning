@@ -1,3 +1,7 @@
+plugins {
+    id 'com.google.devtools.ksp' version "${kspVersion}"
+}
+
 dependencies {
 
     implementation("com.google.guava:guava:31.1-jre")
@@ -6,11 +10,14 @@ dependencies {
     testImplementation("io.micrometer:micrometer-tracing-test")
     testImplementation("io.micrometer:micrometer-tracing-integration-test")
 
-
+    implementation "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
     testImplementation "ch.qos.logback:logback-classic:"
     testImplementation "ch.qos.logback:logback-core:"
     testImplementation "org.slf4j:slf4j-api:"
     testImplementation("io.github.resilience4j:resilience4j-circuitbreaker:")
     testImplementation("org.junit.jupiter:junit-jupiter:")
     testImplementation("org.assertj:assertj-core:")
+
+    implementation project(':dm-base-repo-processor')
+    ksp project(':dm-base-repo-processor')
 }

@@ -9,19 +9,6 @@ import org.junit.jupiter.api.Test
  */
 internal class JsonToolsTest {
 
-    @Test
-    fun `test json`() {
-        val jsonStr = JsonTools.mapper.writeValueAsString(Child("aaa", 10))
-        println(jsonStr)
-        println(JsonTools.mapper.readValue<Child>(jsonStr))
-        println(JsonTools.mapper.readValue<Base>(jsonStr))
 
-    }
 }
 
-
-
-data class Child(
-    val name: String,
-    val age: Int
-) : Base(name)
