@@ -6,6 +6,4 @@ package com.ysz.dm.base.repo.anotation
  **/
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION)
-annotation class Ignore(
-
-)
+annotation class Ignore

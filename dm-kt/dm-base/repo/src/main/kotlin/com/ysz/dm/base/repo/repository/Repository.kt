@@ -30,21 +30,3 @@ class RepositoryMeta(repositoryInterface: Class<*>) {
         idType = arguments[1]!!
     }
 }
-
-
-/**
- *
- * @see org.springframework.data.repository.core.support.RepositoryMethodInvoker
- * invoker for repository methods , Used to invoke query methods are fragment methods .
- *
- * The invoker considers Kotlin coroutine ?
- *
- */
-class RepositoryMethodInvoker(
-    val method: Method,
-    val returnType: Class<*>,
-
-    ) {
-
-
-}

@@ -8,5 +8,9 @@ package com.ysz.dm.base.repo.repository
 interface CrudRepository<T, ID> : Repository<T, ID> {
     fun findById(id: ID): T?
 
-    fun insertOne(entity: T);
+    fun queryByIds(id: List<ID>): List<T>
+
+    fun insert(entity: T);
+
+    fun update(entity: T)
 }
