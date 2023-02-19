@@ -2,8 +2,8 @@ package com.ysz.dm.base.repo.anotation
 
 /**
  * @author carl
- * @since 2023-02-17 9:03 PM
+ * @since 2023-02-18 10:11 PM
  **/
 @Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
-annotation class Entity
+@Target(AnnotationTarget.FIELD)
+annotation class Id()

@@ -1,4 +1,4 @@
-package com.ysz.dm.base.repo.support
+package com.ysz.dm.base.repo.support.mapping
 
 import com.google.common.base.CaseFormat
 
