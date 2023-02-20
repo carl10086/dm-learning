@@ -1,6 +1,5 @@
 package com.ysz.dm.base.repo.repository
 
-import org.springframework.data.util.TypeInformation
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KType
@@ -71,6 +70,9 @@ enum class DomainClassType {
     JAVA_BEAN;
 
     companion object {
+
+        val ALL = setOf(KOTLIN_DATA_CLASS)
+
         fun fromKClass(kClass: KClass<*>): DomainClassType {
             return when {
                 kClass.isData -> KOTLIN_DATA_CLASS
