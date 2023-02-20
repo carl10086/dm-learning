@@ -5,9 +5,11 @@ import com.ysz.dm.base.core.domain.page.PageImpl
 import com.ysz.dm.base.core.domain.page.Pageable
 import com.ysz.dm.base.core.domain.page.Sort
 import com.ysz.dm.base.repo.repository.CrudRepository
+import com.ysz.dm.base.repo.repository.DomainClassType.Companion.ALL
 import com.ysz.dm.base.repo.repository.RepositoryMeta
 import com.ysz.dm.base.repo.support.mapping.KotlinDataClassMapper
 import com.ysz.dm.base.repo.support.mapping.PropertyColNameConverter
+import com.ysz.dm.base.repo.support.mapping.ReflectDomainMeta
 import com.ysz.dm.base.repo.support.mapping.ReflectEntityMapper
 import com.ysz.dm.base.repo.support.query.OrPart
 import com.ysz.dm.base.repo.support.query.Part
@@ -38,12 +40,16 @@ class SimpleJdbcRepository<T : Any, ID>(
 ) : CrudRepository<T, ID> {
 
     private var entityMapper: ReflectEntityMapper<T>
-    private var columnsJoinString: String
-    private var columns: List<String>
+    private var columns: String
     private val rowMapper: RowMapper<T>
+    private val meta: ReflectDomainMeta<T>
 
 
     init {
+        check(ALL.contains(repositoryMeta.domainClassType)) {
+            "currently not support for this type"
+        }
+
         val domainTypeKClass = repositoryMeta.domainKClass as KClass<T>
 
         this.entityMapper = KotlinDataClassMapper(
@@ -51,8 +57,8 @@ class SimpleJdbcRepository<T : Any, ID>(
             converter
         )
 
-        this.columns = this.entityMapper.columns()
-        this.columnsJoinString = this.columns.joinToString(",")
+        this.meta = this.entityMapper.domainMeta()
+        this.columns = meta.columns.joinToString(",")
         this.rowMapper = RowMapper { rs, _ ->
             this.entityMapper.rowMapper()(rs)
         }
@@ -62,7 +68,7 @@ class SimpleJdbcRepository<T : Any, ID>(
 
     override fun findById(id: ID): T? {
         val sql = """
-            SELECT $columnsJoinString FROM $tableName WHERE id = ?
+            SELECT $columns FROM $tableName WHERE id = ?
         """.trimIndent()
 
 
@@ -75,10 +81,10 @@ class SimpleJdbcRepository<T : Any, ID>(
 
     override fun insert(entity: T) {
 
-        val autoGenerateId = entityMapper.autoGenerateId()
+        val autoGenerateId = meta.autoGenerateId
         if (autoGenerateId && entityMapper.primaryKeyValue(entity) == null) {
             val keyHolder: KeyHolder = GeneratedKeyHolder()
-            val columnsWithoutPk = columns.filter { it != entityMapper.primaryKeyColumnName() }
+            val columnsWithoutPk = meta.columns.filter { it != meta.primaryKeyColumn }
             this.jdbcTpl.update(
                 {
                     val sql = """
@@ -98,8 +104,8 @@ class SimpleJdbcRepository<T : Any, ID>(
         } else {
             val params = this.entityMapper.allPropertyValues(entity)
             this.jdbcTpl.update("""
-                INSERT INTO $tableName ($columnsJoinString) VALUES(${
-                columns.joinToString(",") { "?" }
+                INSERT INTO $tableName ($columns) VALUES(${
+                meta.columns.joinToString(",") { "?" }
             })
                 """.trimIndent(), *params.toTypedArray())
         }
@@ -109,7 +115,7 @@ class SimpleJdbcRepository<T : Any, ID>(
 
     override fun queryByIds(ids: List<ID>): List<T> {
         val sql = """
-             SELECT $columnsJoinString FROM $tableName WHERE id in (${ids.joinToString(",") { "?" }})
+             SELECT $columns FROM $tableName WHERE id in (${ids.joinToString(",") { "?" }})
             """.trimIndent()
 
         val array: Array<Any> = Array(ids.size) {
@@ -120,12 +126,12 @@ class SimpleJdbcRepository<T : Any, ID>(
     }
 
     override fun update(entity: T) {
-        val primaryKeyColumnName = entityMapper.primaryKeyColumnName()
+        val primaryKeyColumnName = meta.primaryKeyColumn
         val sql = """
             UPDATE $tableName SET ${
-            columns.filter { it != primaryKeyColumnName }.joinToString(",") { "${it}=?" }
+            meta.columns.filter { it != primaryKeyColumnName }.joinToString(",") { "${it}=?" }
         } 
-            WHERE ${entityMapper.primaryKeyColumnName()} = ?
+            WHERE $primaryKeyColumnName = ?
         """.trimIndent()
 
         val params = buildList {
@@ -172,7 +178,7 @@ class SimpleJdbcRepository<T : Any, ID>(
                 return Page.empty<T>()
             }
             val querySql = """
-                 SELECT  ${columnsJoinString} FROM $tableName WHERE $whereCause  ${orderSql(pageRequest.sort())} limit ${pageRequest.offset()}, ${pageRequest.pageSize()}
+                 SELECT  ${columns} FROM $tableName WHERE $whereCause  ${orderSql(pageRequest.sort())} limit ${pageRequest.offset()}, ${pageRequest.pageSize()}
             """.trimIndent()
 
             val contentList = this.jdbcTpl.query(querySql, this.rowMapper, *argsIterator.list.toTypedArray())
@@ -181,7 +187,7 @@ class SimpleJdbcRepository<T : Any, ID>(
 
         } else {
             val sql = """
-                SELECT $columnsJoinString FROM $tableName WHERE $whereCause
+                SELECT $columns FROM $tableName WHERE $whereCause
             """.trimIndent()
             val result = if (null == args) {
                 this.jdbcTpl.query(
