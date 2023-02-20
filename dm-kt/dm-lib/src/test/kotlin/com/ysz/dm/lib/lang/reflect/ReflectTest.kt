@@ -1,6 +1,7 @@
 package com.ysz.dm.lib.lang.reflect
 
 import com.ysz.dm.lib.java.JavaObj
+import com.ysz.dm.lib.java.JavaRecord
 import org.junit.jupiter.api.Test
 import kotlin.reflect.full.memberProperties
 
@@ -50,6 +51,12 @@ internal class ReflectTest {
     fun `test iterator`() {
         val a1 = listOf(1L, 2L)
         println(a1 is Collection<Any>)
+    }
+
+    @Test
+    fun `test record`() {
+        val kclass = JavaRecord::class
+        println(kclass.isData)
     }
 }
 

@@ -13,9 +13,9 @@ internal class MetaFetchTest {
 
     @Test
     fun `test fetchRepositoryType`() {
-        val repositoryMeta = RepositoryMeta(StudentRepo::class.java)
-        repositoryMeta.idType.type eq java.lang.Long::class.java
-        repositoryMeta.domainType.type eq Student::class.java
+        val repositoryMetaV1 = RepositoryMetaV1(StudentRepo::class.java)
+        repositoryMetaV1.idType.type eq java.lang.Long::class.java
+        repositoryMetaV1.domainType.type eq Student::class.java
     }
 
 }

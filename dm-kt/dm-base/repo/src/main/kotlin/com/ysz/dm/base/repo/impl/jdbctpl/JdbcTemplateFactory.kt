@@ -1,7 +1,7 @@
 package com.ysz.dm.base.repo.impl.jdbctpl
 
 import com.ysz.dm.base.repo.repository.Repository
-import com.ysz.dm.base.repo.repository.RepositoryMeta
+import com.ysz.dm.base.repo.repository.RepositoryMetaV1
 import com.ysz.dm.base.repo.support.mapping.PropertyColNameConverter
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -20,7 +20,7 @@ class JdbcTemplateFactory(
         return JdbcTemplateProxy(
             infJavaClz,
             SimpleJdbcRepository(
-                RepositoryMeta(infJavaClz),
+                RepositoryMetaV1(infJavaClz),
                 table,
                 converter,
                 this.jdbcTemplate

@@ -5,7 +5,7 @@ import com.ysz.dm.base.core.domain.page.PageImpl
 import com.ysz.dm.base.core.domain.page.Pageable
 import com.ysz.dm.base.core.domain.page.Sort
 import com.ysz.dm.base.repo.repository.CrudRepository
-import com.ysz.dm.base.repo.repository.RepositoryMeta
+import com.ysz.dm.base.repo.repository.RepositoryMetaV1
 import com.ysz.dm.base.repo.support.mapping.KotlinDataClassMapper
 import com.ysz.dm.base.repo.support.mapping.PropertyColNameConverter
 import com.ysz.dm.base.repo.support.mapping.ReflectEntityMapper
@@ -31,7 +31,7 @@ import kotlin.reflect.jvm.jvmErasure
  **/
 
 class SimpleJdbcRepository<T : Any, ID>(
-    private val repositoryMeta: RepositoryMeta,
+    private val repositoryMetaV1: RepositoryMetaV1,
     private val tableName: String,
     private val converter: PropertyColNameConverter = PropertyColNameConverter.CAMEL_TO_UNDERSCORE,
     private val jdbcTpl: JdbcTemplate,
@@ -44,7 +44,7 @@ class SimpleJdbcRepository<T : Any, ID>(
 
 
     init {
-        val domainTypeKClass = repositoryMeta.domainType.type.kotlin as KClass<T>
+        val domainTypeKClass = repositoryMetaV1.domainType.type.kotlin as KClass<T>
 
         this.entityMapper = KotlinDataClassMapper(
             domainTypeKClass,
@@ -138,7 +138,7 @@ class SimpleJdbcRepository<T : Any, ID>(
 
     fun doInvoke(func: KFunction<*>, args: Array<out Any>?): Any? {
         val name = func.name
-        val domainClazz = this.repositoryMeta.domainType.type
+        val domainClazz = this.repositoryMetaV1.domainType.type
         val partTree = PartTree(name, domainClazz)
         val orParts = partTree.predicate.nodes
         val needParenthesis = orParts.size > 1

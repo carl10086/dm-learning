@@ -9,7 +9,6 @@ dependencies {
     implementation("io.micrometer:micrometer-tracing")
     testImplementation("io.micrometer:micrometer-tracing-test")
     testImplementation("io.micrometer:micrometer-tracing-integration-test")
-
     implementation "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
     testImplementation "ch.qos.logback:logback-classic:"
     testImplementation "ch.qos.logback:logback-core:"
