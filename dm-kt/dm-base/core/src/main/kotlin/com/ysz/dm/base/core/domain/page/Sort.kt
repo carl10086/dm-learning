@@ -10,6 +10,10 @@ data class Sort(
     constructor(direction: Direction, vararg props: String) : this(
         props.map { Order(direction, it) }
     )
+
+    companion object {
+        val UNSORTED = Sort(emptyList())
+    }
 }
 
 data class Order(

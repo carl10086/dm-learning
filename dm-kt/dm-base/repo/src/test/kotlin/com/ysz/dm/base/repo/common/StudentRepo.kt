@@ -1,5 +1,7 @@
 package com.ysz.dm.base.repo.common
 
+import com.ysz.dm.base.core.domain.page.PageImpl
+import com.ysz.dm.base.core.domain.page.PageRequest
 import com.ysz.dm.base.repo.anotation.Entity
 import com.ysz.dm.base.repo.anotation.GeneratedValue
 import com.ysz.dm.base.repo.anotation.Id
@@ -42,6 +44,8 @@ interface StudentRepo : CrudRepository<Student, Long> {
         ages: List<Int>,
         username: String
     ): List<Student>
+
+    fun queryByAgeBetween(startAge: Int, endAge: Int, page: PageRequest): PageImpl<Student>
 }
 
 object StudentSchemaTools {

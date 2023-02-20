@@ -10,31 +10,31 @@ interface Pageable {
     /**
      * returns whether current pageable contains pagination information
      */
-    fun isPaged(): Boolean = true
+    fun paged(): Boolean = true
 
-    fun isUnpaged() = !isPaged()
+    fun unpaged() = !paged()
 
     /**
      * returns the page to be returned .
      */
-    fun getPageNumber(): Int
+    fun pageNumber(): Int
 
     /**
      * returns the number of items to be returned
      */
-    fun getPageSize(): Int
+    fun pageSize(): Int
 
 
     /**
      * returns the offset to be taken according to the underlying page and page size
      */
-    fun getOffset(): Long
+    fun offset(): Long
 
 
     /**
      * return the sorting params
      */
-    fun getSort(): Sort
+    fun sort(): Sort
 
 
     /**
@@ -42,13 +42,53 @@ interface Pageable {
      */
     fun next(): Pageable
     fun previousOrFirst(): Pageable
+    fun previous(): Pageable
     fun first(): Pageable
     fun withPage(pageNumber: Int): Pageable
 
     fun hasPrevious(): Boolean
 
     companion object {
+        fun unpaged(): Pageable = Unpaged.INSTANCE
 
     }
+}
 
+
+enum class Unpaged : Pageable {
+    INSTANCE;
+
+    override fun paged(): Boolean {
+        return false
+    }
+
+    override fun unpaged(): Boolean {
+        return true
+    }
+
+    override fun pageNumber(): Int {
+        throw UnsupportedOperationException()
+    }
+
+    override fun pageSize(): Int {
+        throw UnsupportedOperationException()
+    }
+
+    override fun offset(): Long {
+        throw UnsupportedOperationException()
+    }
+
+    override fun sort(): Sort = Sort.UNSORTED
+
+    override fun next(): Pageable = this
+
+    override fun previousOrFirst(): Pageable = this
+
+    override fun first(): Pageable = this
+
+    override fun withPage(pageNumber: Int): Pageable = this
+
+    override fun hasPrevious(): Boolean = false
+
+    override fun previous(): Pageable = this
 }
