@@ -1,5 +1,9 @@
 package com.ysz.dm.base.repo.impl.jdbctpl
 
+import com.ysz.dm.base.core.domain.page.Page
+import com.ysz.dm.base.core.domain.page.PageImpl
+import com.ysz.dm.base.core.domain.page.Pageable
+import com.ysz.dm.base.core.domain.page.Sort
 import com.ysz.dm.base.repo.repository.CrudRepository
 import com.ysz.dm.base.repo.repository.RepositoryMeta
 import com.ysz.dm.base.repo.support.mapping.KotlinDataClassMapper
@@ -137,43 +141,81 @@ class SimpleJdbcRepository<T : Any, ID>(
         val domainClazz = this.repositoryMeta.domainType.type
         val partTree = PartTree(name, domainClazz)
         val orParts = partTree.predicate.nodes
-        val subject = partTree.subject
-
-
         val needParenthesis = orParts.size > 1
+        var pureArgs = args
+        var pageRequest: Pageable? = null
 
-        val argsIterator = ArgsIterator(args)
+        if (args != null) {
+            val pageableList = args.filterIsInstance<Pageable>()
+            check(pageableList.size <= 1) {
+                "pageable args can only have one"
+            }
+            if (pageableList.size == 1) {
+                pureArgs = args.filter { it !is Pageable }.toTypedArray()
+                pageRequest = pageableList.first()
+            }
+        }
+
+        val subject = partTree.subject
+        val argsIterator = ArgsIterator(pureArgs)
         val whereCause = orParts
             .asSequence()
             .map { orPart2Sql(it, needParenthesis, argsIterator) }
             .joinToString(" or ")
 
-
-        val sql = """
-                SELECT $columnsJoinString FROM $tableName WHERE $whereCause
+        if (pageRequest != null) {
+            val countSql = """
+                SELECT COUNT(*) as total FROM $tableName WHERE $whereCause
+            """.trimIndent()
+            val total = jdbcTpl.queryForObject(countSql, Long::class.java, *argsIterator.list.toTypedArray())
+            if (total == 0L) {
+                return Page.empty<T>()
+            }
+            val querySql = """
+                 SELECT  ${columnsJoinString} FROM $tableName WHERE $whereCause  ${orderSql(pageRequest.sort())} limit ${pageRequest.offset()}, ${pageRequest.pageSize()}
             """.trimIndent()
 
-        val result = if (null == args) {
-            this.jdbcTpl.query(
-                sql,
-                this.rowMapper,
-            )
+            val contentList = this.jdbcTpl.query(querySql, this.rowMapper, *argsIterator.list.toTypedArray())
+
+            return PageImpl(contentList, total, pageRequest)
+
         } else {
-            if (logger.isDebugEnabled) {
-                logger.debug("invoke parameters:${argsIterator.list}")
+            val sql = """
+                SELECT $columnsJoinString FROM $tableName WHERE $whereCause
+            """.trimIndent()
+            val result = if (null == args) {
+                this.jdbcTpl.query(
+                    sql,
+                    this.rowMapper,
+                )
+            } else {
+                if (logger.isDebugEnabled) {
+                    logger.debug("invoke parameters:${argsIterator.list}")
+                }
+
+                this.jdbcTpl.query(
+                    sql,
+                    this.rowMapper,
+                    *argsIterator.list.toTypedArray()
+                )
+
             }
+            val collectionLike = TypeInformation.of(func.returnType.jvmErasure.java).isCollectionLike
 
-            this.jdbcTpl.query(
-                sql,
-                this.rowMapper,
-                *argsIterator.list.toTypedArray()
-            )
-
+            return if (collectionLike) result else result.firstOrNull()
         }
-        val collectionLike = TypeInformation.of(func.returnType.jvmErasure.java).isCollectionLike
-
-        return if (collectionLike) result else result.firstOrNull()
     }
+
+    private fun orderSql(sort: Sort): String {
+        val orders = sort.orders
+        if (orders.isNotEmpty()) {
+            return " ORDER BY " + orders.joinToString(",") { "${converter.propertyToColName(it.prop)} ${it.direction}" }
+        }
+
+        return ""
+
+    }
+
 
     private fun orPart2Sql(orPart: OrPart, needParenthesis: Boolean, argsIterator: ArgsIterator): String {
         val children = orPart.children
