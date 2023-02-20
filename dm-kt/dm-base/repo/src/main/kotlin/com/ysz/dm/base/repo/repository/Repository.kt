@@ -20,23 +20,6 @@ import kotlin.reflect.jvm.jvmErasure
  **/
 interface Repository<T, ID> {}
 
-
-/**
- * Metadata of repository interface
- */
-class RepositoryMetaV1(repositoryInterface: Class<*>) {
-    val domainType: TypeInformation<*>
-    val idType: TypeInformation<*>
-
-    init {
-        val arguments = TypeInformation.of(repositoryInterface)
-            .getRequiredSuperTypeInformation(Repository::class.java).typeArguments
-        check(arguments.size >= 2) { "could not resolve domain type and id type" }
-        domainType = arguments[0]!!
-        idType = arguments[1]!!
-    }
-}
-
 class RepositoryMeta(
     val domainKClass: KClass<*>, val idKClass: KClass<*>, val domainClassType: DomainClassType
 ) {

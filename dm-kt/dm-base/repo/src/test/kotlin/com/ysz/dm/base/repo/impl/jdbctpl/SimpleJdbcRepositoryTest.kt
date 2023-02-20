@@ -4,7 +4,7 @@ import com.ysz.dm.base.repo.common.Student
 import com.ysz.dm.base.repo.common.StudentRepo
 import com.ysz.dm.base.repo.common.StudentSchemaTools
 import com.ysz.dm.base.repo.repository.Repository
-import com.ysz.dm.base.repo.repository.RepositoryMetaV1
+import com.ysz.dm.base.repo.repository.RepositoryMeta
 import com.ysz.dm.base.test.eq
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -51,7 +51,7 @@ internal class SimpleJdbcRepositoryTest {
         }
 
         val jdbcRepo = SimpleJdbcRepository<Student, Long>(
-            repositoryMetaV1 = RepositoryMetaV1(StudentRepo::class.java),
+            repositoryMeta = RepositoryMeta.fromRepoInf(StudentRepo::class),
             tableName = "t_students",
             jdbcTpl = StudentSchemaTools.jdbcTpl
         )
