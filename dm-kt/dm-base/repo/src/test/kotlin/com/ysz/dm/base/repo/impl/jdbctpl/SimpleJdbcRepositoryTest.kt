@@ -3,10 +3,12 @@ package com.ysz.dm.base.repo.impl.jdbctpl
 import com.ysz.dm.base.repo.common.Student
 import com.ysz.dm.base.repo.common.StudentRepo
 import com.ysz.dm.base.repo.common.StudentSchemaTools
+import com.ysz.dm.base.repo.repository.Repository
 import com.ysz.dm.base.repo.repository.RepositoryMeta
 import com.ysz.dm.base.test.eq
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.springframework.data.util.TypeInformation
 
 /**
  * @author carl
@@ -30,6 +32,15 @@ internal class SimpleJdbcRepositoryTest {
     }
 
 
+    @Test
+    fun `test type`() {
+        val type = TypeInformation.of(StudentRepo::class.java).getRequiredSuperTypeInformation(
+            Repository::class.java
+        )
+        val args = type.typeArguments
+        println(type)
+    }
+
     companion object {
 
 
@@ -40,7 +51,7 @@ internal class SimpleJdbcRepositoryTest {
         }
 
         val jdbcRepo = SimpleJdbcRepository<Student, Long>(
-            repositoryMeta = RepositoryMeta(StudentRepo::class.java),
+            repositoryMeta = RepositoryMeta.fromRepoInf(StudentRepo::class),
             tableName = "t_students",
             jdbcTpl = StudentSchemaTools.jdbcTpl
         )

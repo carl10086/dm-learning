@@ -7,8 +7,7 @@ import java.util.regex.Pattern
  * @since 2023-02-19 2:24 AM
  **/
 class PartTree(
-    source: String,
-    domainClass: Class<*>
+    source: String
 ) {
 
     val subject: Subject
@@ -20,12 +19,12 @@ class PartTree(
         if (matcher.find()) {
             this.subject = Subject(matcher.group(0))
             this.predicate = Predicate.fromSource(
-                source.substring(matcher.group().length), domainClass
+                source.substring(matcher.group().length)
             )
         } else {
 
             this.subject = Subject("")
-            this.predicate = Predicate.fromSource(source, domainClass)
+            this.predicate = Predicate.fromSource(source)
         }
 
 
@@ -93,11 +92,11 @@ data class Subject(
 data class OrPart(
     val children: List<Part>
 ) {
-    constructor(source: String, domainClass: Class<*>) : this(
+    constructor(source: String) : this(
         source
             .splitToSequence("And")
             .filter(String::isNotBlank)
-            .map { Part.fromSource(it, domainClass) }
+            .map { Part.fromSource(it) }
             .toList()
     )
 
@@ -112,17 +111,13 @@ data class Predicate(
     companion object {
         fun fromSource(
             source: String,
-            domainClass: Class<*>,
         ): Predicate = Predicate(
             source
                 .splitToSequence("Or")
                 .filter { it.isNotBlank() }
-                .map { OrPart(it, domainClass) }
+                .map { OrPart(it) }
                 .toList()
         )
     }
 
 }
-
-
-

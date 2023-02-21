@@ -2,10 +2,7 @@ package com.ysz.dm.base.repo.common
 
 import com.ysz.dm.base.core.domain.page.PageImpl
 import com.ysz.dm.base.core.domain.page.PageRequest
-import com.ysz.dm.base.repo.anotation.Entity
-import com.ysz.dm.base.repo.anotation.GeneratedValue
-import com.ysz.dm.base.repo.anotation.Id
-import com.ysz.dm.base.repo.anotation.Ignore
+import com.ysz.dm.base.repo.anotation.*
 import com.ysz.dm.base.repo.impl.jdbctpl.SimpleJdbcRepositoryTest
 import com.ysz.dm.base.repo.repository.CrudRepository
 import org.springframework.jdbc.core.JdbcTemplate
@@ -24,11 +21,12 @@ data class Student(
     @GeneratedValue
     var id: Long? = null,
     var username: String,
-    @field:Ignore
+    @field:Transient
     val ignore: String? = null,
-    val createAt: Date = Date(),
+    @field: Column("create_at")
+    val createAtFuck: Date = Date(),
     val age: Int? = 10,
-    @field:Ignore
+    @field:Transient
     val gender: Int = 1
 )
 
@@ -36,7 +34,7 @@ data class Student(
 interface StudentRepo : CrudRepository<Student, Long> {
     fun findByUsername(username: String): Student?
     fun queryByAgeBetween(startAge: Int, endAge: Int): List<Student>
-    fun queryByAgeBetweenAndUsernameOrCreateAtGreaterThanEqual(
+    fun queryByAgeBetweenAndUsernameOrCreateAtFuckGreaterThanEqual(
         startAge: Int, endAge: Int, username: String, startCreateAt: Date
     ): List<Student>
 
@@ -45,7 +43,8 @@ interface StudentRepo : CrudRepository<Student, Long> {
         username: String
     ): List<Student>
 
-    fun queryByAgeBetween(startAge: Int, endAge: Int, page: PageRequest): PageImpl<Student>
+    fun searchByAgeBetween(startAge: Int, endAge: Int, page: PageRequest): PageImpl<Student>
+    fun countByAgeBetween(startAge: Int, endAge: Int): Int
 }
 
 object StudentSchemaTools {
@@ -55,7 +54,7 @@ object StudentSchemaTools {
     val ds: DataSource =
         DriverManagerDataSource().apply {
             this.setDriverClassName("org.h2.Driver")
-            this.url = "jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1"
+            this.url = "jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL"
         }
 
     val jdbcTpl = JdbcTemplate(ds)
@@ -76,7 +75,7 @@ object StudentSchemaTools {
             Student(
                 username = "user$i",
                 age = 10 + i,
-                createAt = beforeHours(i)
+                createAtFuck = beforeHours(i)
             ).apply { SimpleJdbcRepositoryTest.jdbcRepo.insert(this) }
         }
 

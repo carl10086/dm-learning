@@ -20,7 +20,7 @@ class JdbcTemplateFactory(
         return JdbcTemplateProxy(
             infJavaClz,
             SimpleJdbcRepository(
-                RepositoryMeta(infJavaClz),
+                RepositoryMeta.fromRepoInf(infJavaClz.kotlin),
                 table,
                 converter,
                 this.jdbcTemplate
