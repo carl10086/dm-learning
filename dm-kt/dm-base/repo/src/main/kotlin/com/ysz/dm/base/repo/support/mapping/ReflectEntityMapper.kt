@@ -1,8 +1,9 @@
 package com.ysz.dm.base.repo.support.mapping
 
+import com.ysz.dm.base.repo.anotation.Column
 import com.ysz.dm.base.repo.anotation.GeneratedValue
 import com.ysz.dm.base.repo.anotation.Id
-import com.ysz.dm.base.repo.anotation.Ignore
+import com.ysz.dm.base.repo.anotation.Transient
 import java.sql.ResultSet
 import kotlin.reflect.*
 import kotlin.reflect.full.memberProperties
@@ -18,7 +19,7 @@ interface ReflectEntityMapper<T : Any> {
     /**
      * return all the values by the order of the domain class
      */
-    fun allPropertyValues(entity: T, withPrimaryKey: Boolean = true): List<Any?>
+    fun propertyValues(entity: T, withPrimaryKey: Boolean = true): List<Any?>
 
     /**
      * a rowMapper used for query
@@ -36,10 +37,37 @@ interface ReflectEntityMapper<T : Any> {
     fun domainMeta(): ReflectDomainMeta<T>
 }
 
+
+/**
+ * reflect info for domain class .
+ *
+ * all data is unchanged for thread-safe
+ */
+data class ReflectDomainMeta<T : Any>(
+    val kClass: KClass<T>,
+    /*all columns have the same order of properties . the order is useful for performance*/
+    val columns: List<String>,
+
+    /*cache for col to Property*/
+    val columnToPropertyMap: Map<String, String>,
+    /*cache for property to Col*/
+    val propertyToColumnMap: Map<String, String>,
+
+    /*this domain class need auto generate id by database*/
+    val autoGenerateId: Boolean,
+
+    val primaryKeyColumn: String,
+) {
+    //    fun columnToProperty(column: String): String = this.columnToPropertyMap[column]!!
+    fun propertyToColumn(property: String): String = this.propertyToColumnMap[property]!!
+    fun columnsWithoutPrimaryKey(): List<String> = this.columns.filter { it != primaryKeyColumn }
+}
+
+
 class KotlinDataClassMapper<T : Any>(
     private val kClass: KClass<T>,
     converter: PropertyColNameConverter,
-    private val propertyValueMapper: PropertyValueMapper = PropertyValueMapperDefaultImpl
+    private val propertyValueMapper: PropertyValueMapper,
 ) : ReflectEntityMapper<T> {
 
     /*primary key property cache*/
@@ -56,7 +84,7 @@ class KotlinDataClassMapper<T : Any>(
 
         /*1. get all properties*/
         this._properties = kClass.memberProperties.filter {
-            it.javaField!!.getAnnotation(Ignore::class.java) == null
+            it.javaField!!.getAnnotation(Transient::class.java) == null
         }
 
         /*2. find primary key*/
@@ -71,13 +99,34 @@ class KotlinDataClassMapper<T : Any>(
         this._parameters = _constructor.parameters
 
         /*4. build meta*/
-        val columns = this._properties.map { converter.propertyToColName(it.name) }
+        val autoGenerateId = this._primaryProperty.javaField!!.getAnnotation(GeneratedValue::class.java) != null
+        if (autoGenerateId) check(_primaryProperty is KMutableProperty1<T, *>) {
+            "domainType must can change id when autoGenerateId is enabled"
+        }
+
+        val columnAnnoProperties = this._properties
+            .filter { it.javaField!!.getAnnotation(Column::class.java) != null }
+
+        val propertyToColumnMap = buildMap {
+            for (name in _properties.asSequence().map { it.name }) {
+                put(name, converter.propertyToColName(name))
+            }
+
+            for (annoProperty in columnAnnoProperties) {
+                put(annoProperty.name, annoProperty.javaField!!.getAnnotation(Column::class.java).name)
+            }
+        }
+
+
+
         this._domainMeta = ReflectDomainMeta(
             this.kClass,
-            columns,
-            columns.associateWith { converter.colToPropertyName(it) },
-            columns.associateBy { converter.colToPropertyName(it) },
-            this._primaryProperty.javaField!!.getAnnotation(GeneratedValue::class.java) != null,
+            this._properties.map { propertyToColumnMap[it.name]!! },
+            buildMap {
+                propertyToColumnMap.forEach { (t, u) -> put(u, t) }
+            },
+            propertyToColumnMap,
+            autoGenerateId,
             _primaryProperty.name
         )
     }
@@ -122,34 +171,10 @@ class KotlinDataClassMapper<T : Any>(
 
     override fun primaryKeyValue(entity: T): Any? = this._primaryProperty.get(entity)
 
-    override fun allPropertyValues(entity: T, withPrimaryKey: Boolean): List<Any?> =
+    override fun propertyValues(entity: T, withPrimaryKey: Boolean): List<Any?> =
         if (withPrimaryKey)
             _properties.map { it.get(entity) }
         else _properties.asSequence()
             .filter { it.name != this._domainMeta.primaryKeyColumn }.map { it.get(entity) }.toList()
 }
 
-
-/**
- * reflect info for domain class .
- *
- * all data is unchanged for thread-safe
- */
-data class ReflectDomainMeta<T : Any>(
-    val kClass: KClass<T>,
-    /*all columns have the same order of properties . the order is useful for performance*/
-    val columns: List<String>,
-
-    /*cache for col to Property*/
-    val columnToPropertyMap: Map<String, String>,
-    /*cache for property to Col*/
-    val propertyToColumnMap: Map<String, String>,
-
-    /*this domain class need auto generate id by database*/
-    val autoGenerateId: Boolean,
-
-    val primaryKeyColumn: String,
-) {
-    fun columnToProperty(column: String): String = this.columnToPropertyMap[column]!!
-    fun propertyToColumn(property: String): String = this.propertyToColumnMap[property]!!
-}

@@ -10,7 +10,7 @@ interface CrudRepository<T, ID> : Repository<T, ID> {
 
     fun queryByIds(id: List<ID>): List<T>
 
-    fun insert(entity: T);
+    fun insert(entity: T): T
 
     fun update(entity: T)
 }

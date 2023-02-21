@@ -1,7 +1,6 @@
 package com.ysz.dm.base.repo.support.query
 
 import com.ysz.dm.base.repo.support.mapping.PropertyPath
-import org.springframework.data.util.TypeInformation
 import java.beans.Introspector
 
 /**
@@ -12,12 +11,12 @@ class Part(
     val type: PartType, val propertyPath: PropertyPath
 ) {
     companion object {
-        fun fromSource(source: String, clazz: Class<*>): Part {
+        fun fromSource(source: String): Part {
             val type = PartType.fromProperty(source)
 
             return Part(
                 type,
-                PropertyPath(type.extractProperty(source), TypeInformation.of(clazz))
+                PropertyPath(type.extractProperty(source))
             )
 
         }

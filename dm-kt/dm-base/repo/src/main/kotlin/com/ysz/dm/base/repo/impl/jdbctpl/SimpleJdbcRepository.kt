@@ -2,29 +2,20 @@ package com.ysz.dm.base.repo.impl.jdbctpl
 
 import com.ysz.dm.base.core.domain.page.Page
 import com.ysz.dm.base.core.domain.page.PageImpl
-import com.ysz.dm.base.core.domain.page.Pageable
-import com.ysz.dm.base.core.domain.page.Sort
 import com.ysz.dm.base.repo.repository.CrudRepository
 import com.ysz.dm.base.repo.repository.DomainClassType.Companion.ALL
+import com.ysz.dm.base.repo.repository.InvokeMethodMeta
 import com.ysz.dm.base.repo.repository.RepositoryMeta
-import com.ysz.dm.base.repo.support.mapping.KotlinDataClassMapper
-import com.ysz.dm.base.repo.support.mapping.PropertyColNameConverter
-import com.ysz.dm.base.repo.support.mapping.ReflectDomainMeta
-import com.ysz.dm.base.repo.support.mapping.ReflectEntityMapper
-import com.ysz.dm.base.repo.support.query.OrPart
-import com.ysz.dm.base.repo.support.query.Part
-import com.ysz.dm.base.repo.support.query.PartTree
-import com.ysz.dm.base.repo.support.query.PartType
+import com.ysz.dm.base.repo.support.mapping.*
+import com.ysz.dm.base.repo.support.sql.DynamicSqlBuilderContext
+import com.ysz.dm.base.repo.support.sql.DynamicSqlBuilderImpl
 import org.slf4j.LoggerFactory
-import org.springframework.data.util.TypeInformation
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.jdbc.support.KeyHolder
 import java.sql.PreparedStatement
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
-import kotlin.reflect.jvm.jvmErasure
 
 
 /**
@@ -33,9 +24,9 @@ import kotlin.reflect.jvm.jvmErasure
  **/
 
 class SimpleJdbcRepository<T : Any, ID>(
-    private val repositoryMeta: RepositoryMeta,
+    repositoryMeta: RepositoryMeta,
     private val tableName: String,
-    private val converter: PropertyColNameConverter = PropertyColNameConverter.CAMEL_TO_UNDERSCORE,
+    converter: PropertyColNameConverter = PropertyColNameConverter.CAMEL_TO_UNDERSCORE,
     private val jdbcTpl: JdbcTemplate,
 ) : CrudRepository<T, ID> {
 
@@ -43,6 +34,7 @@ class SimpleJdbcRepository<T : Any, ID>(
     private var columns: String
     private val rowMapper: RowMapper<T>
     private val meta: ReflectDomainMeta<T>
+    private val sqlBuilder = DynamicSqlBuilderImpl.MYSQL
 
 
     init {
@@ -54,7 +46,8 @@ class SimpleJdbcRepository<T : Any, ID>(
 
         this.entityMapper = KotlinDataClassMapper(
             domainTypeKClass,
-            converter
+            converter,
+            PropertyValueMapperDefaultImpl
         )
 
         this.meta = this.entityMapper.domainMeta()
@@ -68,7 +61,7 @@ class SimpleJdbcRepository<T : Any, ID>(
 
     override fun findById(id: ID): T? {
         val sql = """
-            SELECT $columns FROM $tableName WHERE id = ?
+            SELECT $columns FROM $tableName WHERE ${meta.primaryKeyColumn} = ?
         """.trimIndent()
 
 
@@ -79,43 +72,42 @@ class SimpleJdbcRepository<T : Any, ID>(
         ).firstOrNull()
     }
 
-    override fun insert(entity: T) {
-
-        val autoGenerateId = meta.autoGenerateId
-        if (autoGenerateId && entityMapper.primaryKeyValue(entity) == null) {
+    override fun insert(entity: T): T {
+        /*1. if support auto generate id and also entity id is null*/
+        if (meta.autoGenerateId && entityMapper.primaryKeyValue(entity) == null) {
             val keyHolder: KeyHolder = GeneratedKeyHolder()
-            val columnsWithoutPk = meta.columns.filter { it != meta.primaryKeyColumn }
+            val columnsWithoutPk = meta.columnsWithoutPrimaryKey();
             this.jdbcTpl.update(
                 {
                     val sql = """
-                        INSERT INTO $tableName (${columnsWithoutPk.joinToString(",")}) VALUES(${
-                        columnsWithoutPk.joinToString(",") { "?" }
-                    })
+                        INSERT INTO $tableName (${columnsWithoutPk.joinToString(",")}) 
+                        VALUES
+                        (${columnsWithoutPk.joinToString(",") { "?" }})
                         """.trimIndent()
                     val stat = it.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)
                     var count = 1
-                    for (allPropertyValue in entityMapper.allPropertyValues(entity, false)) {
-                        stat.setObject(count++, allPropertyValue)
+                    for (value in entityMapper.propertyValues(entity, false)) {
+                        /*maybe need type mapping, may jdbc already handle this for you , haha*/
+                        stat.setObject(count++, value)
                     }
                     stat
                 }, keyHolder
             )
             keyHolder.key?.let { this.entityMapper.setPrimaryKeyValue(entity, it) }
         } else {
-            val params = this.entityMapper.allPropertyValues(entity)
             this.jdbcTpl.update("""
                 INSERT INTO $tableName ($columns) VALUES(${
                 meta.columns.joinToString(",") { "?" }
             })
-                """.trimIndent(), *params.toTypedArray())
+                """.trimIndent(), *entityMapper.propertyValues(entity).toTypedArray())
         }
 
-
+        return entity
     }
 
     override fun queryByIds(ids: List<ID>): List<T> {
         val sql = """
-             SELECT $columns FROM $tableName WHERE id in (${ids.joinToString(",") { "?" }})
+             SELECT $columns FROM $tableName WHERE ${meta.primaryKeyColumn} in (${ids.joinToString(",") { "?" }})
             """.trimIndent()
 
         val array: Array<Any> = Array(ids.size) {
@@ -135,136 +127,88 @@ class SimpleJdbcRepository<T : Any, ID>(
         """.trimIndent()
 
         val params = buildList {
-            addAll(entityMapper.allPropertyValues(entity, false))
+            addAll(entityMapper.propertyValues(entity, false))
             add(entityMapper.primaryKeyValue(entity))
         }
 
         this.jdbcTpl.update(sql, *params.toTypedArray())
     }
 
-    fun doInvoke(func: KFunction<*>, args: Array<out Any>?): Any? {
-        val name = func.name
-        val domainClazz = this.repositoryMeta.domainKClass.java
-        val partTree = PartTree(name, domainClazz)
-        val orParts = partTree.predicate.nodes
-        val needParenthesis = orParts.size > 1
-        var pureArgs = args
-        var pageRequest: Pageable? = null
 
-        if (args != null) {
-            val pageableList = args.filterIsInstance<Pageable>()
-            check(pageableList.size <= 1) {
-                "pageable args can only have one"
-            }
-            if (pageableList.size == 1) {
-                pureArgs = args.filter { it !is Pageable }.toTypedArray()
-                pageRequest = pageableList.first()
-            }
+    fun doInvoke(funcMeta: InvokeMethodMeta, args: Array<out Any>?): Any? {
+        val ctx = makeDynamicSqlBuilderContext(funcMeta, args)
+        val wherePart = sqlBuilder.buildWherePart(ctx)
+        val subject = funcMeta.partTree.subject
+
+        return when {
+            funcMeta.pageAbleArgIndex >= 0 -> pageQuery(ctx, wherePart)
+            subject.count -> countQuery(ctx, wherePart, funcMeta)
+            subject.exists -> countQuery(ctx, wherePart, funcMeta).toLong() > 0L
+            else -> normalQuery(ctx, wherePart, funcMeta)
         }
+    }
 
-        val subject = partTree.subject
-        val argsIterator = ArgsIterator(pureArgs)
-        val whereCause = orParts
-            .asSequence()
-            .map { orPart2Sql(it, needParenthesis, argsIterator) }
-            .joinToString(" or ")
-
-        if (pageRequest != null) {
-            val countSql = """
-                SELECT COUNT(*) as total FROM $tableName WHERE $whereCause
-            """.trimIndent()
-            val total = jdbcTpl.queryForObject(countSql, Long::class.java, *argsIterator.list.toTypedArray())
-            if (total == 0L) {
-                return Page.empty<T>()
-            }
-            val querySql = """
-                 SELECT  ${columns} FROM $tableName WHERE $whereCause  ${orderSql(pageRequest.sort())} limit ${pageRequest.offset()}, ${pageRequest.pageSize()}
+    private fun countQuery(ctx: DynamicSqlBuilderContext, wherePart: String, funcMeta: InvokeMethodMeta): Number {
+        val countSql = """
+                SELECT COUNT(*) as total FROM $tableName $wherePart
             """.trimIndent()
 
-            val contentList = this.jdbcTpl.query(querySql, this.rowMapper, *argsIterator.list.toTypedArray())
+        val total = jdbcTpl.queryForObject(countSql, Long::class.java, *ctx.argsIterator.list.toTypedArray())
 
-            return PageImpl(contentList, total, pageRequest)
+        return if (funcMeta.resultType.isInt) total.toInt() else total
+    }
 
-        } else {
-            val sql = """
-                SELECT $columns FROM $tableName WHERE $whereCause
+    private fun normalQuery(ctx: DynamicSqlBuilderContext, wherePart: String, funcMeta: InvokeMethodMeta): Any? {
+        val sql = """
+                SELECT $columns FROM $tableName $wherePart
             """.trimIndent()
-            val result = if (null == args) {
-                this.jdbcTpl.query(
-                    sql,
-                    this.rowMapper,
-                )
-            } else {
-                if (logger.isDebugEnabled) {
-                    logger.debug("invoke parameters:${argsIterator.list}")
-                }
 
-                this.jdbcTpl.query(
-                    sql,
-                    this.rowMapper,
-                    *argsIterator.list.toTypedArray()
-                )
+        val result = this.jdbcTpl.query(
+            sql,
+            this.rowMapper,
+            *ctx.argsIterator.list.toTypedArray()
+        )
 
-            }
-            val collectionLike = TypeInformation.of(func.returnType.jvmErasure.java).isCollectionLike
-
-            return if (collectionLike) result else result.firstOrNull()
-        }
+        return if (funcMeta.resultType.isCollection) result else result.firstOrNull()
     }
 
-    private fun orderSql(sort: Sort): String {
-        val orders = sort.orders
-        if (orders.isNotEmpty()) {
-            return " ORDER BY " + orders.joinToString(",") { "${converter.propertyToColName(it.prop)} ${it.direction}" }
+    private fun pageQuery(ctx: DynamicSqlBuilderContext, wherePart: String): Any? {
+        val countSql = """
+                SELECT COUNT(*) as total FROM $tableName $wherePart
+            """.trimIndent()
+
+        val total = jdbcTpl.queryForObject(countSql, Long::class.java, *ctx.argsIterator.list.toTypedArray())
+        if (total == 0L) {
+            return Page.empty<T>()
         }
 
-        return ""
+        val pageRequest = ctx.pageRequest!!
 
+        val querySql = """
+                 SELECT  ${columns} FROM $tableName 
+                 $wherePart 
+                 ${sqlBuilder.buildOrderPart(pageRequest.sort, meta.propertyToColumnMap)} 
+                 ${sqlBuilder.buildPagePart(pageRequest)}
+            """.trimIndent()
+
+
+        val contentList = this.jdbcTpl.query(querySql, this.rowMapper, *ctx.argsIterator.list.toTypedArray())
+
+        return PageImpl(contentList, total, pageRequest)
     }
 
-
-    private fun orPart2Sql(orPart: OrPart, needParenthesis: Boolean, argsIterator: ArgsIterator): String {
-        val children = orPart.children
-        val sql = children.asSequence().map { part2Sql(it, argsIterator) }.joinToString(" and ")
-
-
-        return if (needParenthesis && children.size > 1) "($sql)" else sql
-
+    private fun makeDynamicSqlBuilderContext(
+        funcMeta: InvokeMethodMeta,
+        args: Array<out Any>?
+    ): DynamicSqlBuilderContext {
+        return DynamicSqlBuilderContext.make(
+            funcMeta.partTree,
+            args,
+            funcMeta.pageAbleArgIndex,
+            meta.propertyToColumnMap
+        )
     }
 
-    private fun part2Sql(part: Part, argsIterator: ArgsIterator): String {
-        val prop = part.propertyPath.name
-        val colName = this.converter.propertyToColName(prop)
-
-        val argSize = when (part.type) {
-            PartType.IN -> {
-                val argAsCollection = argsIterator.next() as Collection<Any?>
-                argsIterator.addAll(argAsCollection)
-                argAsCollection.size
-            }
-
-            else -> {
-                for (i in 0 until part.type.numberOfArguments) {
-                    argsIterator.add(argsIterator.next())
-                }
-                1
-            }
-        }
-
-        return when (part.type) {
-            PartType.BETWEEN -> "$colName between ? and ?"
-            PartType.IS_NOT_NULL -> "$colName is not null"
-            PartType.IS_NULL -> "$colName is null"
-            PartType.LESS_THAN -> "$colName < ?"
-            PartType.LESS_THAN_EQUAL -> "$colName <= ?"
-            PartType.GREATER_THAN -> "$colName > ?"
-            PartType.GREATER_THAN_EQUAL -> "$colName >= ?"
-            PartType.SIMPLE_PROPERTY -> "$colName = ?"
-            PartType.IN -> "$colName in (${(0 until argSize).joinToString(",") { "?" }})"
-            else -> throw IllegalArgumentException("currently not support ${part.type}")
-        }
-
-    }
 
     companion object {
         private val logger = LoggerFactory.getLogger(SimpleJdbcRepository::class.java)
@@ -273,16 +217,3 @@ class SimpleJdbcRepository<T : Any, ID>(
 }
 
 
-class ArgsIterator(
-    private val args: Array<out Any>?
-) {
-    private var count = 0
-    var list: ArrayList<Any?> = ArrayList(args?.size ?: 0)
-
-    fun next(): Any? = this.args?.get(count++)
-    fun add(arg: Any?) = this.list.add(arg)
-
-    fun addAll(args: Collection<Any?>) =
-        this.list.addAll(args)
-
-}

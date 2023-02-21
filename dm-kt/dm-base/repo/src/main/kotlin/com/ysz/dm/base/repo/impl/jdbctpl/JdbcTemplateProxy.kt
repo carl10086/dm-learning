@@ -1,5 +1,6 @@
 package com.ysz.dm.base.repo.impl.jdbctpl
 
+import com.ysz.dm.base.repo.repository.InvokeMethodMeta
 import com.ysz.dm.base.repo.repository.Repository
 import org.springframework.util.ClassUtils
 import org.springframework.util.ReflectionUtils
@@ -15,12 +16,14 @@ import kotlin.reflect.jvm.javaMethod
  **/
 @Suppress("UNCHECKED_CAST")
 class JdbcTemplateProxy<T : Any, ID, I : Repository<T, ID>>(
-    private val infJavaClz: Class<I>, private val jdbcRepository: SimpleJdbcRepository<T, ID>
+    private val infJavaClz: Class<I>,
+    private val jdbcRepository: SimpleJdbcRepository<T, ID>
 ) : InvocationHandler {
 
-    private val queries = this.infJavaClz.kotlin.memberFunctions.asSequence().filter {
-        it.javaMethod!!.declaringClass == infJavaClz
-    }.associateBy { it.javaMethod!! }
+    private val queries = this.infJavaClz.kotlin.memberFunctions.asSequence()
+        .filter { it.javaMethod!!.declaringClass == infJavaClz }
+        .map { InvokeMethodMeta.make(it) }
+        .associateBy { it.func.javaMethod!! }
 
     fun getProxy(): I {
         return Proxy.newProxyInstance(
@@ -45,7 +48,6 @@ class JdbcTemplateProxy<T : Any, ID, I : Repository<T, ID>>(
     override fun toString(): String {
         return "JdbcTplProxy(infJavaClz=$infJavaClz)"
     }
-
 
     override fun equals(other: Any?): Boolean {
         return when {
