@@ -18,6 +18,8 @@ interface DynamicSqlBuilder {
     fun buildOrderPart(sort: Sort, propertyToColumnMap: Map<String, String>): String
 
     fun buildPagePart(pageRequest: PageRequest): String
+
+    fun buildLimitPart(max: Int?): String
 }
 
 class DynamicSqlBuilderContext(
@@ -135,6 +137,10 @@ enum class DynamicSqlBuilderImpl : DynamicSqlBuilder {
 
     override fun buildPagePart(pageRequest: PageRequest): String {
         return "limit ${pageRequest.offset()}, ${pageRequest.pageSize()}"
+    }
+
+    override fun buildLimitPart(max: Int?): String {
+        return if (max == null || max <= 0) return "" else " LIMIT $max"
     }
 
 

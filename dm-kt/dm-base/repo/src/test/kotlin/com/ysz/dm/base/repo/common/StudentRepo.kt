@@ -27,7 +27,9 @@ data class Student(
     val createAtFuck: Date = Date(),
     val age: Int? = 10,
     @field:Transient
-    val gender: Int = 1
+    val gender: Int = 1,
+    @field: Version
+    var version: Int? = null
 )
 
 
@@ -45,13 +47,14 @@ interface StudentRepo : CrudRepository<Student, Long> {
 
     fun searchByAgeBetween(startAge: Int, endAge: Int, page: PageRequest): PageImpl<Student>
     fun countByAgeBetween(startAge: Int, endAge: Int): Int
+    fun pageTop3ByAgeBetweenOrderByIdDesc(startAge: Int, endAge: Int): List<Student>
 }
 
 object StudentSchemaTools {
     fun beforeHours(hours: Int): Date =
         Date(System.currentTimeMillis() / Duration.ofHours(1L).toMillis() - Duration.ofHours(hours.toLong()).toMillis())
 
-    val ds: DataSource =
+    private val ds: DataSource =
         DriverManagerDataSource().apply {
             this.setDriverClassName("org.h2.Driver")
             this.url = "jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL"
@@ -67,7 +70,8 @@ object StudentSchemaTools {
             id int  auto_increment primary key not null,
             username varchar(255) not null ,
             create_at timestamp not null ,
-            age int not null
+            age int not null,
+            version bigint 
             )
         """.trimIndent()
         )
@@ -75,7 +79,7 @@ object StudentSchemaTools {
             Student(
                 username = "user$i",
                 age = 10 + i,
-                createAtFuck = beforeHours(i)
+                createAtFuck = beforeHours(i),
             ).apply { SimpleJdbcRepositoryTest.jdbcRepo.insert(this) }
         }
 

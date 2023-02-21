@@ -10,7 +10,7 @@
 
 
   <!--3. 开发环境 console -->
-  <root level="DEBUG">
+  <root level="TRACE">
     <appender-ref ref="console"/>
   </root>
 

@@ -16,3 +16,12 @@ for (pro in dmBaseProjects) {
 }
 
 include(':dm-lib')
+include(":dm-protocol")
+
+
+def socProjects = ["user"]
+for (pro in socProjects) {
+    def projectName = "dm-soc-${pro}"
+    include(":${projectName}")
+    project(":${projectName}").projectDir = file("dm-soc/${pro}")
+}

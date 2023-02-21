@@ -2,6 +2,8 @@ package com.ysz.dm.base.repo.impl.jdbctpl
 
 import com.ysz.dm.base.core.domain.page.Page
 import com.ysz.dm.base.core.domain.page.PageImpl
+import com.ysz.dm.base.core.domain.page.Sort
+import com.ysz.dm.base.repo.exception.VersionConflictException
 import com.ysz.dm.base.repo.repository.CrudRepository
 import com.ysz.dm.base.repo.repository.DomainClassType.Companion.ALL
 import com.ysz.dm.base.repo.repository.InvokeMethodMeta
@@ -73,6 +75,8 @@ class SimpleJdbcRepository<T : Any, ID>(
     }
 
     override fun insert(entity: T): T {
+        changeVersionColumnIfNeeded(entity)
+
         /*1. if support auto generate id and also entity id is null*/
         if (meta.autoGenerateId && entityMapper.primaryKeyValue(entity) == null) {
             val keyHolder: KeyHolder = GeneratedKeyHolder()
@@ -93,7 +97,7 @@ class SimpleJdbcRepository<T : Any, ID>(
                     stat
                 }, keyHolder
             )
-            keyHolder.key?.let { this.entityMapper.setPrimaryKeyValue(entity, it) }
+            keyHolder.key?.let { this.entityMapper.changePrimaryKeyValue(entity, it) }
         } else {
             this.jdbcTpl.update("""
                 INSERT INTO $tableName ($columns) VALUES(${
@@ -103,6 +107,14 @@ class SimpleJdbcRepository<T : Any, ID>(
         }
 
         return entity
+    }
+
+    private fun changeVersionColumnIfNeeded(entity: T) {
+        if (meta.versionColumn != null) {
+            if (entityMapper.versionPropValue(entity) == null) {
+                entityMapper.initVersionPropValue(entity)
+            }
+        }
     }
 
     override fun queryByIds(ids: List<ID>): List<T> {
@@ -119,19 +131,51 @@ class SimpleJdbcRepository<T : Any, ID>(
 
     override fun update(entity: T) {
         val primaryKeyColumnName = meta.primaryKeyColumn
-        val sql = """
+        if (meta.hasVersion()) {
+            val versionColumn = meta.versionColumn!!
+            val sql = """
+            UPDATE $tableName SET $versionColumn=$versionColumn + 1 ${
+                if (meta.columns.size > 2)
+                    "," + meta.columns
+                        .filter { it != primaryKeyColumnName && it != versionColumn }
+                        .joinToString(",") { "${it}=?" }
+                else ""
+            } 
+            WHERE $primaryKeyColumnName = ? and version = ?
+        """.trimIndent()
+
+            val version = entityMapper.versionPropValue(entity)
+
+            val params = buildList {
+                addAll(entityMapper.propertyValues(entity, false, false))
+                add(entityMapper.primaryKeyValue(entity))
+                add(version)
+            }
+
+            if (this.jdbcTpl.update(
+                    sql,
+                    *params.toTypedArray()
+                ) == 0
+            ) throw VersionConflictException("version conflict for $version")
+
+        } else {
+
+            val sql = """
             UPDATE $tableName SET ${
-            meta.columns.filter { it != primaryKeyColumnName }.joinToString(",") { "${it}=?" }
-        } 
+                meta.columns.filter { it != primaryKeyColumnName }.joinToString(",") { "${it}=?" }
+            } 
             WHERE $primaryKeyColumnName = ?
         """.trimIndent()
 
-        val params = buildList {
-            addAll(entityMapper.propertyValues(entity, false))
-            add(entityMapper.primaryKeyValue(entity))
+
+            val params = buildList {
+                addAll(entityMapper.propertyValues(entity, false))
+                add(entityMapper.primaryKeyValue(entity))
+            }
+
+            this.jdbcTpl.update(sql, *params.toTypedArray())
         }
 
-        this.jdbcTpl.update(sql, *params.toTypedArray())
     }
 
 
@@ -159,8 +203,12 @@ class SimpleJdbcRepository<T : Any, ID>(
     }
 
     private fun normalQuery(ctx: DynamicSqlBuilderContext, wherePart: String, funcMeta: InvokeMethodMeta): Any? {
+        val limitPart = sqlBuilder.buildLimitPart(ctx.partTree.subject.maxResults)
+        val orderPart =
+            sqlBuilder.buildOrderPart(Sort(ctx.partTree.predicate.orderBySource.orders), this.meta.propertyToColumnMap)
+
         val sql = """
-                SELECT $columns FROM $tableName $wherePart
+                SELECT $columns FROM $tableName $wherePart $orderPart $limitPart 
             """.trimIndent()
 
         val result = this.jdbcTpl.query(
