@@ -34,6 +34,7 @@ data class Student(
 
 
 interface StudentRepo : CrudRepository<Student, Long> {
+    /*jdbc*/
     fun findByUsername(username: String): Student?
     fun queryByAgeBetween(startAge: Int, endAge: Int): List<Student>
     fun queryByAgeBetweenAndUsernameOrCreateAtFuckGreaterThanEqual(

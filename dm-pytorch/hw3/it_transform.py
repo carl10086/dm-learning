@@ -5,7 +5,7 @@ import torch
 from PIL import Image
 from torchvision import transforms, datasets
 
-from c3.food import FoodDataset
+from hw3.food import FoodDataset
 
 # from IPython import display
 

@@ -17,6 +17,7 @@ for (pro in dmBaseProjects) {
 
 include(':dm-lib')
 include(":dm-protocol")
+include(":dm-scala3")
 
 
 def socProjects = ["user"]
