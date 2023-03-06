@@ -9,6 +9,7 @@ from deepctr_torch.models import DeepFM
 
 if __name__ == "__main__":
 
+    # data = pd.read_csv("/root/autodl-tmp/dataset/ml-latest-small/movielens_sample.txt")
     data = pd.read_csv("/tmp/dataset/ml-latest-small/movielens_sample.txt")
     sparse_features = ["movie_id", "user_id",
                        "gender", "age", "occupation", "zip"]
@@ -40,7 +41,7 @@ if __name__ == "__main__":
     model = DeepFM(linear_feature_columns, dnn_feature_columns, task='regression', device=device)
     model.compile("adam", "mse", metrics=['mse'], )
 
-    history = model.fit(train_model_input, train[target].values, batch_size=256, epochs=5000, verbose=2,
+    history = model.fit(train_model_input, train[target].values, batch_size=256, epochs=10, verbose=2,
                         validation_split=0.2)
     pred_ans = model.predict(test_model_input, batch_size=256)
     print("test MSE", round(mean_squared_error(

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from torch.utils.data.dataset import T_co, random_split
+import torch.nn as nn
 
 
 def same_seed(seed):
@@ -54,3 +55,19 @@ class TrainResult:
         loss_in_per_batch:{self.loss_in_per_batch},
         norm_of_gradient_per_batch:{self.norm_of_gradient_per_batch},
         """
+
+
+def get_activation(activation):
+    if isinstance(activation, str):
+        if activation.lower() == "relu":
+            return nn.ReLU()
+        elif activation.lower() == "sigmoid":
+            return nn.Sigmoid()
+        elif activation.lower() == "tanh":
+            return nn.Tanh()
+        elif activation.lower() == 'leakyrelu':
+            return nn.LeakyReLU()
+        else:
+            return getattr(nn, activation)()
+    else:
+        return
