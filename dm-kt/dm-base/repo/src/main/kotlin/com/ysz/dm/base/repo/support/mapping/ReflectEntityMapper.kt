@@ -1,9 +1,6 @@
 package com.ysz.dm.base.repo.support.mapping
 
-import com.ysz.dm.base.repo.anotation.Column
-import com.ysz.dm.base.repo.anotation.GeneratedValue
-import com.ysz.dm.base.repo.anotation.Id
-import com.ysz.dm.base.repo.anotation.Transient
+import com.ysz.dm.base.repo.anotation.*
 import java.sql.ResultSet
 import kotlin.reflect.*
 import kotlin.reflect.full.memberProperties
@@ -19,7 +16,7 @@ interface ReflectEntityMapper<T : Any> {
     /**
      * return all the values by the order of the domain class
      */
-    fun propertyValues(entity: T, withPrimaryKey: Boolean = true): List<Any?>
+    fun propertyValues(entity: T, withPrimaryKey: Boolean = true, withVersionColumn: Boolean = true): List<Any?>
 
     /**
      * a rowMapper used for query
@@ -31,8 +28,11 @@ interface ReflectEntityMapper<T : Any> {
      */
     fun primaryKeyValue(entity: T): Any?
 
-    fun setPrimaryKeyValue(entity: T, pkValue: Number)
+    fun changePrimaryKeyValue(entity: T, pkValue: Number)
 
+    fun versionPropValue(entity: T): Any?
+
+    fun initVersionPropValue(entity: T)
 
     fun domainMeta(): ReflectDomainMeta<T>
 }
@@ -44,23 +44,26 @@ interface ReflectEntityMapper<T : Any> {
  * all data is unchanged for thread-safe
  */
 data class ReflectDomainMeta<T : Any>(
-    val kClass: KClass<T>,
-    /*all columns have the same order of properties . the order is useful for performance*/
+    val kClass: KClass<T>,/*all columns have the same order of properties . the order is useful for performance*/
     val columns: List<String>,
 
     /*cache for col to Property*/
-    val columnToPropertyMap: Map<String, String>,
-    /*cache for property to Col*/
+    val columnToPropertyMap: Map<String, String>,/*cache for property to Col*/
     val propertyToColumnMap: Map<String, String>,
 
     /*this domain class need auto generate id by database*/
     val autoGenerateId: Boolean,
 
     val primaryKeyColumn: String,
+
+    val versionColumn: String? = null,
+    val versionColumnDefaultValue: Number? = null,
 ) {
     //    fun columnToProperty(column: String): String = this.columnToPropertyMap[column]!!
     fun propertyToColumn(property: String): String = this.propertyToColumnMap[property]!!
     fun columnsWithoutPrimaryKey(): List<String> = this.columns.filter { it != primaryKeyColumn }
+
+    fun hasVersion(): Boolean = this.versionColumn != null
 }
 
 
@@ -71,7 +74,9 @@ class KotlinDataClassMapper<T : Any>(
 ) : ReflectEntityMapper<T> {
 
     /*primary key property cache*/
-    private var _primaryProperty: KProperty1<T, *>
+    private val _primaryProperty: KProperty1<T, *>
+
+    private val _versionProperty: KMutableProperty1<T, *>?
 
     /*primary constructor*/
     private val _constructor: KFunction<T>
@@ -88,9 +93,8 @@ class KotlinDataClassMapper<T : Any>(
         }
 
         /*2. find primary key*/
-        val primaryKeys = this._properties
-            /*must be Id */
-            .filter { it.javaField!!.getAnnotation(Id::class.java) != null }
+        val primaryKeys =
+            this._properties/*must be Id */.filter { it.javaField!!.getAnnotation(Id::class.java) != null }
         check(primaryKeys.isNotEmpty() && primaryKeys.size == 1) { "only One Id support" }
         this._primaryProperty = primaryKeys.first()
 
@@ -101,11 +105,10 @@ class KotlinDataClassMapper<T : Any>(
         /*4. build meta*/
         val autoGenerateId = this._primaryProperty.javaField!!.getAnnotation(GeneratedValue::class.java) != null
         if (autoGenerateId) check(_primaryProperty is KMutableProperty1<T, *>) {
-            "domainType must can change id when autoGenerateId is enabled"
+            "domainType must can change id when autoGenerateId is enabled, if kotlin, it means var instead of val"
         }
 
-        val columnAnnoProperties = this._properties
-            .filter { it.javaField!!.getAnnotation(Column::class.java) != null }
+        val columnAnnoProperties = this._properties.filter { it.javaField!!.getAnnotation(Column::class.java) != null }
 
         val propertyToColumnMap = buildMap {
             for (name in _properties.asSequence().map { it.name }) {
@@ -117,31 +120,47 @@ class KotlinDataClassMapper<T : Any>(
             }
         }
 
+        /*5. handle version column*/
+        val versionColumns = this._properties.filter { it.javaField!!.getAnnotation(Version::class.java) != null }
+            .apply { check(size <= 1) { "at most one version column" } }
 
 
-        this._domainMeta = ReflectDomainMeta(
-            this.kClass,
-            this._properties.map { propertyToColumnMap[it.name]!! },
-            buildMap {
-                propertyToColumnMap.forEach { (t, u) -> put(u, t) }
-            },
-            propertyToColumnMap,
-            autoGenerateId,
-            _primaryProperty.name
-        )
+        val versionProperty = if (versionColumns.isNotEmpty()) versionColumns.first() else null
+        val versionColumnDefaultValue: Number? = versionProperty?.let {
+            check(it is KMutableProperty1<T, *>) { "version column must can be changed , in kotlin, it means var instead of val" }
+            when (it.returnType.jvmErasure) {
+                Long::class -> 1L
+                Int::class -> Integer.valueOf(1) /*toInt can't remove or something wrong ~*/
+                else -> throw IllegalArgumentException("only support Long, int class for version column")
+            }
+        }
+        this._versionProperty = versionProperty?.let { it as KMutableProperty1<T, *> }
+
+
+        this._domainMeta =
+            ReflectDomainMeta(
+                this.kClass,
+                this._properties.map { propertyToColumnMap[it.name]!! },
+                buildMap {
+                    propertyToColumnMap.forEach { (t, u) -> put(u, t) }
+                },
+                propertyToColumnMap,
+                autoGenerateId,
+                _primaryProperty.name,
+                _versionProperty?.name,
+                versionColumnDefaultValue
+            )
     }
 
 
-    override fun rowMapper(): (ResultSet) -> T {
-        /*根据 name 去查询 constructor 对应的 KParameter*/
+    override fun rowMapper(): (ResultSet) -> T {/*根据 name 去查询 constructor 对应的 KParameter*/
         val associateBy = this._parameters.associateBy { it.name!! }
         return {
             val list = buildMap {
                 for (param in _parameters) {
                     if (_domainMeta.propertyToColumnMap.contains(param.name!!)) {
                         put(
-                            associateBy[param.name!!]!!,
-                            propertyValueMapper.getValueFromResultSet(
+                            associateBy[param.name!!]!!, propertyValueMapper.getValueFromResultSet(
                                 it, _domainMeta.propertyToColumn(param.name!!), param.type.jvmErasure
                             )
                         )
@@ -153,7 +172,14 @@ class KotlinDataClassMapper<T : Any>(
         }
     }
 
-    override fun setPrimaryKeyValue(entity: T, pkValue: Number) {
+    override fun initVersionPropValue(entity: T) {
+        this._versionProperty?.setter?.call(entity, this._domainMeta.versionColumnDefaultValue)
+    }
+
+    override fun versionPropValue(entity: T): Any? =
+        this._versionProperty?.get(entity)
+
+    override fun changePrimaryKeyValue(entity: T, pkValue: Number) {
         val prop = this._primaryProperty
         if (prop is KMutableProperty1<T, *>) {
             when (prop.setter.parameters[1].type.jvmErasure) {
@@ -171,10 +197,14 @@ class KotlinDataClassMapper<T : Any>(
 
     override fun primaryKeyValue(entity: T): Any? = this._primaryProperty.get(entity)
 
-    override fun propertyValues(entity: T, withPrimaryKey: Boolean): List<Any?> =
-        if (withPrimaryKey)
-            _properties.map { it.get(entity) }
-        else _properties.asSequence()
-            .filter { it.name != this._domainMeta.primaryKeyColumn }.map { it.get(entity) }.toList()
+    override fun propertyValues(entity: T, withPrimaryKey: Boolean, withVersionColumn: Boolean): List<Any?> =
+        _properties.asSequence().filter {
+            when {
+                !withPrimaryKey && it.name == this._domainMeta.primaryKeyColumn -> false
+                !withVersionColumn && it.name == this._domainMeta.versionColumn -> false
+                else -> true
+            }
+        }.map { it.get(entity) }.toList()
+
 }
 

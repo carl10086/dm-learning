@@ -28,6 +28,7 @@ if torch.cuda.is_available():
 test_tfm = transforms.Compose([
     transforms.Resize((128, 128)),
     transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
 # However, it is also possible to use augmentation in the testing phase.
@@ -35,11 +36,15 @@ test_tfm = transforms.Compose([
 train_tfm = transforms.Compose([
     # Resize the image into a fixed shape (height = width = 128)
     transforms.Resize((128, 128)),
+    # 1.
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.RandomVerticalFlip(p=0.5),
+    #transforms.ColorJitter(brightness=.5, hue=.3),
     # You may add some transforms here.
     # ToTensor() should be the last one of the transforms.
     transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
-
 
 class FoodDataset(Dataset):
 
@@ -119,9 +124,9 @@ if __name__ == '__main__':
     _dataset_dir = "/tmp/dataset/food11"
     # Construct datasets.
     # The argument "loader" tells how torchvision reads the data.
-    train_set = FoodDataset(os.path.join(_dataset_dir, "training"), tfm=train_tfm)
+    train_set = FoodDataset(os.path.join(_dataset_dir, "training_01"), tfm=train_tfm)
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
-    valid_set = FoodDataset(os.path.join(_dataset_dir, "validation"), tfm=test_tfm)
+    valid_set = FoodDataset(os.path.join(_dataset_dir, "validation_01"), tfm=test_tfm)
     valid_loader = DataLoader(valid_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
 
     # "cuda" only when GPUs are available.

@@ -6,6 +6,7 @@ define USAGE_OPTIONS
 Options:
 	pub				publish to code registry .
 	pub2local		publish to local maven repo.
+	protocol   build protocols
 endef
 export USAGE_OPTIONS
 
@@ -22,10 +23,7 @@ define gradle
 ./gradlew $(1)
 endef
 
-.PHONY: pub2local clean build
-pub2local:
-	$(call gradle, clean publishToMavenLocal  -x test)
-clean:
-	$(call gradle, clean -x test)
-build:
-	$(call gradle, clean build-x test)
+
+#.PHONY: protocol
+protocol:
+	$(call gradle, dm-protocol:clean dm-protocol:build)

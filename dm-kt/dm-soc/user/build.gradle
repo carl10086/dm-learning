@@ -1,0 +1,6 @@
+dependencies {
+    implementation(project(":dm-base-core"))
+    implementation(project(":dm-base-mysql"))
+    implementation(project(":dm-base-repo"))
+    implementation("org.springframework.boot:spring-boot-starter-web")
+}

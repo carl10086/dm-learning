@@ -17,6 +17,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:")
     testImplementation("org.assertj:assertj-core:")
 
+
+
     implementation project(':dm-base-repo-processor')
     ksp project(':dm-base-repo-processor')
 }

@@ -1,0 +1,14 @@
+syntax = "proto3";
+option java_multiple_files = true;
+//option java_package = "com.ysz.dm.protocol.soc.user";
+package com.ysz.dm.protocol.soc.user;
+
+message UserDto {
+  uint64 id = 1;
+  string username = 2;
+  string nickname = 3;
+}
+
+
+
+

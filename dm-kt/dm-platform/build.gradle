@@ -29,6 +29,7 @@ dependencies {
         api('org.apache.hbase:hbase-client:2.2.4')
         api 'com.github.jasync-sql:jasync-mysql:2.1.16'
         api("com.google.guava:guava:31.1-jre")
+        api 'org.scalanlp:breeze_3:2.1.0'
 
 
     }

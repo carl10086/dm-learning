@@ -58,6 +58,12 @@ internal class ReflectTest {
         val kclass = JavaRecord::class
         println(kclass.isData)
     }
+
+    @Test
+    fun `test NullAble`() {
+        val prop = ReflectDataClz::class.memberProperties.first { it.name == "id" }
+        println(prop)
+    }
 }
 
 

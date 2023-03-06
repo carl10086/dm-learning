@@ -2,7 +2,7 @@ dependencies {
 //    implementation('com.github.jasync-sql:jasync-mysql')
     implementation("org.springframework:spring-jdbc")
     implementation(project(":dm-base-core"))
-    implementation("org.springframework.data:spring-data-commons")
+//    implementation("org.springframework.data:spring-data-commons")
     implementation "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
     implementation("com.google.guava:guava:")
 

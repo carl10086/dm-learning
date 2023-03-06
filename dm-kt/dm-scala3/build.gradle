@@ -1,0 +1,30 @@
+plugins {
+//    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java-library'
+    id 'scala'
+    id 'application'
+}
+
+//jar {
+//    manifest {  //incubating版本，以后版本可能会改API
+//        attributes("Main-Class": "com.duitang.st.cf.api.CfRecHourlyJob",
+//                "Implementation-Title": "Gradle")
+//    }
+//}
+//shadowJar {
+//    dependencies {
+//    }
+//    zip64 true
+//    archiveBaseName = 'st-cf'
+//}
+
+
+dependencies {
+    api platform(project(":dm-platform"))
+    testImplementation 'org.scalanlp:breeze_3:'
+
+    testImplementation 'org.scalatest:scalatest_3:3.2.15'
+
+    testImplementation("org.junit.jupiter:junit-jupiter:")
+    testImplementation("org.assertj:assertj-core:")
+}
