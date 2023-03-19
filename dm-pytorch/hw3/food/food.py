@@ -1,50 +1,57 @@
-# Import necessary packages.
-import numpy as np
-import pandas as pd
 import torch
 import os
+
+import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 from PIL import Image
 # "ConcatDataset" and "Subset" are possibly useful when doing semi-supervised learning.
-from torch.utils.data import ConcatDataset, DataLoader, Subset, Dataset
-from torchvision.datasets import DatasetFolder, VisionDataset
+from torch.utils.data import DataLoader, Dataset
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
-# This is for the progress bar.
-from tqdm.auto import tqdm
-import random
+from hw3.food.food_model_v1 import FoodModelV1
+from hw3.food.food_models import load_alexnet
 
-_exp_name = "sample"
-myseed = 6666  # set a random seed for reproducibility
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
-np.random.seed(myseed)
-torch.manual_seed(myseed)
-if torch.cuda.is_available():
-    torch.cuda.manual_seed_all(myseed)
+config = {
+    'seed': 5201314,  # Your seed number, you can pick your lucky number. :)
+    'select_all': True,  # Whether to use all features.
+    'valid_ratio': 0.2,  # validation_size = train_size * valid_ratio
+    'n_epochs': 3,  # Number of epochs.
+    'batch_size': 256,
+    # 'batch_size': 64,
+    'learning_rate': 1e-5,
+    'early_stop': 100,  # If model has not improved for this many consecutive epochs, stop training.
+    'save_path': './models/model.ckpt'  # Your model will be saved here.
+}
 
+input_size = 224
 # Normally, We don't need augmentations in testing and validation.
 # All we need here is to resize the PIL image and transform it into Tensor.
 test_tfm = transforms.Compose([
-    transforms.Resize((128, 128)),
+    transforms.Resize(input_size),
+    transforms.CenterCrop(input_size),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
+
+writer = SummaryWriter()
 
 # However, it is also possible to use augmentation in the testing phase.
 # You may use train_tfm to produce a variety of images and then test using ensemble methods
 train_tfm = transforms.Compose([
     # Resize the image into a fixed shape (height = width = 128)
-    transforms.Resize((128, 128)),
-    # 1.
-    transforms.RandomHorizontalFlip(p=0.5),
-    transforms.RandomVerticalFlip(p=0.5),
-    #transforms.ColorJitter(brightness=.5, hue=.3),
+    transforms.RandomResizedCrop(input_size),
+    transforms.RandomHorizontalFlip(),
+    # transforms.RandomHorizontalFlip(p=0.5),
+    # transforms.RandomVerticalFlip(p=0.5),
+    # transforms.ColorJitter(brightness=.5, hue=.3),
     # You may add some transforms here.
     # ToTensor() should be the last one of the transforms.
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
+
 
 class FoodDataset(Dataset):
 
@@ -73,82 +80,31 @@ class FoodDataset(Dataset):
         return im, label
 
 
-class Classifier(nn.Module):
-    def __init__(self):
-        super(Classifier, self).__init__()
-        # torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
-        # torch.nn.MaxPool2d(kernel_size, stride, padding)
-        # input 維度 [3, 128, 128]
-        self.cnn = nn.Sequential(
-            nn.Conv2d(3, 64, 3, 1, 1),  # [64, 128, 128]
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2, 0),  # [64, 64, 64]
-
-            nn.Conv2d(64, 128, 3, 1, 1),  # [128, 64, 64]
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2, 0),  # [128, 32, 32]
-
-            nn.Conv2d(128, 256, 3, 1, 1),  # [256, 32, 32]
-            nn.BatchNorm2d(256),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2, 0),  # [256, 16, 16]
-
-            nn.Conv2d(256, 512, 3, 1, 1),  # [512, 16, 16]
-            nn.BatchNorm2d(512),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2, 0),  # [512, 8, 8]
-
-            nn.Conv2d(512, 512, 3, 1, 1),  # [512, 8, 8]
-            nn.BatchNorm2d(512),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2, 0),  # [512, 4, 4]
-        )
-        self.fc = nn.Sequential(
-            nn.Linear(512 * 4 * 4, 1024),
-            nn.ReLU(),
-            nn.Linear(1024, 512),
-            nn.ReLU(),
-            nn.Linear(512, 11)
-        )
-
-    def forward(self, x):
-        out = self.cnn(x)
-        out = out.view(out.size()[0], -1)
-        return self.fc(out)
-
-
 if __name__ == '__main__':
-    batch_size = 64
-    _dataset_dir = "/tmp/dataset/food11"
-    # Construct datasets.
-    # The argument "loader" tells how torchvision reads the data.
-    train_set = FoodDataset(os.path.join(_dataset_dir, "training_01"), tfm=train_tfm)
+    dir = "/root/autodl-tmp/dataset/food11"
+    batch_size = config['batch_size']
+    train_set = FoodDataset(os.path.join(dir, "training"), tfm=train_tfm)
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
-    valid_set = FoodDataset(os.path.join(_dataset_dir, "validation_01"), tfm=test_tfm)
+    valid_set = FoodDataset(os.path.join(dir, "validation"), tfm=test_tfm)
     valid_loader = DataLoader(valid_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
 
     # "cuda" only when GPUs are available.
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    n_epochs = config['n_epochs']
+    patience = config['early_stop']
 
-    # The number of training epochs and patience.
-    n_epochs = 3
-    patience = 300  # If no improvement in 'patience' epochs, early stop
-
-    # Initialize a model, and put it on the device specified.
-    model = Classifier().to(device)
-
+    # model = FoodModelV1().to(device)
+    model = load_alexnet(False).to(device)
     # For the classification task, we use cross-entropy as the measurement of performance.
     criterion = nn.CrossEntropyLoss()
 
     # Initialize optimizer, you may fine-tune some hyperparameters such as learning rate on your own.
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0003, weight_decay=1e-5)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.00003, weight_decay=1e-5)
 
     # Initialize trackers, these are not parameters and should not be changed
     stale = 0
     best_acc = 0
-
+    step = 0
     for epoch in range(n_epochs):
 
         # ---------- Training ----------
@@ -188,14 +144,20 @@ if __name__ == '__main__':
             acc = (logits.argmax(dim=-1) == labels.to(device)).float().mean()
 
             # Record the loss and accuracy.
-            train_loss.append(loss.item())
+            step += 1
+            loss_item = loss.item()
+            train_loss.append(loss_item)
             train_accs.append(acc)
+            writer.add_scalar("Loss/batch", loss_item, step)
+            writer.add_scalar("Acc/batch", acc, step)
 
         train_loss = sum(train_loss) / len(train_loss)
         train_acc = sum(train_accs) / len(train_accs)
 
         # Print the information.
         print(f"[ Train | {epoch + 1:03d}/{n_epochs:03d} ] loss = {train_loss:.5f}, acc = {train_acc:.5f}")
+        # writer.add_scalar("Loss/train", train_loss, step)
+        # writer.add_scalar("Acc/train", train_acc, step)
 
         # ---------- Validation ----------
         # Make sure the model is in eval mode so that some modules like dropout are disabled and work normally.
@@ -234,20 +196,22 @@ if __name__ == '__main__':
         # Print the information.
         print(f"[ Valid | {epoch + 1:03d}/{n_epochs:03d} ] loss = {valid_loss:.5f}, acc = {valid_acc:.5f}")
 
+        writer.add_scalar("Loss/valid", valid_loss, step)
+        writer.add_scalar("Acc/valid", valid_acc, step)
+
         # update logs
         if valid_acc > best_acc:
-            with open(f"./{_exp_name}_log.txt", "a"):
-                print(
-                    f"[ Valid | {epoch + 1:03d}/{n_epochs:03d} ] loss = {valid_loss:.5f}, acc = {valid_acc:.5f} -> best")
+            # with open(f"./{_exp_name}_log.txt", "a"):
+            print(f"[ Valid | {epoch + 1:03d}/{n_epochs:03d} ] loss = {valid_loss:.5f}, acc = {valid_acc:.5f} -> best")
         else:
-            with open(f"./{_exp_name}_log.txt", "a"):
-                print(f"[ Valid | {epoch + 1:03d}/{n_epochs:03d} ] loss = {valid_loss:.5f}, acc = {valid_acc:.5f}")
+            # with open(f"./{_exp_name}_log.txt", "a"):
+            print(f"[ Valid | {epoch + 1:03d}/{n_epochs:03d} ] loss = {valid_loss:.5f}, acc = {valid_acc:.5f}")
 
         # save models
         if valid_acc > best_acc:
             print(f"Best model found at epoch {epoch}, saving model")
-            torch.save(model.state_dict(),
-                       f"{_exp_name}_best.ckpt")  # only save best to prevent output memory exceed error
+            # torch.save(model.state_dict(),
+            #            f"{_exp_name}_best.ckpt")  # only save best to prevent output memory exceed error
             best_acc = valid_acc
             stale = 0
         else:

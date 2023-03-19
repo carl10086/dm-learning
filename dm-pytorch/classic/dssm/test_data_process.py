@@ -1,21 +1,16 @@
-import math
-
-import pandas as pd
 import re
 
-import torch
-from sklearn.model_selection import train_test_split
-
-import torch.nn as nn
-
-from torch.utils.data import Dataset, DataLoader
 import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
+from sklearn.model_selection import train_test_split
+from torch.utils.data import Dataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from torchmetrics.classification import BinaryAUROC
 from tqdm import tqdm
-from sklearn.utils import shuffle
-from torch.utils.data.dataset import T_co
 
-from classic.dssm.model import EmbeddingModule, DataType, Tower, DSSM
+from classic.dssm.model import DataType, DSSM
 
 data_dir = "/tmp/dataset/ml-1m"
 
@@ -301,9 +296,9 @@ class MovieLenDataSet(Dataset):
 config = {
     'seed': 5201314,  # Your seed number, you can pick your lucky number. :)
     'valid_ratio': 0.2,  # validation_size = train_size * valid_ratio
-    'n_epochs': 10,  # Number of epochs.
+    'n_epochs': 100,  # Number of epochs.
     'batch_size': 256,
-    'learning_rate': 1e-6,
+    'learning_rate': 1e-3,
     'early_stop': 600,  # If model has not improved for this many consecutive epochs, stop training.
     "embedding_size": 50
 }
@@ -321,10 +316,13 @@ def train(
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=config['learning_rate'])
     criterion = nn.BCELoss(reduction="mean")
-    n_epochs, best_loss, step, early_stop_count = config['n_epochs'], math.inf, 0, 0
+    n_epochs, best_acc, step, early_stop_count = config['n_epochs'], 0, 0, 0
+
+    metric = BinaryAUROC(thresholds=None)
     for epoch in range(n_epochs):
         model.train()
         loss_record = []
+        train_accs = []
         train_pbar = tqdm(train_loader, position=0, leave=True)
         for user_feats, item_feats, y in train_pbar:
             for idx, user_feat in enumerate(user_feats):
@@ -345,14 +343,21 @@ def train(
             step += 1
             loss_record.append(loss.detach().item())
 
+            # auc = roc_auc_score(np.array(y_pre), np.array(y))
+            acc = metric(y_pre, y)
+            train_accs.append(acc)
+
             # Display current epoch number and loss on tqdm progress bar.
             train_pbar.set_description(f'Epoch [{epoch + 1}/{n_epochs}]')
-            train_pbar.set_postfix({'loss': loss.detach().item()})
+            train_pbar.set_postfix({'loss': loss.detach().item(), 'acc': acc.detach().item()})
 
         mean_train_loss = sum(loss_record) / len(loss_record)
+        mean_train_acc = sum(train_accs) / len(train_accs)
         writer.add_scalar('Loss/train', mean_train_loss, step)
+        writer.add_scalar('Acc/train', mean_train_acc, step)
         model.eval()  # Set your model to evaluation mode.
         loss_record = []
+        valid_accs = []
 
         for user_feats, item_feats, y in valid_loader:
             with torch.no_grad():
@@ -365,24 +370,30 @@ def train(
                 y_pre = torch.sigmoid((user_emb * item_emb).sum(dim=-1)).reshape(-1, 1)
                 loss = criterion(y_pre, y)
 
+                valid_accs.append(metric(y_pre, y))
+
             loss_record.append(loss.item())
 
         mean_valid_loss = sum(loss_record) / len(loss_record)
-        print(f'Epoch [{epoch + 1}/{n_epochs}]: Train loss: {mean_train_loss:.4f}, Valid loss: {mean_valid_loss:.4f}')
+        mean_valid_acc = sum(valid_accs) / len(valid_accs)
+        print(
+            f'Epoch [{epoch + 1}/{n_epochs}]: Train loss: {mean_train_loss:.4f}, Valid loss: {mean_valid_loss:.4f}, '
+            f'train acc: {mean_train_acc:.3f}, valid acc: {mean_valid_acc:.3f}')
         writer.add_scalar('Loss/valid', mean_valid_loss, step)
-        if mean_valid_loss < best_loss:
-            best_loss = mean_valid_loss
-            print('Saving model with loss {:.3f}...'.format(best_loss))
+        writer.add_scalar('Acc/valid', mean_valid_acc, step)
+        if mean_valid_acc > best_acc:
+            best_acc = mean_valid_acc
+            print('Saving model with acc {:.3f}...'.format(best_acc))
             early_stop_count = 0
         else:
             early_stop_count += 1
 
         if early_stop_count >= config['early_stop']:
             print('\nModel is not improving, so we halt the training session.')
-            print(f"train is over with steps:{step}, best_loss:{best_loss}")
+            print(f"train is over with steps:{step}, best_acc:{best_acc}")
             return
 
-        print(f"train is over with steps:{step}, best_loss:{best_loss}")
+        print(f"train is over with steps:{step}, best_acc:{best_acc}")
 
 
 if __name__ == '__main__':
@@ -401,7 +412,12 @@ if __name__ == '__main__':
         data_type.dims
     )
 
+    print(
+        f"{emb.weight}"
+    )
+
     user_id = emb(train_dataset.user_feats[0])
+    print(f"userid: ${user_id}")
 
     data_type = user_data_types[1]
     emb = nn.Embedding(
@@ -416,8 +432,8 @@ if __name__ == '__main__':
         data_type.dims,
         mode="sum"
     )
-
-    genres = emb(train_dataset.movie_feats[1])
+    #
+    # genres = emb(train_dataset.movie_feats[1])
 
     # model = EmbeddingModule(
     #     user_data_types, False
@@ -438,7 +454,7 @@ if __name__ == '__main__':
     model = DSSM(
         user_data_types=user_data_types,
         item_data_types=movie_data_types,
-        use_senet=False
+        use_senet=True
     )
 
     output = model(

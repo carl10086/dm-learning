@@ -6,10 +6,18 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+import gc
 
-from infra.train_toolkit import plot
 
-device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+def same_seeds(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
 
 
 def load_feat(path):
@@ -21,7 +29,6 @@ def shift(x, n):
     if n < 0:
         left = x[0].repeat(-n, 1)
         right = x[:n]
-
     elif n > 0:
         right = x[-1].repeat(n, 1)
         left = x[n:]
@@ -46,29 +53,31 @@ def concat_feat(x, concat_n):
     return x.permute(1, 0, 2).view(seq_len, concat_n * feature_dim)
 
 
-def preprocess_data(split, feat_dir, phone_path, concat_nframes, train_ratio=0.8, train_val_seed=1337):
+def preprocess_data(split, feat_dir, phone_path, concat_nframes, train_ratio=0.8, random_seed=1213):
     class_num = 41  # NOTE: pre-computed, should not need change
-    mode = 'train' if (split == 'train' or split == 'val') else 'test'
+
+    if split == 'train' or split == 'val':
+        mode = 'train'
+    elif split == 'test':
+        mode = 'test'
+    else:
+        raise ValueError('Invalid \'split\' argument for dataset: PhoneDataset!')
 
     label_dict = {}
-    if mode != 'test':
-        phone_file = open(os.path.join(phone_path, f'{mode}_labels.txt')).readlines()
-
-        for line in phone_file:
+    if mode == 'train':
+        for line in open(os.path.join(phone_path, f'{mode}_labels.txt')).readlines():
             line = line.strip('\n').split(' ')
             label_dict[line[0]] = [int(p) for p in line[1:]]
 
-    if split == 'train' or split == 'val':
         # split training and validation data
         usage_list = open(os.path.join(phone_path, 'train_split.txt')).readlines()
-        random.seed(train_val_seed)
+        random.seed(random_seed)
         random.shuffle(usage_list)
-        percent = int(len(usage_list) * train_ratio)
-        usage_list = usage_list[:percent] if split == 'train' else usage_list[percent:]
-    elif split == 'test':
+        train_len = int(len(usage_list) * train_ratio)
+        usage_list = usage_list[:train_len] if split == 'train' else usage_list[train_len:]
+
+    elif mode == 'test':
         usage_list = open(os.path.join(phone_path, 'test_split.txt')).readlines()
-    else:
-        raise ValueError('Invalid \'split\' argument for dataset: PhoneDataset!')
 
     usage_list = [line.strip('\n') for line in usage_list]
     print('[Dataset] - # phone classes: ' + str(class_num) + ', number of utterances for ' + split + ': ' + str(
@@ -76,7 +85,7 @@ def preprocess_data(split, feat_dir, phone_path, concat_nframes, train_ratio=0.8
 
     max_len = 3000000
     X = torch.empty(max_len, 39 * concat_nframes)
-    if mode != 'test':
+    if mode == 'train':
         y = torch.empty(max_len, dtype=torch.long)
 
     idx = 0
@@ -84,22 +93,22 @@ def preprocess_data(split, feat_dir, phone_path, concat_nframes, train_ratio=0.8
         feat = load_feat(os.path.join(feat_dir, mode, f'{fname}.pt'))
         cur_len = len(feat)
         feat = concat_feat(feat, concat_nframes)
-        if mode != 'test':
+        if mode == 'train':
             label = torch.LongTensor(label_dict[fname])
 
         X[idx: idx + cur_len, :] = feat
-        if mode != 'test':
+        if mode == 'train':
             y[idx: idx + cur_len] = label
 
         idx += cur_len
 
     X = X[:idx, :]
-    if mode != 'test':
+    if mode == 'train':
         y = y[:idx]
 
     print(f'[INFO] {split} set')
     print(X.shape)
-    if mode != 'test':
+    if mode == 'train':
         print(y.shape)
         return X, y
     else:
@@ -124,10 +133,14 @@ class LibriDataset(Dataset):
         return len(self.data)
 
 
+
 class BasicBlock(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(BasicBlock, self).__init__()
 
+        # TODO: apply batch normalization and dropout for strong baseline.
+        # Reference: https://pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html (batch normalization)
+        #       https://pytorch.org/docs/stable/generated/torch.nn.Dropout.html (dropout)
         self.block = nn.Sequential(
             nn.Linear(input_dim, output_dim),
             nn.ReLU(),
@@ -152,41 +165,45 @@ class Classifier(nn.Module):
         x = self.fc(x)
         return x
 
-
 # data prarameters
-concat_nframes = 1  # the number of frames to concat with, n must be odd (total 2k+1 = n frames)
-train_ratio = 0.8  # the ratio of data used for training, the rest will be used for validation
+# TODO: change the value of "concat_nframes" for medium baseline
+concat_nframes = 3  # the number of frames to concat with, n must be odd (total 2k+1 = n frames)
+train_ratio = 0.75  # the ratio of data used for training, the rest will be used for validation
 
 # training parameters
-seed = 0  # random seed
+seed = 1213  # random seed
 batch_size = 512  # batch size
-num_epoch = 5  # the number of training epoch
-# learning_rate = 0.0001  # learning rate
-learning_rate = 0.001  # learning rate
+num_epoch = 10  # the number of training epoch
+learning_rate = 1e-4  # learning rate
 model_path = './model.ckpt'  # the path where the checkpoint will be saved
 
 # model parameters
+# TODO: change the value of "hidden_layers" or "hidden_dim" for medium baseline
 input_dim = 39 * concat_nframes  # the input dim of the model, you should not change the value
-hidden_layers = 8  # the number of hidden layers
-hidden_dim = 256  # the hidden dim
+hidden_layers = 2  # the number of hidden layers
+hidden_dim = 64  # the hidden dim
 
-#### PREPARE dataset AND MODEL
+same_seeds(seed)
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f'DEVICE: {device}')
 
-import gc
+data_dir = "/root/autodl-tmp/dataset"
 
 # preprocess data
-train_X, train_y = preprocess_data(split='train', feat_dir='/tmp/dataset/libriphone/feat',
-                                   phone_path='/tmp/dataset/libriphone',
-                                   concat_nframes=concat_nframes, train_ratio=train_ratio)
-val_X, val_y = preprocess_data(split='val', feat_dir='/tmp/dataset/libriphone/feat',
-                               phone_path='/tmp/dataset/libriphone',
-                               concat_nframes=concat_nframes, train_ratio=train_ratio)
+train_X, train_y = preprocess_data(split='train', feat_dir=f'{data_dir}/libriphone/feat',
+                                   phone_path=f'{data_dir}/libriphone',
+                                   concat_nframes=concat_nframes, train_ratio=train_ratio, random_seed=seed)
+val_X, val_y = preprocess_data(split='val', feat_dir=f'{data_dir}/libriphone/feat', phone_path=f'{data_dir}/libriphone',
+                               concat_nframes=concat_nframes, train_ratio=train_ratio, random_seed=seed)
+
+## (1979256, 117)
+print(f"Shape Of trainX: {train_X.shape}")
 
 # get dataset
 train_set = LibriDataset(train_X, train_y)
 val_set = LibriDataset(val_X, val_y)
 
-# remove raw feature to save memory
+# remove raw feature to save memory, Is this really work?
 del train_X, train_y, val_X, val_y
 gc.collect()
 
@@ -194,31 +211,12 @@ gc.collect()
 train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=False)
 
-
-# fix seed
-def same_seeds(seed):
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-    np.random.seed(seed)
-    # torch.backends.cudnn.benchmark = False
-    # torch.backends.cudnn.deterministic = True
-
-
-# fix random seed
-same_seeds(seed)
-
 # create model, define a loss function, and optimizer
 model = Classifier(input_dim=input_dim, hidden_layers=hidden_layers, hidden_dim=hidden_dim).to(device)
 criterion = nn.CrossEntropyLoss()
-# optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 best_acc = 0.0
-
-loss_in_per_batch = []
-
 for epoch in range(num_epoch):
     train_acc = 0.0
     train_loss = 0.0
@@ -240,51 +238,30 @@ for epoch in range(num_epoch):
         optimizer.step()
 
         _, train_pred = torch.max(outputs, 1)  # get the index of the class with the highest probability
-        ## 正确率
         train_acc += (train_pred.detach() == labels.detach()).sum().item()
-        item = loss.detach().item()
-        train_loss += item
-
-        loss_in_per_batch.append(
-            item
-        )
+        train_loss += loss.item()
 
     # validation
-    if len(val_set) > 0:
-        model.eval()  # set the model to evaluation mode
-        with torch.no_grad():
-            for i, batch in enumerate(tqdm(val_loader)):
-                features, labels = batch
-                features = features.to(device)
-                labels = labels.to(device)
-                outputs = model(features)
+    model.eval()  # set the model to evaluation mode
+    with torch.no_grad():
+        for i, batch in enumerate(tqdm(val_loader)):
+            features, labels = batch
+            features = features.to(device)
+            labels = labels.to(device)
+            outputs = model(features)
 
-                loss = criterion(outputs, labels)
-                # print(f"each batch loss {i} in epoch {epoch} is {item}")
+            loss = criterion(outputs, labels)
 
-                _, val_pred = torch.max(outputs, 1)
-                val_acc += (
+            _, val_pred = torch.max(outputs, 1)
+            val_acc += (
                         val_pred.cpu() == labels.cpu()).sum().item()  # get the index of the class with the highest probability
-                val_loss += loss.item()
+            val_loss += loss.item()
 
-            print('[{:03d}/{:03d}] Train Acc: {:3.6f} Loss: {:3.6f} | Val Acc: {:3.6f} loss: {:3.6f}'.format(
-                epoch + 1, num_epoch, train_acc / len(train_set), train_loss / len(train_loader),
-                val_acc / len(val_set), val_loss / len(val_loader)
-            ))
+    print(
+        f'[{epoch + 1:03d}/{num_epoch:03d}] Train Acc: {train_acc / len(train_set):3.5f} Loss: {train_loss / len(train_loader):3.5f} | Val Acc: {val_acc / len(val_set):3.5f} loss: {val_loss / len(val_loader):3.5f}')
 
-            # if the model improves, save a checkpoint at this epoch
-            if val_acc > best_acc:
-                best_acc = val_acc
-                # torch.save(model.state_dict(), model_path)
-                print('saving model with acc {:.3f}'.format(best_acc / len(val_set)))
-    else:
-        print('[{:03d}/{:03d}] Train Acc: {:3.6f} Loss: {:3.6f}'.format(
-            epoch + 1, num_epoch, train_acc / len(train_set), train_loss / len(train_loader)
-        ))
-
-# if not validating, save the last epoch
-if len(val_set) == 0:
-    # torch.save(model.state_dict(), model_path)
-    print('saving model at last epoch')
-
-plot(loss_in_per_batch)
+    # if the model improves, save a checkpoint at this epoch
+    if val_acc > best_acc:
+        best_acc = val_acc
+        # torch.save(model.state_dict(), model_path)
+        print(f'saving model with acc {best_acc / len(val_set):.5f}')
