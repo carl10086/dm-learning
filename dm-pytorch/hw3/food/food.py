@@ -25,6 +25,8 @@ config = {
     'save_path': './models/model.ckpt'  # Your model will be saved here.
 }
 
+writer = SummaryWriter()
+
 input_size = 224
 # Normally, We don't need augmentations in testing and validation.
 # All we need here is to resize the PIL image and transform it into Tensor.
