@@ -133,7 +133,6 @@ class LibriDataset(Dataset):
         return len(self.data)
 
 
-
 class BasicBlock(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(BasicBlock, self).__init__()
@@ -143,6 +142,7 @@ class BasicBlock(nn.Module):
         #       https://pytorch.org/docs/stable/generated/torch.nn.Dropout.html (dropout)
         self.block = nn.Sequential(
             nn.Linear(input_dim, output_dim),
+            nn.BatchNorm1d(output_dim),
             nn.ReLU(),
         )
 
@@ -152,8 +152,15 @@ class BasicBlock(nn.Module):
 
 
 class Classifier(nn.Module):
-    def __init__(self, input_dim, output_dim=41, hidden_layers=1, hidden_dim=256):
+    def __init__(
+            self,
+            input_dim,
+            output_dim=41,
+            hidden_layers=1,
+            hidden_dim=256):
         super(Classifier, self).__init__()
+        self.lstm = nn.LSTM(39, 39, 3)  #
+        # self.hidden2out = nn.Linear(hidden_dim * concat_nframes, output_dim)
 
         self.fc = nn.Sequential(
             BasicBlock(input_dim, hidden_dim),
@@ -162,26 +169,32 @@ class Classifier(nn.Module):
         )
 
     def forward(self, x):
-        x = self.fc(x)
+        m = x.shape[0]
+        inputs = x.view(concat_nframes, m, -1)
+        lstm_out, _ = self.lstm(inputs)
+        x = self.fc(lstm_out.view(m, -1))
+        # lstm_out, _ = self.lstm(x.view(m, concat_nframes, -1))
+        # x = self.fc(lstm_out.view(m, -1))
         return x
+
 
 # data prarameters
 # TODO: change the value of "concat_nframes" for medium baseline
-concat_nframes = 3  # the number of frames to concat with, n must be odd (total 2k+1 = n frames)
+concat_nframes = 11 + 2 * 1  # the number of frames to concat with, n must be odd (total 2k+1 = n frames)
 train_ratio = 0.75  # the ratio of data used for training, the rest will be used for validation
 
 # training parameters
 seed = 1213  # random seed
 batch_size = 512  # batch size
-num_epoch = 10  # the number of training epoch
-learning_rate = 1e-4  # learning rate
+num_epoch = 20 * 1  # the number of training epoch
+learning_rate = 1e-4 * 5  # learning rate
 model_path = './model.ckpt'  # the path where the checkpoint will be saved
 
 # model parameters
 # TODO: change the value of "hidden_layers" or "hidden_dim" for medium baseline
 input_dim = 39 * concat_nframes  # the input dim of the model, you should not change the value
-hidden_layers = 2  # the number of hidden layers
-hidden_dim = 64  # the hidden dim
+hidden_layers = 2 * 4  # the number of hidden layers
+hidden_dim = 64 * 4  # the hidden dim
 
 same_seeds(seed)
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -213,55 +226,62 @@ val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=False)
 
 # create model, define a loss function, and optimizer
 model = Classifier(input_dim=input_dim, hidden_layers=hidden_layers, hidden_dim=hidden_dim).to(device)
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-best_acc = 0.0
-for epoch in range(num_epoch):
-    train_acc = 0.0
-    train_loss = 0.0
-    val_acc = 0.0
-    val_loss = 0.0
 
-    # training
-    model.train()  # set the model to training mode
-    for i, batch in enumerate(tqdm(train_loader)):
-        features, labels = batch
-        features = features.to(device)
-        labels = labels.to(device)
+def train():
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    best_acc = 0.0
+    for epoch in range(num_epoch):
+        train_acc = 0.0
+        train_loss = 0.0
+        val_acc = 0.0
+        val_loss = 0.0
 
-        optimizer.zero_grad()
-        outputs = model(features)
-
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-
-        _, train_pred = torch.max(outputs, 1)  # get the index of the class with the highest probability
-        train_acc += (train_pred.detach() == labels.detach()).sum().item()
-        train_loss += loss.item()
-
-    # validation
-    model.eval()  # set the model to evaluation mode
-    with torch.no_grad():
-        for i, batch in enumerate(tqdm(val_loader)):
+        # training
+        model.train()  # set the model to training mode
+        for i, batch in enumerate(tqdm(train_loader)):
             features, labels = batch
             features = features.to(device)
             labels = labels.to(device)
+
+            optimizer.zero_grad()
             outputs = model(features)
 
             loss = criterion(outputs, labels)
+            loss.backward()
+            # Clip the gradient norms for stable training.
+            # grad_norm = nn.utils.clip_grad_norm_(model.parameters(), max_norm=10)
+            optimizer.step()
 
-            _, val_pred = torch.max(outputs, 1)
-            val_acc += (
+            _, train_pred = torch.max(outputs, 1)  # get the index of the class with the highest probability
+            train_acc += (train_pred.detach() == labels.detach()).sum().item()
+            train_loss += loss.item()
+
+        # validation
+        model.eval()  # set the model to evaluation mode
+        with torch.no_grad():
+            for i, batch in enumerate(tqdm(val_loader)):
+                features, labels = batch
+                features = features.to(device)
+                labels = labels.to(device)
+                outputs = model(features)
+
+                loss = criterion(outputs, labels)
+
+                _, val_pred = torch.max(outputs, 1)
+                val_acc += (
                         val_pred.cpu() == labels.cpu()).sum().item()  # get the index of the class with the highest probability
-            val_loss += loss.item()
+                val_loss += loss.item()
 
-    print(
-        f'[{epoch + 1:03d}/{num_epoch:03d}] Train Acc: {train_acc / len(train_set):3.5f} Loss: {train_loss / len(train_loader):3.5f} | Val Acc: {val_acc / len(val_set):3.5f} loss: {val_loss / len(val_loader):3.5f}')
+        print(
+            f'[{epoch + 1:03d}/{num_epoch:03d}] Train Acc: {train_acc / len(train_set):3.5f} Loss: {train_loss / len(train_loader):3.5f} | Val Acc: {val_acc / len(val_set):3.5f} loss: {val_loss / len(val_loader):3.5f}')
 
-    # if the model improves, save a checkpoint at this epoch
-    if val_acc > best_acc:
-        best_acc = val_acc
-        # torch.save(model.state_dict(), model_path)
-        print(f'saving model with acc {best_acc / len(val_set):.5f}')
+        # if the model improves, save a checkpoint at this epoch
+        if val_acc > best_acc:
+            best_acc = val_acc
+            # torch.save(model.state_dict(), model_path)
+            print(f'saving model with acc {best_acc / len(val_set):.5f}')
+
+
+train()
