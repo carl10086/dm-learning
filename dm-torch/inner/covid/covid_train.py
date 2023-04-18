@@ -143,7 +143,7 @@ if __name__ == '__main__':
     print(f"config is {config}")
     df: DataFrame = pd.read_csv(f"{dataset_dir}/covid.train.csv")
     # df.values[:, :-1] = preprocessing.MinMaxScaler().fit_transform(df.values[:, :-1])
-    # df.values[:, :-1] = preprocessing.StandardScaler().fit_transform(df.values[:, :-1])
+    df.values[:, :-1] = preprocessing.StandardScaler().fit_transform(df.values[:, :-1])
     train_data, valid_data = train_test_split(df.values, test_size=config.valid_ratio, random_state=config.seed)
     train_X, train_Y = train_data[:, :-1], train_data[:, -1]
     valid_X, valid_Y = valid_data[:, :-1], valid_data[:, -1]
