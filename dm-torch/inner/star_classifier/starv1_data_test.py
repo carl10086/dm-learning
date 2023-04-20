@@ -21,6 +21,6 @@ test_tfm = transforms.Compose([
 if __name__ == '__main__':
     same_seed(config.seed)
     print(f"config is {config}")
-    train_dataset = StarV1Dataset(
-        DIR, test_tfm
+    ds = StarV1Dataset(
+        DIR, test_tfm, file="valid.txt"
     )

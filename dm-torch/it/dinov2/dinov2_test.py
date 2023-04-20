@@ -9,14 +9,15 @@ url = "https://d-ssl.dtstatic.com/uploads/blog/202303/23/20230323030234_8700a.th
 image = Image.open(requests.get(url, stream=True).raw)
 
 # 1. 你懂得佛跳墙 god need vpn
-# os.environ['HTTP_PROXY'] = 'http://192.168.126.12:12798'
-# os.environ['HTTPS_PROXY'] = 'http://192.168.126.12:12798'
+os.environ['HTTP_PROXY'] = 'http://192.168.126.12:12798'
+os.environ['HTTPS_PROXY'] = 'http://192.168.126.12:12798'
 
 # 2. 利用 torch2.0 直接加载 pre-trained
-# model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
+model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
 # model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitg14')
 # model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitl14')
-model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitb14')
+# model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitb14')
+print(model)
 
 
 
