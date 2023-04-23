@@ -115,12 +115,11 @@ if __name__ == '__main__':
 
     training_args = TrainingArguments(
         output_dir=output_dir,
-        per_device_train_batch_size=16,
-        evaluation_strategy="steps",
-        num_train_epochs=4,
+        per_device_train_batch_size=32,
+        evaluation_strategy="epoch",
+        save_strategy="epoch",
+        num_train_epochs=100,
         fp16=True,
-        save_steps=100,
-        eval_steps=100,
         logging_steps=10,
         learning_rate=2e-4,
         save_total_limit=2,

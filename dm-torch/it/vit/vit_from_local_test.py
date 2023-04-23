@@ -13,7 +13,7 @@ feature_extractor = ViTFeatureExtractor.from_pretrained(model_name_or_path)
 ViTForImageClassification.from_pretrained(model_name_or_path, problem_type="")
 
 model = ViTForImageClassification.from_pretrained(
-    '/root/autodl-tmp/output/vit-base-patch16-224-starv2-0419_1737')
+    '/root/autodl-tmp/output/vit-base-patch16-224-starv2-0420_1538')
 model = model.to(device)
 
 
