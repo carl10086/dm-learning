@@ -1,0 +1,6 @@
+#!/bin/bash
+# this is used for dashboard restart in autodl
+
+ps -ef | grep tensorboard | awk '{print $2}' | xargs kill -9
+
+tensorboard --port 6007 --logdir ${PWD}

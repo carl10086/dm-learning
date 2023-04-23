@@ -10,9 +10,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 model_name_or_path = 'google/vit-base-patch16-224-in21k'
 feature_extractor = ViTFeatureExtractor.from_pretrained(model_name_or_path)
+ViTForImageClassification.from_pretrained(model_name_or_path, problem_type="")
 
 model = ViTForImageClassification.from_pretrained(
-    '/root/autodl-tmp/projects/carl/dm-torch/inner/star_classifier/vit-base-starv1')
+    '/root/autodl-tmp/output/vit-base-patch16-224-starv2-0420_1538')
 model = model.to(device)
 
 
@@ -23,10 +24,24 @@ def predict(url: str):
     with torch.no_grad():
         outputs = model(pixel_values)
         logits = outputs.logits
-        print(logits.shape)
         prediction = logits.argmax(-1)
         print("Predicted class:", model.config.id2label[prediction.item()])
 
 
-predict(
-    'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2F835212bd-bb10-4112-b42b-f224486d757a%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1684421065&t=ef2d77f96633d46400194961d5d73b2b')
+def predict_urls(urls):
+    for url in urls:
+        predict(url)
+
+
+urls = [
+    'https://c-ssl.duitang.com/uploads/blog/202303/26/20230326094912_7afe0.jpeg',
+    'https://c-ssl.duitang.com/uploads/blog/202303/19/20230319213554_f61c3.jpeg',
+    'https://c-ssl.duitang.com/uploads/blog/202303/13/20230313193520_f2c51.jpeg',
+    'https://c-ssl.duitang.com/uploads/blog/202302/19/20230219134123_6460a.jpeg',
+    'https://c-ssl.duitang.com/uploads/blog/202302/08/20230208134024_e112a.jpeg',
+    'https://c-ssl.duitang.com/uploads/blog/202301/30/20230130194936_30844.jpeg',
+    'https://c-ssl.duitang.com/uploads/blog/202210/10/20221010225928_36aed.jpeg',
+    'https://c-ssl.duitang.com/uploads/blog/202303/22/20230322191844_3fad6.jpg',
+]
+
+predict_urls(urls)
