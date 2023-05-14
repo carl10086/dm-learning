@@ -129,8 +129,8 @@ if __name__ == '__main__':
 
     labels = ds['train'].features[label_col_name].names
     origin_lens = len(labels)
-    labels.append('dong_man') # add extra labels
-    labels.append('mingxing') # add extra labels
+    labels.append('dong_man')  # add extra labels
+    labels.append('mingxing')  # add extra labels
 
     train_ds = ds['train']
     val_ds = ds['validation']
