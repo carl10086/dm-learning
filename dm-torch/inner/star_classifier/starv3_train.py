@@ -11,7 +11,7 @@ from inner.tools.train_tools import TrainConfig, same_seed, train_classifier
 # Input size must be consistent with PRE-TRAIN model
 input_size = 224
 train_tfm = transforms.Compose([
-    transforms.RandomResizedCrop(input_size),
+    transforms.RandomResizedCrop((input_size, input_size)),
     transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
@@ -63,6 +63,5 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.00003, weight_decay=1e-5)
     # optimizer = torch.optim.AdamW(model.parameters(), lr=2.0e-04)
-
 
     train_classifier(optimizer, criterion, model, config, train_loader, val_loader, model_version)
