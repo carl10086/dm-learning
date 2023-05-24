@@ -27,3 +27,9 @@ endef
 #.PHONY: protocol
 protocol:
 	$(call gradle, dm-protocol:clean dm-protocol:build)
+
+
+.PHONY: pub pub2local
+pub2local:
+	$(call gradle, clean publishToMavenLocal  -x test)
+

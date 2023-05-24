@@ -3,7 +3,6 @@ package com.ysz.dm.base.repo.common
 import com.ysz.dm.base.core.domain.page.PageImpl
 import com.ysz.dm.base.core.domain.page.PageRequest
 import com.ysz.dm.base.repo.anotation.*
-import com.ysz.dm.base.repo.impl.jdbctpl.SimpleJdbcRepositoryTest
 import com.ysz.dm.base.repo.repository.CrudRepository
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.DriverManagerDataSource
@@ -63,26 +62,26 @@ object StudentSchemaTools {
 
     val jdbcTpl = JdbcTemplate(ds)
 
-    fun init() {
-        jdbcTpl.execute(
-            """
-            create table t_students
-            (
-            id int  auto_increment primary key not null,
-            username varchar(255) not null ,
-            create_at timestamp not null ,
-            age int not null,
-            version bigint 
-            )
-        """.trimIndent()
-        )
-        for (i in 1 until 10) {
-            Student(
-                username = "user$i",
-                age = 10 + i,
-                createAtFuck = beforeHours(i),
-            ).apply { SimpleJdbcRepositoryTest.jdbcRepo.insert(this) }
-        }
-
-    }
+//    fun init() {
+//        jdbcTpl.execute(
+//            """
+//            create table t_students
+//            (
+//            id int  auto_increment primary key not null,
+//            username varchar(255) not null ,
+//            create_at timestamp not null ,
+//            age int not null,
+//            version bigint
+//            )
+//        """.trimIndent()
+//        )
+//        for (i in 1 until 10) {
+//            Student(
+//                username = "user$i",
+//                age = 10 + i,
+//                createAtFuck = beforeHours(i),
+//            ).apply { SimpleJdbcRepositoryTest.jdbcRepo.insert(this) }
+//        }
+//
+//    }
 }

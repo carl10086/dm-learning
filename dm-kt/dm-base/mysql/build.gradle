@@ -1,6 +1,7 @@
 dependencies {
     api(project(":dm-base-core"))
-    api("mysql:mysql-connector-java:")
+    api('mysql:mysql-connector-java:')
+
     implementation('com.zaxxer:HikariCP:')
     compileOnly("org.springframework:spring-context:")
     compileOnly 'org.springframework:spring-jdbc:'

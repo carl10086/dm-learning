@@ -19,8 +19,8 @@ dependencies {
 
 
 
-    implementation project(':dm-base-repo-processor')
-    ksp project(':dm-base-repo-processor')
+//    implementation project(':dm-base-repo-processor')
+//    ksp project(':dm-base-repo-processor')
 
     testImplementation 'jdepend:jdepend:2.9.1'
 }
