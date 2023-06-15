@@ -27,12 +27,16 @@ def simple_txt_2_img(prompt: str):
                                                      # generator=generator
                                                      ).to_tuple()
 
-    image = t2i_pipe(prompt, negative_prompt=negative_prompt, image_embeds=image_embeds,
-                     negative_image_embeds=negative_image_embeds).images[0]
+    images = t2i_pipe(prompt,
+                      negative_prompt=negative_prompt,
+                      image_embeds=image_embeds,
+                      num_images_per_prompt=4,
+                      negative_image_embeds=negative_image_embeds).images
     # image.save("cheeseburger_monster.png")
 
-    show_img(image)
+    for image in images:
+        show_img(image)
 
 
 if __name__ == '__main__':
-    simple_txt_2_img("An Asia man face, handsome, smile, long hair, big eyes")
+    simple_txt_2_img("A alien cheeseburger creature eating itself, claymation, cinematic, moody lighting")

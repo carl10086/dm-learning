@@ -6,6 +6,18 @@ from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
 
 from inner.tools.image_tools import show_img
 
+
+def print_gpu_mem():
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        gpu_memory = torch.cuda.get_device_properties(device).total_memory
+        gpu_memory_available = gpu_memory - torch.cuda.memory_allocated(device)
+        print(f"当前可用的GPU内存: {gpu_memory_available / 1024 ** 3} GB")
+    else:
+        print("未检测到可用的GPU")
+
+
+print_gpu_mem()
 pipeline = StableDiffusionPipeline.from_pretrained("/root/autodl-tmp/output/rev_diff", torch_dtype=torch.float16,
                                                    safety_checker=None).to("cuda")
 pipeline.scheduler = DPMSolverMultistepScheduler.from_config(
@@ -13,14 +25,15 @@ pipeline.scheduler = DPMSolverMultistepScheduler.from_config(
 )
 
 # optional use torch2 compile feature
-pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
+# pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
 
 # pipeline.enable_attention_slicing()
 # this can load c lora
 pipeline.load_lora_weights("/root/autodl-tmp/models/ui_lora/revPopmart_v20.safetensors")
 
-
+print_gpu_mem()
 # pipeline.load_lora_weights("/root/autodl-tmp/models/ui_lora/blindbox.safetensors")
+
 
 def time_wrapper(func):
     start_time = time.time()
@@ -71,7 +84,7 @@ def stress_test_v2(func, num_requests=100, num_workers=1):
 
 
 def text_2_image():
-    prompt = "((solo)), ((1girl)), best quality, ultra high res, 8K, masterpiece, sharp focus,  clear gaze,popmart"
+    prompt = "((solo)), ((1girl)), best quality, ultra high res, 8K, masterpiece, sharp focus,  clear gaze, popmart"
     negative_prompt = (
         "nsfw, (nipples:1.5), skin spots, acnes, skin blemishes, age spot, ugly, bad_anatomy, bad_hands, unclear fingers, twisted hands, fused fingers, fused legs, extra_hands, missing_fingers, broken hand, (more than two hands), well proportioned hands, more than two legs, unclear eyes, missing_arms, mutilated, extra limbs, extra legs, cloned face, extra_digit, fewer_digits, jpeg_artifacts,signature, watermark, username, blurry, mirror image, (worst quality:2), (low quality:2), (normal quality:2), lowres, ((monochrome)), ((grayscale)),((big hands, un-detailed skin, semi-realistic, cgi, 3d, render, sketch, cartoon, drawing, anime)), ((ugly mouth, ugly eyes, missing teeth, crooked teeth, close up, cropped, out of frame))")
 
@@ -90,4 +103,4 @@ if __name__ == '__main__':
     # images = text_2_image()
     for image in text_2_image():
         show_img(image)
-    stress_test_v2(func=text_2_image, num_requests=10, num_workers=1)
+    # stress_test_v2(func=text_2_image, num_requests=10, num_workers=1)
