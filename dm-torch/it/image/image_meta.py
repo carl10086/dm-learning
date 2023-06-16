@@ -1,16 +1,17 @@
+import os
+
 from PIL import Image
 import hashlib
 
 import numpy as np
 from safetensors import safe_open
 import torch
+import requests
 
+os.environ['HTTP_PROXY'] = 'http://192.168.126.12:12798'
+os.environ['HTTPS_PROXY'] = 'http://192.168.126.12:12798'
 
 image_path = '/tmp/carl/00000-3121882917.png'
-
-with open(image_path, 'rb') as f:
-    image = Image.open(f)
-    print(image.info)
 
 
 def calculate_sha256(file_path):
@@ -36,8 +37,6 @@ def model_hash(filename):
             return m.hexdigest()[0:8]
     except FileNotFoundError:
         return 'NOFILE'
-
-
 
 
 def check_file_format_and_precision(file_path):
@@ -77,4 +76,17 @@ def check_file_format_and_precision(file_path):
 
 # print(model_hash('/root/autodl-tmp/models/ui_models_1/rev_animated/Rev_Animated_v1.2.2_Pruned.safetensors'))
 # print(calculate_sha256('/root/autodl-tmp/models/ui_models_1/rev_animated/Rev_Animated_v1.2.2_Pruned.safetensors'))
-print(check_file_format_and_precision('/root/autodl-tmp/models/ui_models_1/rev_animated/Rev_Animated_v1.2.2_Pruned.safetensors'))
+if __name__ == '__main__':
+    # print(check_file_format_and_precision(
+    #     '/root/autodl-tmp/models/ui_models_1/rev_animated/Rev_Animated_v1.2.2_Pruned.safetensors'))
+    img = Image.open("/tmp/carl/00020-4134381700.jpeg")
+
+    # 获取exif数据
+    exif_data = img._getexif()
+    from PIL.ExifTags import TAGS
+    # 打印exif数据
+    for tag, value in exif_data.items():
+        tag_name = TAGS.get(tag, tag)
+        if isinstance(value, bytes):
+            decode = value.decode("utf8").strip('UNICODE\x00')
+            print(decode)

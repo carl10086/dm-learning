@@ -10,8 +10,8 @@ from diffusers import AutoencoderKL, UNet2DConditionModel, PNDMScheduler, UniPCM
 from inner.tools.image_tools import show_img, show_np
 
 # use proxy
-os.environ['HTTP_PROXY'] = 'http://192.168.126.12:12798'
-os.environ['HTTPS_PROXY'] = 'http://192.168.126.12:12798'
+os.environ['HTTP_PROXY'] = 'http://127.0.0.1:8001'
+os.environ['HTTPS_PROXY'] = 'http://127.0.0.1:8001'
 
 
 def gen_by_pipe():
@@ -24,7 +24,7 @@ def gen_by_steps():
     global sample_size
     scheduler = DDPMScheduler.from_pretrained("google/ddpm-cat-256")
     model = UNet2DModel.from_pretrained("google/ddpm-cat-256").to("cuda")
-    # print(model.config)
+    print(model)
     # 1. Set the number of timesteps to run the denoising process for
     scheduler.set_timesteps(50)
     # 2. 随机化初始化一个噪音 当作输入图片的代表, 符合模型 shape 要求即可
@@ -121,4 +121,7 @@ def gen_with_sd():
 
 if __name__ == '__main__':
     # gen_with_sd()
-    gen_by_steps()
+    # gen_by_steps()
+    print(UNet2DModel.from_pretrained("google/ddpm-cat-256"))
+    # unet = UNet2DConditionModel.from_pretrained(SD_MODEL, subfolder="unet")
+    # print(unet)

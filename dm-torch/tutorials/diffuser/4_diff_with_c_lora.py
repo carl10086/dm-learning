@@ -1,37 +1,49 @@
+import os
+
 import torch
 import concurrent.futures
 import time
 import numpy as np
 from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
+import tomesd
 
 from inner.tools.image_tools import show_img
 
+os.environ['HTTP_PROXY'] = 'http://127.0.0.1:8001'
+os.environ['HTTPS_PROXY'] = 'http://127.0.0.1:8001'
+
 
 def print_gpu_mem():
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        gpu_memory = torch.cuda.get_device_properties(device).total_memory
-        gpu_memory_available = gpu_memory - torch.cuda.memory_allocated(device)
-        print(f"当前可用的GPU内存: {gpu_memory_available / 1024 ** 3} GB")
-    else:
-        print("未检测到可用的GPU")
+    device = torch.device("cuda")
+    gpu_memory = torch.cuda.get_device_properties(device).total_memory
+    gpu_memory_available = gpu_memory - torch.cuda.memory_allocated(device)
+    print(f"当前可用的GPU内存: {gpu_memory_available / 1024 ** 3} GB")
 
 
 print_gpu_mem()
 pipeline = StableDiffusionPipeline.from_pretrained("/root/autodl-tmp/output/rev_diff", torch_dtype=torch.float16,
                                                    safety_checker=None).to("cuda")
+# pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
 pipeline.scheduler = DPMSolverMultistepScheduler.from_config(
     pipeline.scheduler.config, use_karras_sigmas=True
 )
+# 这个代码是强制关闭 flash attention 技术
+# pipeline.unet.set_default_attn_processor()
+# pipeline = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16).to(
+#     "cuda")
+#
 
 # optional use torch2 compile feature
-# pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
+tomesd.apply_patch(pipeline.unet, ratio=0.75)
+
 
 # pipeline.enable_attention_slicing()
 # this can load c lora
-pipeline.load_lora_weights("/root/autodl-tmp/models/ui_lora/revPopmart_v20.safetensors")
+# pipeline.load_lora_weights("/root/autodl-tmp/models/ui_lora/revPopmart_v20.safetensors")
 
 print_gpu_mem()
+
+
 # pipeline.load_lora_weights("/root/autodl-tmp/models/ui_lora/blindbox.safetensors")
 
 
@@ -93,14 +105,14 @@ def text_2_image():
                       width=512,
                       height=512,
                       num_inference_steps=20,
-                      num_images_per_prompt=8,
+                      num_images_per_prompt=1,
                       # generator=torch.manual_seed(0)
                       ).images
     return images
 
 
 if __name__ == '__main__':
-    # images = text_2_image()
+    # 预热
     for image in text_2_image():
         show_img(image)
-    # stress_test_v2(func=text_2_image, num_requests=10, num_workers=1)
+    stress_test_v2(func=text_2_image, num_requests=10, num_workers=1)
