@@ -4,8 +4,7 @@ import torch
 import concurrent.futures
 import time
 import numpy as np
-from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
-
+from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler, AutoencoderKL
 from inner.tools.image_tools import show_img
 
 os.environ['HTTP_PROXY'] = 'http://127.0.0.1:8001'
@@ -22,6 +21,8 @@ def print_gpu_mem():
 print_gpu_mem()
 pipeline = StableDiffusionPipeline.from_pretrained("/root/autodl-tmp/output/rev_diff", torch_dtype=torch.float16,
                                                    safety_checker=None).to("cuda")
+pipeline.vae = AutoencoderKL.from_pretrained("/root/autodl-tmp/output/diffusers/vae/kl-f8-anime2",
+                                             torch_dtype=torch.float16, ).to("cuda")
 # pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
 pipeline.scheduler = DPMSolverMultistepScheduler.from_config(
     pipeline.scheduler.config, use_karras_sigmas=True
@@ -40,7 +41,7 @@ pipeline.scheduler = DPMSolverMultistepScheduler.from_config(
 # this can load c lora
 # lora_path = "/root/autodl-tmp/models/ui_lora/revPopmart_v20.safetensors"
 lora_path = "/root/autodl-tmp/models/ui_lora/blindbox.safetensors"
-pipeline.load_lora_weights(lora_path)
+pipeline.load_lora_weights(lora_path, scale=0.5)
 # pipeline.unet.load_attn_procs(lora_path)
 print_gpu_mem()
 
