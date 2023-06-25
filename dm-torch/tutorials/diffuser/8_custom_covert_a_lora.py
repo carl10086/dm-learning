@@ -35,7 +35,6 @@ if __name__ == '__main__':
     #         text_encoder_lora_state_dict, network_alpha=network_alpha
     #     )
 
-
     pipe.load_lora_weights(model_file)
 
     pipe.save_lora_weights(

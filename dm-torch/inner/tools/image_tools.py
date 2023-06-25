@@ -2,6 +2,11 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
+def show_images(images):
+    for image in images:
+        show_img(image)
+
+
 def show_img(img):
     plt.imshow(img)
     plt.show()
