@@ -1,12 +1,10 @@
-import math
+import os
 
-import numpy as np
+import math
 import safetensors
 import torch
 import torch.nn as nn
-import os
 from PIL import Image
-
 from diffusers import DiffusionPipeline, DPMSolverMultistepScheduler, StableDiffusionPipeline, \
     StableDiffusionLatentUpscalePipeline
 
@@ -248,23 +246,21 @@ if __name__ == "__main__":
     #     "bad composition, inaccurate eyes, extra digit, fewer digits, (extra arms:1.2) "
     # )
 
-    # prompt = "(masterpiece),(best quality),(ultra-detailed), (full body:1.2), 1girl,chibi,cute, smile, open mouth, flower, outdoors, playing guitar, music, beret, holding guitar, jacket, blush, tree, :3, shirt, short hair, cherry blossoms, green headwear, blurry, brown hair, blush stickers, long sleeves, bangs, headphones, black hair, pink flower, (beautiful detailed face), (beautiful detailed eyes), <lora:blindbox_v1_mix:1>"
-    # negative_prompt = (
-    #     "(low quality:1.3), (worst quality:1.3)")
-    # lora_fn = "../stable-diffusion-study/models/lora/light_and_shadow.safetensors"
-    prompt = "mini\(ttp\), (8k, RAW photo, best quality, masterpiece:1.2), (realistic:1.37),(ancient temple), miniature, landscape, (isometric), glass tank,<lora:miniature_V1:0.6>, on table",
-    negative_prompt = "(((blur))),(EasyNegative:1.2), ng_deepnegative_v1_75t, paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), bad anatomy,(long hair:1.4),DeepNegative,(fat:1.2),facing away, looking away,tilted head,lowres,bad anatomy,bad hands, text, error, missing fingers,extra digit, fewer digits, cropped, worstquality, low quality, normal quality,jpegartifacts,signature, watermark, username,blurry,bad feet,cropped,poorly drawn hands,poorly drawn face,mutation,deformed,worst quality,low quality,normal quality,jpeg artifacts,signature,watermark,extra fingers,fewer digits,extra limbs,extra arms,extra legs,malformed limbs,fused fingers,too many fingers,long neck,cross-eyed,mutated hands,polar lowres,bad body,bad proportions,gross proportions,text,error,missing fingers,missing arms,missing legs,extra digi",
-    lora_fn = "/root/autodl-tmp/models/ui_locoris/nucleardiffv2.safetensors"
+    prompt = "(masterpiece),(best quality),(ultra-detailed), (full body:1.2), 1girl,chibi,cute, smile, open mouth, flower, outdoors, playing guitar, music, beret, holding guitar, jacket, blush, tree, :3, shirt, short hair, cherry blossoms, green headwear, blurry, brown hair, blush stickers, long sleeves, bangs, headphones, black hair, pink flower, (beautiful detailed face), (beautiful detailed eyes), <lora:blindbox_v1_mix:1>"
+    negative_prompt = ("(low quality:1.3), (worst quality:1.3)")
+    # prompt = "mini\(ttp\), (8k, RAW photo, best quality, masterpiece:1.2), (realistic:1.37),(ancient temple), miniature, landscape, (isometric), glass tank,<lora:miniature_V1:0.6>, on table",
+    # negative_prompt = "(((blur))),(EasyNegative:1.2), ng_deepnegative_v1_75t, paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), bad anatomy,(long hair:1.4),DeepNegative,(fat:1.2),facing away, looking away,tilted head,lowres,bad anatomy,bad hands, text, error, missing fingers,extra digit, fewer digits, cropped, worstquality, low quality, normal quality,jpegartifacts,signature, watermark, username,blurry,bad feet,cropped,poorly drawn hands,poorly drawn face,mutation,deformed,worst quality,low quality,normal quality,jpeg artifacts,signature,watermark,extra fingers,fewer digits,extra limbs,extra arms,extra legs,malformed limbs,fused fingers,too many fingers,long neck,cross-eyed,mutated hands,polar lowres,bad body,bad proportions,gross proportions,text,error,missing fingers,missing arms,missing legs,extra digi",
+    # lora_fn = "/root/autodl-tmp/models/ui_locoris/nucleardiffv2.safetensors"
+    lora_fn = "/root/autodl-tmp/models/ui_lora/blindbox.safetensors"
 
-    # Without Lora
     # images = pipe(
     #     prompt=prompt,
     #     negative_prompt=negative_prompt,
     #     width=512,
     #     height=768,
-    #     num_inference_steps=15,
+    #     num_inference_steps=25,
     #     num_images_per_prompt=4,
-    #     generator=torch.manual_seed(941189224),
+    #     generator=torch.manual_seed(0),
     # ).images
     # image_grid(images, 1, 4).save("test_orig.png")
     # show_images(images)
@@ -280,20 +276,26 @@ if __name__ == "__main__":
     images = pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
-        width=768,
+        width=512,
         height=768,
         num_inference_steps=30,
         num_images_per_prompt=4,
         generator=generator,
-        # output_type="latent"
     ).images
 
-    # upscaler = StableDiffusionLatentUpscalePipeline.from_pretrained("stabilityai/sd-x2-latent-upscaler",
-    #                                                                 torch_dtype=torch.float16)
+    # upscaler = StableDiffusionLatentUpscalePipeline.from_pretrained(
+    #     "stabilityai/sd-x2-latent-upscaler",
+    #     torch_dtype=torch.float16)
     # upscaler.to("cuda")
+    # we stay in latent space! Let's make sure that Stable Diffusion returns the image
+    # in latent space
+    # low_res_latents = pipe(prompt, negative_prompt=negative_prompt, generator=generator, output_type="latent",
+    #                        num_images_per_prompt=4).images
+
     #
     # images = upscaler(
-    #     prompt=prompt,
+    #     prompt=[prompt for _ in range(4)],
+    #     negative_prompt=[negative_prompt for _ in range(4)],
     #     image=low_res_latents,
     #     num_inference_steps=20,
     #     guidance_scale=0,
@@ -312,6 +314,8 @@ if __name__ == "__main__":
     mem_bytes = torch.cuda.max_memory_allocated()
     torch.cuda.reset_peak_memory_stats()
     print(f"Hook version -> {mem_bytes / (10 ** 6)}MB")
+
+
 
     # Diffusers dev version
     # pipe.load_lora_weights(lora_fn)
