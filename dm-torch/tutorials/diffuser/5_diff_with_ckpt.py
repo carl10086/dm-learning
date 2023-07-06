@@ -1,7 +1,7 @@
 import torch
 from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
 
-from inner.tools.image_tools import show_img
+from inner.tools.image_tools import show_image
 
 pipeline = StableDiffusionPipeline.from_ckpt(
     "/root/autodl-tmp/models/ui_models_1/rev_animated/Rev_Animated_v1.2.2_Pruned.safetensors",
@@ -27,4 +27,4 @@ def text_2_image():
 
 if __name__ == '__main__':
     for image in text_2_image():
-        show_img(image)
+        show_image(image)

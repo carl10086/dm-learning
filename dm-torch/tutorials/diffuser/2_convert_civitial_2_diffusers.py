@@ -63,7 +63,7 @@ def text2img(seed=-1, count=1):
     end_time = time.perf_counter()
     print(f"代码执行时间为 {end_time - start_time} 秒")
     for image in result.images:
-        image_tools.show_img(image)
+        image_tools.show_image(image)
 
 
 if __name__ == '__main__':

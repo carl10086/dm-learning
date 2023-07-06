@@ -277,7 +277,7 @@ if __name__ == "__main__":
         prompt=prompt,
         negative_prompt=negative_prompt,
         width=512,
-        height=768,
+        height=512,
         num_inference_steps=30,
         num_images_per_prompt=4,
         generator=generator,
@@ -314,8 +314,6 @@ if __name__ == "__main__":
     mem_bytes = torch.cuda.max_memory_allocated()
     torch.cuda.reset_peak_memory_stats()
     print(f"Hook version -> {mem_bytes / (10 ** 6)}MB")
-
-
 
     # Diffusers dev version
     # pipe.load_lora_weights(lora_fn)

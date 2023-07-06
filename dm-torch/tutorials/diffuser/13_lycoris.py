@@ -5,7 +5,7 @@ from lycoris.kohya_model_utils import (
 )
 from lycoris.utils import merge
 
-from inner.tools.image_tools import show_img
+from inner.tools.image_tools import show_image
 
 TEXT_ENCODER_NAME = "text_encoder"
 UNET_NAME = "unet"
@@ -33,7 +33,7 @@ if __name__ == '__main__':
         generator=generator
     ).images
     for image in images:
-        show_img(image)
+        show_image(image)
     # after merged
 
     merged = (
@@ -59,4 +59,4 @@ if __name__ == '__main__':
         generator=generator
     ).images
     for image in images:
-        show_img(image)
+        show_image(image)

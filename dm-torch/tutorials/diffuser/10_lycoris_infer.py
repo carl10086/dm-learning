@@ -9,7 +9,7 @@ from lycoris.kohya_model_utils import (
 )
 
 
-from inner.tools.image_tools import show_img
+from inner.tools.image_tools import show_image
 
 TEXT_ENCODER_NAME = "text_encoder"
 UNET_NAME = "unet"

@@ -7,7 +7,7 @@ from PIL import Image
 import torch
 from transformers import CLIPTextModel, CLIPTokenizer
 from diffusers import AutoencoderKL, UNet2DConditionModel, PNDMScheduler, UniPCMultistepScheduler
-from inner.tools.image_tools import show_img, show_np
+from inner.tools.image_tools import show_image, show_np
 
 # use proxy
 os.environ['HTTP_PROXY'] = 'http://127.0.0.1:8001'
@@ -17,7 +17,7 @@ os.environ['HTTPS_PROXY'] = 'http://127.0.0.1:8001'
 def gen_by_pipe():
     ddpm = DDPMPipeline.from_pretrained("google/ddpm-cat-256").to("cuda")
     image = ddpm(num_inference_steps=25).images[0]
-    show_img(image)
+    show_image(image)
 
 
 def gen_by_steps():
