@@ -2,7 +2,7 @@ from diffusers import DiffusionPipeline
 import torch
 import os
 
-from inner.tools.image_tools import show_img
+from inner.tools.image_tools import show_image
 
 # os.environ['HTTP_PROXY'] = 'http://192.168.126.12:12798'
 # os.environ['HTTPS_PROXY'] = 'http://192.168.126.12:12798'
@@ -35,7 +35,7 @@ def simple_txt_2_img(prompt: str):
     # image.save("cheeseburger_monster.png")
 
     for image in images:
-        show_img(image)
+        show_image(image)
 
 
 if __name__ == '__main__':

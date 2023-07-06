@@ -5,7 +5,7 @@ import concurrent.futures
 import time
 import numpy as np
 from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
-from inner.tools.image_tools import show_img
+from inner.tools.image_tools import show_image
 
 os.environ['HTTP_PROXY'] = 'http://127.0.0.1:8001'
 os.environ['HTTPS_PROXY'] = 'http://127.0.0.1:8001'
@@ -116,5 +116,5 @@ def text_2_image():
 if __name__ == '__main__':
     # 预热
     for image in text_2_image():
-        show_img(image)
+        show_image(image)
     # stress_test_v2(func=text_2_image, num_requests=10, num_workers=1)

@@ -5,7 +5,7 @@ import os
 from transformers import CLIPTextModel, CLIPTokenizer, CLIPImageProcessor
 
 from inner.tools import gpu_tools
-from inner.tools.image_tools import show_img, show_images
+from inner.tools.image_tools import show_image, show_images
 
 os.environ['HTTP_PROXY'] = 'http://127.0.0.1:8001'
 os.environ['HTTPS_PROXY'] = 'http://127.0.0.1:8001'
@@ -62,4 +62,4 @@ if __name__ == '__main__':
                       ).images
     # show_images(images)
     for image in images:
-        show_img(image)
+        show_image(image)
