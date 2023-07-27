@@ -8,7 +8,7 @@ def gpu_index(device: str) -> int:
     return 0
 
 
-def gpu_available_as_mb_str(device: str) -> str:
+def gpu_available_as_mb_str(device: str = "cuda:0") -> str:
     device = torch.device(device)
     gpu_memory = torch.cuda.get_device_properties(device).total_memory
     gpu_memory_reserved = torch.cuda.memory_reserved(device)
@@ -19,7 +19,7 @@ def gpu_available_as_mb_str(device: str) -> str:
     return f"{gpu_memory_available / 1024 ** 2:.2f} MB"
 
 
-def force_empty_cache_for_gpu(gpu_device: str):
+def force_empty_cache_for_gpu(gpu_device: str = "cuda:0"):
     device_index = gpu_index(device=gpu_device)
     torch.cuda.set_device(device_index)
     torch.cuda.empty_cache()

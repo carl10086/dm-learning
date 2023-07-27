@@ -64,8 +64,6 @@ class LoraCache:
         return self.cache.get(name)
 
 
-gpu_tools.print_gpu_mem()
-
 vae = AutoencoderKL.from_pretrained(SD_MODEL, subfolder="vae", torch_dtype=torch.float16).to("cuda")
 # CLIP tokenizer 用来 分词 把文字转为 token 向量
 tokenizer = CLIPTokenizer.from_pretrained(SD_MODEL, subfolder="tokenizer", torch_dtype=torch.float16)
@@ -73,13 +71,13 @@ tokenizer = CLIPTokenizer.from_pretrained(SD_MODEL, subfolder="tokenizer", torch
 text_encoder = CLIPTextModel.from_pretrained(SD_MODEL, subfolder="text_encoder", torch_dtype=torch.float16).to(
     "cuda")
 # UNet2DConditionModel 扩散模型
-# unet = UNet2DConditionModel.from_pretrained(SD_MODEL, subfolder="unet", torch_dtype=torch.float16).to("cuda")
-unet = torch.compile(
-    UNet2DConditionModel.from_pretrained(
-        "/root/autodl-tmp/output/rev_diff",
-        subfolder="unet",
-        torch_dtype=torch.float16).to("cuda"), mode="reduce-overhead",
-    fullgraph=True)
+unet = UNet2DConditionModel.from_pretrained(SD_MODEL, subfolder="unet", torch_dtype=torch.float16).to("cuda")
+# unet = torch.compile(
+#     UNet2DConditionModel.from_pretrained(
+#         "/root/autodl-tmp/output/rev_diff",
+#         subfolder="unet",
+#         torch_dtype=torch.float16).to("cuda"), mode="reduce-overhead",
+#     fullgraph=True)
 # 调度器
 scheduler = UniPCMultistepScheduler.from_pretrained(SD_MODEL, subfolder="scheduler")
 gpu_tools.print_gpu_mem()
@@ -87,13 +85,11 @@ imageProcessor = CLIPImageProcessor.from_pretrained(SD_MODEL, torch_dtype=torch.
                                                     subfolder="feature_extractor")
 
 print("加载了 unet")
-gpu_tools.print_gpu_mem()
 global_lora_cache = LoraCache()
-global_lora_cache.load_lora("blindbox", "/root/autodl-tmp/models/ui_lora/blindbox.safetensors")
-global_lora_cache.load_lora("popmart", "/root/autodl-tmp/models/ui_lora/revPopmart_v20.safetensors")
-global_lora_cache.load_lora("3dmm", "/root/autodl-tmp/models/ui_lora/3DMM_V11.safetensors")
+# global_lora_cache.load_lora("blindbox", "/root/autodl-tmp/models/ui_lora/blindbox.safetensors")
+# global_lora_cache.load_lora("popmart", "/root/autodl-tmp/models/ui_lora/revPopmart_v20.safetensors")
+# global_lora_cache.load_lora("3dmm", "/root/autodl-tmp/models/ui_lora/3DMM_V11.safetensors")
 print("加载了 2个lora")
-gpu_tools.print_gpu_mem()
 
 
 def text_2_img(lora: str):
@@ -110,7 +106,7 @@ def text_2_img(lora: str):
         feature_extractor=imageProcessor,
         requires_safety_checker=False,
     )
-    pipeline.load_lora_weights(global_lora_cache.get_lora_by_name(lora))
+    # pipeline.load_lora_weights(global_lora_cache.get_lora_by_name(lora))
     pipeline(prompt=prompt,
              negative_prompt=negative_prompt,
              width=768,
@@ -119,11 +115,10 @@ def text_2_img(lora: str):
              num_images_per_prompt=1,
              )
     print(f"使用lora:{lora} 推理之后")
-    gpu_tools.print_gpu_mem()
 
 
 if __name__ == '__main__':
     for i in range(10):
         text_2_img("blindbox")
-        text_2_img("popmart")
-        text_2_img("3dmm")
+        # text_2_img("popmart")
+        # text_2_img("3dmm")
