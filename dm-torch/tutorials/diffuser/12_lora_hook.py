@@ -270,7 +270,7 @@ if __name__ == "__main__":
     print(f"Without Lora -> {mem_bytes / (10 ** 6)}MB")
 
     # Hook version (some restricted apply)
-    generator = torch.manual_seed(0)
+    generator = torch.manual_seed(2023)
     install_lora_hook(pipe)
     pipe.apply_lora(lora_fn)
     images = pipe(
