@@ -10,8 +10,7 @@ from diffusers import AutoencoderKL, UNet2DConditionModel, PNDMScheduler, UniPCM
 from inner.tools.image_tools import show_image, show_np
 
 # use proxy
-os.environ['HTTP_PROXY'] = 'http://127.0.0.1:8001'
-os.environ['HTTPS_PROXY'] = 'http://127.0.0.1:8001'
+os.environ['HTTPS_PROXY'] = 'http://10.200.69.3:8001'
 
 
 def gen_by_pipe():
@@ -121,7 +120,7 @@ def gen_with_sd():
 
 if __name__ == '__main__':
     # gen_with_sd()
-    # gen_by_steps()
-    print(UNet2DModel.from_pretrained("google/ddpm-cat-256"))
+    gen_by_steps()
+    # print(UNet2DModel.from_pretrained("google/ddpm-cat-256"))
     # unet = UNet2DConditionModel.from_pretrained(SD_MODEL, subfolder="unet")
     # print(unet)

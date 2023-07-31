@@ -108,7 +108,7 @@ def text_2_image():
                       height=512,
                       num_inference_steps=25,
                       num_images_per_prompt=2,
-                      # generator=torch.manual_seed(0)
+                      generator=torch.manual_seed(23)
                       ).images
     return images
 
