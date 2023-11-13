@@ -146,7 +146,8 @@ def upscale(input_path, model_name='RealESRGAN_x4plus', output_folder='results',
 
 if __name__ == '__main__':
     upscale(
-        input_path='/tmp/carl/output', model_name='RealESRGAN_x4plus_anime_6B',
+        input_path='/tmp/carl/output',
+        model_name='RealESRGAN_x4plus_anime_6B',
         output_folder="/tmp/carl/realgan",
         denoise_strength=0.5,
         outscale=4,
